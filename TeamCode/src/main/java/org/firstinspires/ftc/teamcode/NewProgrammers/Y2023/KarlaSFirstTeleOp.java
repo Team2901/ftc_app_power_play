@@ -14,7 +14,7 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 @TeleOp(name= "KarlaSTeleOp", group= "Shared")
-class KarlaSFirstTeleOp extends OpMode implements OpenCvCamera.AsyncCameraOpenListener {
+public class KarlaSFirstTeleOp extends OpMode implements OpenCvCamera.AsyncCameraOpenListener {
 
 
     public DcMotor frontLeftDrive;
