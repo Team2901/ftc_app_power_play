@@ -12,6 +12,7 @@ public class RI3W11588OpenCV extends OpenCvPipeline {
 
     public Mat lastImage = null;
     public static enum ConeColor { red, green, blue};
+    public ConeColor coneColor;
     Mat redMask = new Mat();
     Mat blueMask = new Mat();
     Mat greenMask = new Mat();
