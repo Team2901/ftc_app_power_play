@@ -46,8 +46,8 @@ public class RI3W11588TeleOp extends OpMode {
         }else if(gamepad1.left_trigger > 0){
             triggerValue = -gamepad1.left_trigger;
         }
-        double y = -gamepad1.left_stick_y;
-        double x = gamepad1.left_stick_x;
+        double y = -.5 * gamepad1.left_stick_y;
+        double x = .3 * gamepad1.left_stick_x;
         double rx = triggerValue;
 
         robot.frontLeft.setPower(y + x + rx);
@@ -55,18 +55,32 @@ public class RI3W11588TeleOp extends OpMode {
         robot.backLeft.setPower(y - x + rx);
         robot.backRight.setPower(y + x - rx);
 
+        robot.arm.setPower(gamepad1.right_stick_y);
+
+        if(currentGamepad1.b && !previousGamepad1.b) {
+            robot.claw.setPosition(1);
+        }
+        if(currentGamepad1.a && !previousGamepad1.a) {
+            robot.claw.setPosition(.5);
+        }
+        if(currentGamepad1.y && !previousGamepad1.y) {
+            robot.claw.setPosition(0);
+        }
+
+        /*
         switch (currentClawPosition){
             case Open:
-                if(currentGamepad1.a && !previousGamepad1.a){
+                if(currentGamepad1.b && !previousGamepad1.b){
                     robot.claw.setPosition(0);
                     currentClawPosition = ClawPosition.Closed;
                 }
                 break;
             case Closed:
-                if(currentGamepad1.a && !previousGamepad1.a){
+                if(currentGamepad1.b && !previousGamepad1.b){
                     robot.claw.setPosition(.5);
                     currentClawPosition = ClawPosition.Open;
                 }
         }
+         */
     }
 }
