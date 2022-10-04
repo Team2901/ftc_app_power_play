@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.PowerPlay11588.TeleOp;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.exception.RobotCoreException;
+import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.robotcore.external.Func;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -12,6 +14,17 @@ import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.RI3W11588Hardware;
 public class RI3W11588TeleOp extends OpMode {
     RI3W11588Hardware robot = new RI3W11588Hardware();
 
+    double triggerValue = 0;
+    enum ClawPosition{Open, Closed}
+    ClawPosition currentClawPosition = ClawPosition.Open;
+
+    //I can't decide which one to use, imp gamepad or checking ourselves
+    Gamepad currentGamepad1 = new Gamepad();
+    Gamepad currentGamepad2 = new Gamepad();
+
+    Gamepad previousGamepad1 = new Gamepad();
+    Gamepad previousGamepad2 = new Gamepad();
+
     @Override
     public void init() {
         robot.init(this.hardwareMap);
@@ -19,21 +32,41 @@ public class RI3W11588TeleOp extends OpMode {
 
     @Override
     public void loop() {
+        try {
+            previousGamepad1.copy(currentGamepad1);
+            previousGamepad2.copy(currentGamepad2);
+
+            currentGamepad1.copy(gamepad1);
+            currentGamepad2.copy(gamepad2);
+        } catch (RobotCoreException e) {
+            e.printStackTrace();
+        }
+        if(gamepad1.right_trigger > 0){
+            triggerValue = gamepad1.right_trigger;
+        }else if(gamepad1.left_trigger > 0){
+            triggerValue = -gamepad1.left_trigger;
+        }
         double y = -gamepad1.left_stick_y;
         double x = gamepad1.left_stick_x;
-        double rx = gamepad1.right_stick_x;
+        double rx = triggerValue;
 
         robot.frontLeft.setPower(y + x + rx);
         robot.frontRight.setPower(y - x - rx);
         robot.backLeft.setPower(y - x + rx);
         robot.backRight.setPower(y + x - rx);
 
-        //Open CV code
-
-        RI3W11588OpenCV pipeline = new RI3W11588OpenCV(telemetry);
-
-
+        switch (currentClawPosition){
+            case Open:
+                if(currentGamepad1.a && !previousGamepad1.a){
+                    robot.claw.setPosition(0);
+                    currentClawPosition = ClawPosition.Closed;
+                }
+                break;
+            case Closed:
+                if(currentGamepad1.a && !previousGamepad1.a){
+                    robot.claw.setPosition(.5);
+                    currentClawPosition = ClawPosition.Open;
+                }
+        }
     }
-
-
 }
