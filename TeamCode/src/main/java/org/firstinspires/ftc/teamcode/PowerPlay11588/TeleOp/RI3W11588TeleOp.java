@@ -41,13 +41,17 @@ public class RI3W11588TeleOp extends OpMode {
         } catch (RobotCoreException e) {
             e.printStackTrace();
         }
+
+        //I fixed turning I think, definately test
         if(gamepad1.right_trigger > 0){
             triggerValue = gamepad1.right_trigger;
         }else if(gamepad1.left_trigger > 0){
             triggerValue = -gamepad1.left_trigger;
+        }else{
+            triggerValue = 0;
         }
         double y = -.5 * gamepad1.left_stick_y;
-        double x = .3 * gamepad1.left_stick_x;
+        double x = .5 * gamepad1.left_stick_x;
         double rx = triggerValue;
 
         robot.frontLeft.setPower(y + x + rx);
@@ -55,8 +59,9 @@ public class RI3W11588TeleOp extends OpMode {
         robot.backLeft.setPower(y - x + rx);
         robot.backRight.setPower(y + x - rx);
 
-        robot.arm.setPower(gamepad1.right_stick_y);
+        robot.arm.setPower(.3 * gamepad1.right_stick_y);
 
+        /*
         if(currentGamepad1.b && !previousGamepad1.b) {
             robot.claw.setPosition(1);
         }
@@ -66,8 +71,7 @@ public class RI3W11588TeleOp extends OpMode {
         if(currentGamepad1.y && !previousGamepad1.y) {
             robot.claw.setPosition(0);
         }
-
-        /*
+        */
         switch (currentClawPosition){
             case Open:
                 if(currentGamepad1.b && !previousGamepad1.b){
@@ -81,6 +85,5 @@ public class RI3W11588TeleOp extends OpMode {
                     currentClawPosition = ClawPosition.Open;
                 }
         }
-         */
     }
 }
