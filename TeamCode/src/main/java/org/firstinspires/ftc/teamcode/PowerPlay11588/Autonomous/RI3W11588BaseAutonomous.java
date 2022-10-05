@@ -40,7 +40,7 @@ public class RI3W11588BaseAutonomous extends LinearOpMode {
         robot.backLeft.setPower(0.5);
         robot.backRight.setPower(0.5);
 
-        while(opModeIsActive() && (robot.frontLeft.isBusy() && robot.frontRight.isBusy() && robot.backLeft.isBusy() &&
+        while(opModeIsActive() || (robot.frontLeft.isBusy() || robot.frontRight.isBusy() || robot.backLeft.isBusy() ||
                 robot.backRight.isBusy())){
             telemetry.addData("Front Left Position", robot.frontLeft.getCurrentPosition());
             telemetry.addData("Front Right Position", robot.frontRight.getCurrentPosition());
