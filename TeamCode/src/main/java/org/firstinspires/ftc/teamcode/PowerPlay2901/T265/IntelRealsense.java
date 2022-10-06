@@ -41,12 +41,17 @@ public class IntelRealsense extends OpMode
     double p;
     double i;
     double d;
-    final double kp = 0;
+    final double kp = 0.1;
     final double ki = 0;
     final double kd = 0;
     final double max_i = 0.5;
 
     double addX = 0;
+
+    double positionX;
+    double positionY;
+
+    double output;
 
     ImprovedGamepad improvedGamepad;
 
@@ -96,8 +101,45 @@ public class IntelRealsense extends OpMode
 
         if(improvedGamepad.a.isInitialPress()){
             addX += 10;
+            move(addX, 0);
         }
-        move(translation.getX() + addX, 0);
+        if(Math.abs(positionX - translation.getX()) > 1 || Math.abs(positionY - translation.getY()) > 1){
+            double dx = positionX - translation.getX();
+            double dy = positionY - translation.getY();
+            double angle = Math.atan(dy/dx);
+            double hypotenuse = Math.sqrt((Math.pow(dx, 2)+Math.pow(dy, 2)));
+            currentError = hypotenuse;
+
+            currentTime = time.time(TimeUnit.MILLISECONDS);
+
+            p = kp * currentError;
+            i += ki * (currentError * (currentTime-previousTime));
+
+            if(i > max_i) {
+                i = max_i;
+            }else if(i < -max_i) {
+                i = -max_i;
+            }
+
+            d = kd * (currentError - previousError) / (currentTime - previousTime);
+
+            output = p + i + d;
+
+//            robot.leftOne.setVelocity(output);
+//            robot.leftTwo.setVelocity(output);
+//            robot.rightOne.setVelocity(output);
+//            robot.rightTwo.setVelocity(output);
+
+
+            previousError = currentError;
+            previousTime = currentTime;
+            if(output > 1) {
+                output = 1;
+            } else if (output < -1){
+                output = -1;
+            }
+        }
+        telemetry.addData("output", output);
         telemetry.addData("x1", String.format("%.2f", x1));
         telemetry.addData("y1", String.format("%.2f", y1));
         telemetry.addData("x2", String.format("%.2f", x2));
@@ -127,41 +169,8 @@ public class IntelRealsense extends OpMode
 //    }
     //enter (x, y) coordinates to move robot wheels to angle and position
     public void move(double x, double y) {
-        double positionX = translation.getX() + x;
-        double positionY = translation.getY() + y;
-        if(Math.abs(positionX - translation.getX()) > 1 || Math.abs(positionY - translation.getY()) > 1){
-            double dx = positionX - translation.getX();
-            double dy = positionY - translation.getY();
-            double angle = Math.atan(dy/dx);
-            double hypotenuse = Math.sqrt((Math.pow(dx, 2)+Math.pow(dy, 2)));
-            currentError = hypotenuse;
-
-            currentTime = time.time(TimeUnit.MILLISECONDS);
-
-            p = kp * currentError;
-            i += ki * (currentError * (currentTime-previousTime));
-
-            if(i > max_i) {
-                i = max_i;
-            }else if(i < -max_i) {
-                i = -max_i;
-            }
-
-            d = kd * (currentError - previousError) / (currentTime - previousTime);
-
-            double output = p + i + d;
-
-//            robot.leftOne.setVelocity(output);
-//            robot.leftTwo.setVelocity(output);
-//            robot.rightOne.setVelocity(output);
-//            robot.rightTwo.setVelocity(output);
-
-            telemetry.addData("output power", output);
-            previousError = currentError;
-            previousTime = currentTime;
-
-        }
-
+        positionX = x + translation.getX();
+        positionY = y + translation.getY();
 
     }
 
