@@ -12,7 +12,7 @@ public class RI3W11588RedLower extends RI3W11588BaseAutonomous{
         robot.init(this.hardwareMap);
         waitForStart();
         runTime.reset();
-        while(runTime.milliseconds() < 2000){}
+        while(runTime.milliseconds() < 8000){}
         park();
     }
 }
