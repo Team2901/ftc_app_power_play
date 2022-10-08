@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.Shared.Gamepad.ImprovedGamepad;
 
 @TeleOp(name = "Early Diffy Teleop")
@@ -31,26 +32,36 @@ public class EarlyDiffyTeleop extends OpMode {
         double turnPower = gamepad1.right_stick_x;
 
         if(gamepad1.right_bumper){
-            leftPodPower = -turnPower-forwardPower;
-            rightPodPower = turnPower-forwardPower;
+            leftPodPower = turnPower-forwardPower;
+            rightPodPower = -turnPower-forwardPower;
             leftTurnPower = leftPodTurn(0);
             rightTurnPower = rightPodTurn(0);
         } else {
             double moveAngle = Math.toDegrees(Math.atan2(sidePower, -forwardPower+.001));
-            moveAngle = AngleUnit.normalizeDegrees(moveAngle+robot.getAngle());
-            leftPodPower = Math.sqrt(forwardPower*forwardPower+sidePower*sidePower)-(turnPower*Math.cos(Math.toRadians(moveAngle)));
-            rightPodPower = Math.sqrt(forwardPower*forwardPower+sidePower*sidePower)+(turnPower*Math.cos(Math.toRadians(moveAngle)));
-            leftTurnPower = leftPodTurn(moveAngle+(45*turnPower*Math.sin(Math.toRadians(moveAngle))));
-            rightTurnPower = rightPodTurn(moveAngle-(45*turnPower*Math.sin(Math.toRadians(moveAngle))));
+            //moveAngle = AngleUnit.normalizeDegrees(moveAngle+robot.getAngle());
+            leftPodPower = Math.sqrt(forwardPower*forwardPower+sidePower*sidePower)+(turnPower*Math.cos(Math.toRadians(moveAngle)));
+            rightPodPower = Math.sqrt(forwardPower*forwardPower+sidePower*sidePower)-(turnPower*Math.cos(Math.toRadians(moveAngle)));
+            leftTurnPower = leftPodTurn(moveAngle-(45*turnPower*Math.sin(Math.toRadians(moveAngle))));
+            rightTurnPower = rightPodTurn(moveAngle+(45*turnPower*Math.sin(Math.toRadians(moveAngle))));
         }
+
+        if(gamepad1.a||gamepad2.left_bumper){
+            robot.clawOne.setPosition(0.1);
+            robot.clawTwo.setPosition(0.9);
+        } else if(gamepad2.right_bumper||gamepad1.x/*robot.clawSensor.getDistance(DistanceUnit.INCH)<1.5*/){
+            robot.clawOne.setPosition(.5);
+            robot.clawTwo.setPosition(.5);
+        }
+
+        double liftHeight = 0;
 
         double liftPower = gamepad1.right_stick_y;
 
-        robot.liftOne.setPower(liftPower);
-        robot.leftTwo.setPower(liftPower);
+        //robot.liftOne.setPower(liftPower);
+        //robot.leftTwo.setPower(liftPower);
 
         int speedMod = 3;
-        if(gamepad1.left_bumper){
+        if(gamepad1.left_bumper/*&&!(robot.liftOne.getCurrentPosition()>=50)*/){
             speedMod = 1;
         }
 
@@ -124,7 +135,7 @@ public class EarlyDiffyTeleop extends OpMode {
         return total;
     }
 
-    double klp = 0;
+    /*double klp = 0;
     double kli = 0;
     double kld = 0;
 
@@ -150,5 +161,5 @@ public class EarlyDiffyTeleop extends OpMode {
             total = -1;
         }
         return total;
-    }
+    }*/
 }
