@@ -146,6 +146,19 @@ public class DDROutreachBotOneTeleOp extends OpMode {
         } else {
             robot.claw.setPosition(0);
         }
+        if (participantInput && !override) {
+            if (difficultyMode == 0) {
+                participantLeftPower /= 3;
+                participantRightPower /= 3;
+            } else if (difficultyMode == 1) {
+                participantLeftPower *= 2.0 / 3;
+                participantRightPower *= 2.0 / 3;
+            }
+            // Sets power to motors
+            power(participantLeftPower, participantRightPower);
+        } else {
+            power(gmLeftPower, gmRightPower);
+        }
     }
 
     public void power(double left, double right) {
