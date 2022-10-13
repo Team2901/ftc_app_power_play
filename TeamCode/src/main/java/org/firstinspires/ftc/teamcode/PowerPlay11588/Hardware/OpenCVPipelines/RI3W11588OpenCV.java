@@ -12,7 +12,10 @@ public class RI3W11588OpenCV extends OpenCvPipeline {
 
     public Mat lastImage = null;
     public static enum ConeColor { red, green, blue};
-    public ConeColor coneColor;
+    public ConeColor coneColor = null;
+    public double redAmount;
+    public double blueAmount;
+    public double greenAmount;
     Mat redMask = new Mat();
     Mat blueMask = new Mat();
     Mat greenMask = new Mat();
@@ -49,46 +52,46 @@ public class RI3W11588OpenCV extends OpenCvPipeline {
 
         Imgproc.cvtColor(lastImage, lastImage, Imgproc.COLOR_RGBA2RGB);
 
-        Imgproc.rectangle(lastImage, new Rect(100, 100, 100, 100), new Scalar(255, 0, 0));
+        Rect r = new Rect(100, 100, 100, 100);
 
-        Core.inRange(lastImage, new Scalar(100, 0, 0), new Scalar(255, 100, 115), redMask);
-        Core.inRange(lastImage, new Scalar(0, 0, 100), new Scalar(155, 100, 255), blueMask);
+        Imgproc.rectangle(lastImage, r , new Scalar(100, 0, 0));
 
-        nonZeroPixels = Core.countNonZero(redMask);
+        Mat subMat = lastImage.submat(r);
+
+        Core.inRange(subMat, new Scalar(100, 50, 50), new Scalar(255, 100, 155), redMask);
+        Core.inRange(subMat, new Scalar(0, 0, 80), new Scalar(70, 70, 255), blueMask);
+        Core.inRange(subMat, new Scalar(0, 80, 0), new Scalar(80, 255, 80), greenMask);
+
+        double nonZeroPixelsRed = Core.countNonZero(redMask);
+
+        double nonZeroPixelsBlue = Core.countNonZero(blueMask);
+
+        double nonZeroPixelsGreen = Core.countNonZero(greenMask);
+
         //This method creates a new mask that isolates a range of colors
 
-        Imgproc.cvtColor(redMask, redMask, Imgproc.COLOR_GRAY2RGB);
+        redAmount = nonZeroPixelsRed / subMat.total() * 100;
 
-        double percentRed = 100 - lastImage.total() /  nonZeroPixels;
+        blueAmount = nonZeroPixelsBlue / subMat.total() * 100;
+
+        greenAmount = nonZeroPixelsGreen / subMat.total() * 100;
 
 
-        telemetry.addData("mask size", redMask.size());
-        telemetry.addData("image size", lastImage.size());
-        telemetry.addData("mask type", redMask.type());
-        telemetry.addData("image type", lastImage.type());
-        telemetry.addData("Red Percent", percentRed);
-        telemetry.update();
+        //THESE ARE NOT REALLY PERCENTAGES: THIS WILL NEED TO BE FIXED IN THE FUTURE
 
-        Core.bitwise_and(lastImage, blueMask, lastImage);
+
         //All Pipeline code must be written above here
 
-
-
-        telemetry.addData("Percent Red", percentRed);
-
-        ConeColor coneColor = null;
-
-        if(percentRed > 85){
-            coneColor = ConeColor.red;
-        }
-
-        if(coneColor != ConeColor.red){
-
-
-            Core.bitwise_and(lastImage, blueMask, lastImage);
-        }
 
         return lastImage;
         //what is returned is what you will see
     }
+
+    public void openCVTelemetry() {
+        telemetry.addData("Red Amount", redAmount);
+        telemetry.addData("Blue Amount", blueAmount);
+        telemetry.addData("Green Amount", greenAmount);
+        telemetry.update();
+    }
+
 }
