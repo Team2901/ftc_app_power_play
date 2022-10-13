@@ -10,7 +10,9 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.spartronics4915.lib.T265Camera;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.PowerPlay2901.EarlyDiffy.EarlyDiffyHardware;
+import org.firstinspires.ftc.teamcode.PowerPlay2901.EarlyDiffy.EarlyDiffyTeleop;
 import org.firstinspires.ftc.teamcode.Shared.Gamepad.ImprovedGamepad;
 
 import java.util.concurrent.TimeUnit;
@@ -23,6 +25,8 @@ public class IntelRealsense extends OpMode
     private static T265Camera slamra = null;
     public double initTheta;
 
+    final double angleOffset = 45;
+
     T265Camera.CameraUpdate up;
 
     Translation2d translation;
@@ -31,7 +35,9 @@ public class IntelRealsense extends OpMode
     ElapsedTime time = new ElapsedTime();
     ElapsedTime impTime = new ElapsedTime();
 
-//    EarlyDiffyHardware robot = new EarlyDiffyHardware();
+    private ElapsedTime runtime = new ElapsedTime();
+
+    EarlyDiffyHardware robot = new EarlyDiffyHardware();
 
     double currentTime;
     double previousTime;
@@ -41,27 +47,33 @@ public class IntelRealsense extends OpMode
     double p;
     double i;
     double d;
-    final double kp = 0.1;
+
+    double kp = 0.1;
     final double ki = 0;
     final double kd = 0;
-    final double max_i = 0.5;
+    final double max_i = 1;
 
     double addX = 0;
+    double addY = 0;
 
     double positionX;
     double positionY;
 
+    double angleToTarget;
+
     double output;
+    double speedMod = 3;
 
     ImprovedGamepad improvedGamepad;
 
 
     @Override
     public void init() {
+        robot.init(hardwareMap);
         if (slamra == null) {
             slamra = new T265Camera(new Transform2d(), 0.1, hardwareMap.appContext);
         }
-        initTheta = slamra.getLastReceivedCameraUpdate().pose.getRotation().getDegrees();
+        initTheta = slamra.getLastReceivedCameraUpdate().pose.getRotation().getDegrees() + angleOffset;
         currentTime = time.time(TimeUnit.MILLISECONDS);
         previousTime = currentTime;
         previousError = currentError;
@@ -95,20 +107,48 @@ public class IntelRealsense extends OpMode
         double arrowX = rotation.getCos() * robotRadius, arrowY = rotation.getSin() * robotRadius;
         double x1 = translation.getX(), y1 = translation.getY();
         double x2 = translation.getX() + arrowX, y2 = translation.getY() + arrowY;
-        double fieldTheta = rotation.getDegrees() - initTheta;
+        double fieldTheta = rotation.getDegrees() + angleOffset - initTheta;
         double adjustX = ((x2*rotation.getCos()) - (y2*rotation.getSin()));
         double adjustY = ((x2*rotation.getSin()) + (y2*rotation.getCos()));
 
-        if(improvedGamepad.a.isInitialPress()){
-            addX += 10;
-            move(addX, 0);
+        if(improvedGamepad.dpad_right.isInitialPress()){
+            addX ++;
+            move(addX, addY);
+        } else if(improvedGamepad.dpad_left.isInitialPress()){
+            addX --;
+            move(addX, addY);
         }
-        if(Math.abs(positionX - translation.getX()) > 1 || Math.abs(positionY - translation.getY()) > 1){
+
+        if(improvedGamepad.dpad_up.isInitialPress()){
+//            kp += 0.01;
+//            kp *= 100;
+//            kp = (int)kp;
+//            kp /= 100;
+            addY++;
+            move(addX, addY);
+        } else if(improvedGamepad.dpad_down.isInitialPress()){
+//            kp -= 0.01;
+//            kp *= 100;
+//            kp = (int)kp;
+//            kp /= 100;
+            addY--;
+            move(addX, addY);
+        }
+
+        if(Math.abs(positionX - translation.getX()) > .1 || Math.abs(positionY - translation.getY()) > .1){
             double dx = positionX - translation.getX();
             double dy = positionY - translation.getY();
-            double angle = Math.atan(dy/dx);
+            double angle = Math.atan(dy/dx) + angleOffset;
             double hypotenuse = Math.sqrt((Math.pow(dx, 2)+Math.pow(dy, 2)));
             currentError = hypotenuse;
+            angleToTarget = angle * (180/Math.PI);
+
+            if(dx < 0){
+                angleToTarget += 180;
+            } else if(dx > 0 && dy < 0){
+                angleToTarget += 360;
+            }
+
 
             currentTime = time.time(TimeUnit.MILLISECONDS);
 
@@ -125,12 +165,6 @@ public class IntelRealsense extends OpMode
 
             output = p + i + d;
 
-//            robot.leftOne.setVelocity(output);
-//            robot.leftTwo.setVelocity(output);
-//            robot.rightOne.setVelocity(output);
-//            robot.rightTwo.setVelocity(output);
-
-
             previousError = currentError;
             previousTime = currentTime;
             if(output > 1) {
@@ -138,7 +172,14 @@ public class IntelRealsense extends OpMode
             } else if (output < -1){
                 output = -1;
             }
-        }
+            if(currentError - Math.sqrt(Math.pow(translation.getX(), 2) + Math.pow(translation.getY(), 2)) < 0){
+                output = -output;
+            }
+        } else {output = 0;}
+        double leftTurnPowerS = leftPodTurn(angleToTarget-(45*Math.sin(Math.toRadians(angleToTarget))));
+        robot.leftOne.setPower(output/speedMod + leftTurnPowerS);
+        robot.leftTwo.setPower(output/speedMod - leftTurnPowerS);
+
         telemetry.addData("output", output);
         telemetry.addData("x1", String.format("%.2f", x1));
         telemetry.addData("y1", String.format("%.2f", y1));
@@ -149,6 +190,10 @@ public class IntelRealsense extends OpMode
         telemetry.addData("Adjusted x", String.format("%.2f", adjustX) + " inches");
         telemetry.addData("Adjusted y", String.format("%.2f", adjustY) + " inches");
         telemetry.addData("Translation", translation);
+        telemetry.addData("addX", addX);
+        telemetry.addData("addY", addY);
+        telemetry.addData("kp", kp);
+        telemetry.addData("Angle to Target", angleToTarget + "°");
     }
 
     @Override
@@ -172,6 +217,37 @@ public class IntelRealsense extends OpMode
         positionX = x + translation.getX();
         positionY = y + translation.getY();
 
+    }
+
+    private ElapsedTime runtimePodLeft = new ElapsedTime();
+    double leftPodPower = 0;
+    double leftPodAngle = 0;
+    double pAngleLeft = 0;
+    double iAngleLeft = 0;
+    double dAngleLeft = 0;
+
+    public double leftPodTurn(double angle){
+        leftPodAngle = (robot.leftOne.getCurrentPosition() - robot.leftTwo.getCurrentPosition())/8.95;
+        double error = AngleUnit.normalizeDegrees(angle - leftPodAngle);
+        if(!gamepad1.start && (error >= 90 || error <= -90)){
+            error = AngleUnit.normalizeDegrees(error-180);
+            leftPodPower = -leftPodPower;
+        }
+        double secs = runtimePodLeft.seconds();
+        runtime.reset();
+        dAngleLeft = (error - pAngleLeft) / secs;
+        iAngleLeft = iAngleLeft + (error * secs);
+        pAngleLeft = error;
+        double total = (kp* pAngleLeft + ki* iAngleLeft + kd* dAngleLeft)/100;
+        if(total > 1){
+            iAngleLeft = 0;
+            total = 1;
+        }
+        if(total < -1){
+            iAngleLeft = 0;
+            total = -1;
+        }
+        return total;
     }
 
 }
