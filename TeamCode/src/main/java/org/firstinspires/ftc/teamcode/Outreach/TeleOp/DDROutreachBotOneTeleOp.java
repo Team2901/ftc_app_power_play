@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.Outreach.Hardware.OutreachBotOneHardware;
 import org.firstinspires.ftc.teamcode.Shared.Gamepad.DDRGamepad;
 import org.firstinspires.ftc.teamcode.Shared.Gamepad.ImprovedGamepad;
 import org.firstinspires.ftc.teamcode.Shared.Hardware.ClawbotHardware;
@@ -11,11 +12,8 @@ import org.firstinspires.ftc.teamcode.Utility.CountDownTimer;
 
 @TeleOp(name = "DDR Outreach Bot One Teleop")
 public class DDROutreachBotOneTeleOp extends OpMode {
-    final double CLAW_SPEED = 0.05;
-    final ClawbotHardware robot = new ClawbotHardware();
+    final OutreachBotOneHardware robot = new OutreachBotOneHardware();
     CountDownTimer countDownTimer = new CountDownTimer(ElapsedTime.Resolution.MILLISECONDS);
-    double clawOffset = 0.0;
-    boolean isLastClawPressed = false;
     boolean isClawOpen = false;
     boolean override = false;
     int difficultyMode = 1;
@@ -31,7 +29,11 @@ public class DDROutreachBotOneTeleOp extends OpMode {
     int hopScotchProgress = 0;
     boolean isActive = false;
 
-    int armTarget = 0;
+    double participantLeftPower = 0;
+    double participantRightPower = 0;
+
+    double gmLeftPower = 0;
+    double gmRightPower = 0;
 
     @Override
     public void init() {
@@ -46,23 +48,6 @@ public class DDROutreachBotOneTeleOp extends OpMode {
     public void loop() {
         participantGP.update();
         gameMasterGP.update();
-
-        double participantLeftPower;
-        double participantRightPower;
-        double participantArmPower;
-
-        // gm = game master
-        double gmLeftPower = 0;
-        double gmRightPower = 0;
-        double gmArmPower = 0;
-
-        /*if(robot.potentiometer.getVoltage() < ClawbotHardware.MIN_ARM_VOLTAGE){
-            robot.armMotor.setPower(0.3);
-        } else if(robot.potentiometer.getVoltage() > ClawbotHardware.MAX_ARM_VOLTAGE){
-            robot.armMotor.setPower(-0.3);
-        }*/
-
-        //another different ujkufcomment to prove a point
 
         // Moves robot forward using the left joystick
         if (gameMasterGP.b.getValue()) {
@@ -101,20 +86,7 @@ public class DDROutreachBotOneTeleOp extends OpMode {
             gmLeftPower /= maxPower;
         }
 
-        // DDR pad left moves the arm down, DDR pad right moves the arm up, else, it stays in place.
-        gmArmPower = gameMasterGP.right_stick_y.getValue() * .5;
-
-        if (this.participantGP.rightArrow.getValue() && this.participantGP.leftArrow.getValue() && difficultyMode > 0) {
-            participantLeftPower = -0.75;
-            participantRightPower = -0.75;
-
-        } else if (this.participantGP.rightArrow.getValue() && this.participantGP.leftArrow.getValue() && difficultyMode == 0) {
-            participantLeftPower = 0;
-            participantRightPower = 0;
-        }
-        //Topleft + Up = arc counterclockwise
-        //Left power = 0.75, Right power = 1
-        else if (this.participantGP.leftArrow.getValue() && this.participantGP.upArrow.getValue()) {
+        if (this.participantGP.leftArrow.getValue() && this.participantGP.upArrow.getValue()) {
             participantLeftPower = 1;
             participantRightPower = .75;
 
@@ -140,59 +112,58 @@ public class DDROutreachBotOneTeleOp extends OpMode {
         else if (this.participantGP.upArrow.getValue()) {
             participantLeftPower = 0.75;
             participantRightPower = 0.75;
-        } else {
+        }
+        else if (this.participantGP.downArrow.getValue()){
+            participantLeftPower = -0.75;
+            participantRightPower = -0.75;
+        }
+        else {
             participantLeftPower = 0;
             participantRightPower = 0;
         }
 
-        // DDR pad left moves the arm down, DDR pad right moves the arm up, else, it stays in place.
-        if (this.participantGP.topLeftArrow.getValue() && robot.potentiometer.getVoltage() < ClawbotHardware.ARM_DOWN_VOLTAGE || gameMasterGP.dpad_up.getValue()) {
-            armTarget = 25;
-        } else if (this.participantGP.topRightArrow.getValue() && robot.potentiometer.getVoltage() > ClawbotHardware.ARM_UP_VOLTAGE || gameMasterGP.dpad_down.getValue()) {
-            armTarget = 280/3;
-        } else {
-            participantArmPower = 0;
-        }
-
-
-        // Checks to see if it is the initial press of DDR pad down
-        if (this.participantGP.downArrow.isInitialPress() && !override && !this.participantGP.startButton.getValue()) {
-            isClawOpen = !isClawOpen;
-        } else if (this.gameMasterGP.y.isInitialPress()) {
+        if(this.participantGP.topRightArrow.getValue()){
+            isClawOpen = true;
+        }else if(this.participantGP.topLeftArrow.getValue()){
+            isClawOpen = false;
+        }else if(this.gameMasterGP.y.isInitialPress()){
             isClawOpen = !isClawOpen;
         }
-
 
         final boolean participantInput = participantGP.areButtonsActive();
 
-        // If there is any power set to the left or right motors, checks and moves the arm up if it is under limit.
-        if (participantLeftPower != 0 || participantRightPower != 0 || gmLeftPower != 0 || gmRightPower != 0) {
-            if (robot.potentiometer.getVoltage() > ClawbotHardware.ARM_DOWN_SAFE_MOVEMENT_VOLTAGE) {
-                participantArmPower = 0.5;
-                gmArmPower = 0.5;
-            }
-        }
-        // If the user is pressing a button and the override is turned off then
-        // the participant can use the robot.  Otherwise, the game master has complete control.
-
-
         telemetryDDRGraphic();
-        telemetry.addData("Arm Power:", robot.armMotor.getPower());
         telemetry.addData("Override", override);
         telemetry.addData("Is Active", isActive);
         telemetry.addData("Mode", difficultyNames[difficultyMode]);
         telemetry.addData("Participant Input", participantInput);
-        telemetry.addData("Potentiometer", robot.potentiometer.getVoltage());
         telemetry.addData("Konami Code Progress", konamiCodeProgress);
         telemetry.addData("Beginner Konami Code Progress", beginnerKonamiCodeProgress);
         telemetry.update();
 
-
+        if (isClawOpen) {
+            robot.claw.setPosition(0.75);
+        } else {
+            robot.claw.setPosition(0);
+        }
+        if (participantInput && !override) {
+            if (difficultyMode == 0) {
+                participantLeftPower /= 3;
+                participantRightPower /= 3;
+            } else if (difficultyMode == 1) {
+                participantLeftPower *= 2.0 / 3;
+                participantRightPower *= 2.0 / 3;
+            }
+            // Sets power to motors
+            power(participantLeftPower, participantRightPower);
+        } else {
+            power(gmLeftPower, gmRightPower);
+        }
     }
 
     public void power(double left, double right) {
-        robot.leftMotor.setPower(-left);
-        robot.rightMotor.setPower(-right);
+        robot.leftDrive.setPower(-left);
+        robot.rightDrive.setPower(-right);
     }
 
     public void telemetryDDRGraphic() {
