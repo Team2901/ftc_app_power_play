@@ -141,7 +141,7 @@ public class IntelRealsense extends OpMode
             double angle = Math.atan(dy/dx) + angleOffset;
             double hypotenuse = Math.sqrt((Math.pow(dx, 2)+Math.pow(dy, 2)));
             currentError = hypotenuse;
-            angleToTarget = angle * (180/Math.PI);
+            angleToTarget = Math.toDegrees(angle);
 
             if(dx < 0){
                 angleToTarget += 180;
@@ -176,7 +176,7 @@ public class IntelRealsense extends OpMode
                 output = -output;
             }
         } else {output = 0;}
-        double leftTurnPowerS = leftPodTurn(angleToTarget-(45*Math.sin(Math.toRadians(angleToTarget))));
+        double leftTurnPowerS = leftPodTurn(-angleToTarget);
         robot.leftOne.setPower(output/speedMod + leftTurnPowerS);
         robot.leftTwo.setPower(output/speedMod - leftTurnPowerS);
 
@@ -226,6 +226,10 @@ public class IntelRealsense extends OpMode
     double iAngleLeft = 0;
     double dAngleLeft = 0;
 
+    double kpPod = 1.2;
+    double kiPod = 0;
+    double kdPod = 0;
+
     public double leftPodTurn(double angle){
         leftPodAngle = (robot.leftOne.getCurrentPosition() - robot.leftTwo.getCurrentPosition())/8.95;
         double error = AngleUnit.normalizeDegrees(angle - leftPodAngle);
@@ -238,7 +242,7 @@ public class IntelRealsense extends OpMode
         dAngleLeft = (error - pAngleLeft) / secs;
         iAngleLeft = iAngleLeft + (error * secs);
         pAngleLeft = error;
-        double total = (kp* pAngleLeft + ki* iAngleLeft + kd* dAngleLeft)/100;
+        double total = (kpPod* pAngleLeft + kiPod* iAngleLeft + kdPod* dAngleLeft)/100;
         if(total > 1){
             iAngleLeft = 0;
             total = 1;
