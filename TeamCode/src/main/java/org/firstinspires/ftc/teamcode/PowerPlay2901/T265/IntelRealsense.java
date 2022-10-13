@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.spartronics4915.lib.T265Camera;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.PowerPlay2901.EarlyDiffy.EarlyDiffyHardware;
 import org.firstinspires.ftc.teamcode.PowerPlay2901.EarlyDiffy.EarlyDiffyTeleop;
 import org.firstinspires.ftc.teamcode.Shared.Gamepad.ImprovedGamepad;
@@ -34,8 +35,9 @@ public class IntelRealsense extends OpMode
     ElapsedTime time = new ElapsedTime();
     ElapsedTime impTime = new ElapsedTime();
 
+    private ElapsedTime runtime = new ElapsedTime();
+
     EarlyDiffyHardware robot = new EarlyDiffyHardware();
-    EarlyDiffyTeleop earlyDiffyTeleop = new EarlyDiffyTeleop();
 
     double currentTime;
     double previousTime;
@@ -67,6 +69,7 @@ public class IntelRealsense extends OpMode
 
     @Override
     public void init() {
+        robot.init(hardwareMap);
         if (slamra == null) {
             slamra = new T265Camera(new Transform2d(), 0.1, hardwareMap.appContext);
         }
@@ -173,9 +176,9 @@ public class IntelRealsense extends OpMode
                 output = -output;
             }
         } else {output = 0;}
-        double leftTurnPower = earlyDiffyTeleop.leftPodTurn(angleToTarget-(45*Math.sin(Math.toRadians(angleToTarget))));
-        robot.leftOne.setPower(output/speedMod + leftTurnPower);
-        robot.leftTwo.setPower(output/speedMod -leftTurnPower);
+        double leftTurnPowerS = leftPodTurn(angleToTarget-(45*Math.sin(Math.toRadians(angleToTarget))));
+        robot.leftOne.setPower(output/speedMod + leftTurnPowerS);
+        robot.leftTwo.setPower(output/speedMod - leftTurnPowerS);
 
         telemetry.addData("output", output);
         telemetry.addData("x1", String.format("%.2f", x1));
@@ -214,6 +217,37 @@ public class IntelRealsense extends OpMode
         positionX = x + translation.getX();
         positionY = y + translation.getY();
 
+    }
+
+    private ElapsedTime runtimePodLeft = new ElapsedTime();
+    double leftPodPower = 0;
+    double leftPodAngle = 0;
+    double pAngleLeft = 0;
+    double iAngleLeft = 0;
+    double dAngleLeft = 0;
+
+    public double leftPodTurn(double angle){
+        leftPodAngle = (robot.leftOne.getCurrentPosition() - robot.leftTwo.getCurrentPosition())/8.95;
+        double error = AngleUnit.normalizeDegrees(angle - leftPodAngle);
+        if(!gamepad1.start && (error >= 90 || error <= -90)){
+            error = AngleUnit.normalizeDegrees(error-180);
+            leftPodPower = -leftPodPower;
+        }
+        double secs = runtimePodLeft.seconds();
+        runtime.reset();
+        dAngleLeft = (error - pAngleLeft) / secs;
+        iAngleLeft = iAngleLeft + (error * secs);
+        pAngleLeft = error;
+        double total = (kp* pAngleLeft + ki* iAngleLeft + kd* dAngleLeft)/100;
+        if(total > 1){
+            iAngleLeft = 0;
+            total = 1;
+        }
+        if(total < -1){
+            iAngleLeft = 0;
+            total = -1;
+        }
+        return total;
     }
 
 }
