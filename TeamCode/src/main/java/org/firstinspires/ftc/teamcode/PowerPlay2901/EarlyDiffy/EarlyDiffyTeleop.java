@@ -49,8 +49,8 @@ public class EarlyDiffyTeleop extends OpMode {
             robot.clawOne.setPosition(0.1);
             robot.clawTwo.setPosition(0.9);
         } else if(gamepad2.right_bumper||gamepad1.x/*robot.clawSensor.getDistance(DistanceUnit.INCH)<1.5*/){
-            robot.clawOne.setPosition(.5);
-            robot.clawTwo.setPosition(.5);
+            robot.clawOne.setPosition(.2);
+            robot.clawTwo.setPosition(.8);
         }
 
         double liftHeight = 0;
