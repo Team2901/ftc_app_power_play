@@ -1,20 +1,19 @@
-package org.firstinspires.ftc.teamcode.Shared.TeleOp;
+package org.firstinspires.ftc.teamcode.Outreach.TeleOp;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Shared.Gamepad.DDRGamepad;
 import org.firstinspires.ftc.teamcode.Shared.Gamepad.ImprovedGamepad;
-import org.firstinspires.ftc.teamcode.Shared.Hardware.ClawbotHardware;
+import org.firstinspires.ftc.teamcode.Outreach.Hardware.ClawbotHardware;
 import org.firstinspires.ftc.teamcode.Utility.CountDownTimer;
 
 /**
  * Created by Kearneyg20428 on 2/7/2017.
  */
 
-@TeleOp(name = "DDR Clawbot", group = "Shared")
+@TeleOp(name = "DDR Clawbot", group = "Outreach")
 public class DDRClawbotTeleOp extends OpMode {
 
     final double CLAW_SPEED = 0.05;

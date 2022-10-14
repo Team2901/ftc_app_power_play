@@ -8,11 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OutreachBotOneHardware {
-    public static final double MID_SERVO = 0.5;
-    public static final double ARM_UP_POWER = 1;
-    public static final double ARM_DOWN_POWER = -0.5;
-    public static final double MIN_SAFE_CLAW_OFFSET = 0;
-    public static final double MAX_SAFE_CLAW_OFFSET = .4;
     public DcMotor leftDrive = null;
     public DcMotor rightDrive = null;
     public Servo claw = null;

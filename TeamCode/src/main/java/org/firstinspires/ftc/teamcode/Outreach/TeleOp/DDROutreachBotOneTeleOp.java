@@ -7,12 +7,11 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.Outreach.Hardware.OutreachBotOneHardware;
 import org.firstinspires.ftc.teamcode.Shared.Gamepad.DDRGamepad;
 import org.firstinspires.ftc.teamcode.Shared.Gamepad.ImprovedGamepad;
-import org.firstinspires.ftc.teamcode.Shared.Hardware.ClawbotHardware;
 import org.firstinspires.ftc.teamcode.Utility.CountDownTimer;
 
-@TeleOp(name = "DDR Outreach Bot One Teleop")
+@TeleOp(name = "DDR Outreach Bot One Teleop", group = "Outreach")
 public class DDROutreachBotOneTeleOp extends OpMode {
-    final OutreachBotOneHardware robot = new OutreachBotOneHardware();
+    OutreachBotOneHardware robot = new OutreachBotOneHardware();
     CountDownTimer countDownTimer = new CountDownTimer(ElapsedTime.Resolution.MILLISECONDS);
     boolean isClawOpen = false;
     boolean override = false;
@@ -38,7 +37,6 @@ public class DDROutreachBotOneTeleOp extends OpMode {
     @Override
     public void init() {
         robot.init(hardwareMap);
-        robot.claw.setPosition(ClawbotHardware.MID_SERVO);
 
         participantGP = new DDRGamepad(this.gamepad1, this.timer, "GP1");
         gameMasterGP = new ImprovedGamepad(this.gamepad2, this.timer, "GP2");
@@ -132,15 +130,6 @@ public class DDROutreachBotOneTeleOp extends OpMode {
 
         final boolean participantInput = participantGP.areButtonsActive();
 
-        telemetryDDRGraphic();
-        telemetry.addData("Override", override);
-        telemetry.addData("Is Active", isActive);
-        telemetry.addData("Mode", difficultyNames[difficultyMode]);
-        telemetry.addData("Participant Input", participantInput);
-        telemetry.addData("Konami Code Progress", konamiCodeProgress);
-        telemetry.addData("Beginner Konami Code Progress", beginnerKonamiCodeProgress);
-        telemetry.update();
-
         if (isClawOpen) {
             robot.claw.setPosition(0.75);
         } else {
@@ -159,6 +148,15 @@ public class DDROutreachBotOneTeleOp extends OpMode {
         } else {
             power(gmLeftPower, gmRightPower);
         }
+
+        telemetryDDRGraphic();
+        telemetry.addData("Override", override);
+        telemetry.addData("Is Active", isActive);
+        telemetry.addData("Mode", difficultyNames[difficultyMode]);
+        telemetry.addData("Participant Input", participantInput);
+        telemetry.addData("Konami Code Progress", konamiCodeProgress);
+        telemetry.addData("Beginner Konami Code Progress", beginnerKonamiCodeProgress);
+        telemetry.update();
     }
 
     public void power(double left, double right) {

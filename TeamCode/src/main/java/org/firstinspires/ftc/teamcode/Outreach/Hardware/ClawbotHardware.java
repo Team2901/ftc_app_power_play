@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Shared.Hardware;
+package org.firstinspires.ftc.teamcode.Outreach.Hardware;
 
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
