@@ -6,13 +6,11 @@ import com.arcrobotics.ftclib.geometry.Transform2d;
 import com.arcrobotics.ftclib.geometry.Translation2d;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.spartronics4915.lib.T265Camera;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.PowerPlay2901.EarlyDiffy.EarlyDiffyHardware;
-import org.firstinspires.ftc.teamcode.PowerPlay2901.EarlyDiffy.EarlyDiffyTeleop;
 import org.firstinspires.ftc.teamcode.Shared.Gamepad.ImprovedGamepad;
 
 import java.util.concurrent.TimeUnit;
@@ -61,7 +59,8 @@ public class IntelRealsense extends OpMode
 
     double angleToTarget;
 
-    double output;
+    double outputLeft;
+    double outputRight;
     double speedMod = 3;
 
     ImprovedGamepad improvedGamepad;
@@ -163,24 +162,29 @@ public class IntelRealsense extends OpMode
 
             d = kd * (currentError - previousError) / (currentTime - previousTime);
 
-            output = p + i + d;
+            outputLeft = p + i + d;
 
             previousError = currentError;
             previousTime = currentTime;
-            if(output > 1) {
-                output = 1;
-            } else if (output < -1){
-                output = -1;
+            if(outputLeft > 1) {
+                outputLeft = 1;
+            } else if (outputLeft < -1){
+                outputLeft = -1;
             }
             if(currentError - Math.sqrt(Math.pow(translation.getX(), 2) + Math.pow(translation.getY(), 2)) < 0){
-                output = -output;
+                outputLeft = -outputLeft;
             }
-        } else {output = 0;}
-        double leftTurnPowerS = leftPodTurn(-angleToTarget);
-        robot.leftOne.setPower(output/speedMod + leftTurnPowerS);
-        robot.leftTwo.setPower(output/speedMod - leftTurnPowerS);
+        } else {
+            outputLeft = 0;}
+        outputRight = outputLeft;
+        double leftTurnPower = leftPodTurn(-angleToTarget);
+        double rightTurnPower = rightPodTurn(-angleToTarget);
+        robot.leftOne.setPower((outputLeft/speedMod + leftTurnPower)*2500);
+        robot.leftTwo.setPower((outputLeft/speedMod - leftTurnPower)*2500);
+        robot.leftOne.setPower((outputRight/speedMod + rightTurnPower)*2500);
+        robot.leftTwo.setPower((outputRight/speedMod - rightTurnPower)*2500);
 
-        telemetry.addData("output", output);
+        telemetry.addData("output", outputLeft);
         telemetry.addData("x1", String.format("%.2f", x1));
         telemetry.addData("y1", String.format("%.2f", y1));
         telemetry.addData("x2", String.format("%.2f", x2));
@@ -220,7 +224,6 @@ public class IntelRealsense extends OpMode
     }
 
     private ElapsedTime runtimePodLeft = new ElapsedTime();
-    double leftPodPower = 0;
     double leftPodAngle = 0;
     double pAngleLeft = 0;
     double iAngleLeft = 0;
@@ -235,7 +238,7 @@ public class IntelRealsense extends OpMode
         double error = AngleUnit.normalizeDegrees(angle - leftPodAngle);
         if(!gamepad1.start && (error >= 90 || error <= -90)){
             error = AngleUnit.normalizeDegrees(error-180);
-            leftPodPower = -leftPodPower;
+            outputLeft = -outputLeft;
         }
         double secs = runtimePodLeft.seconds();
         runtime.reset();
@@ -254,4 +257,33 @@ public class IntelRealsense extends OpMode
         return total;
     }
 
+    private ElapsedTime runtimePodRight = new ElapsedTime();
+    double rightPodAngle = 0;
+    double pAngleRight = 0;
+    double iAngleRight = 0;
+    double dAngleRight = 0;
+
+    public double rightPodTurn(double angle){
+        rightPodAngle = (robot.rightOne.getCurrentPosition() - robot.rightTwo.getCurrentPosition())/8.95;
+        double error = AngleUnit.normalizeDegrees(angle - rightPodAngle);
+        if(!gamepad1.start && (error >= 90 || error <= -90)){
+            error = AngleUnit.normalizeDegrees(error-180);
+            outputRight = -outputRight;
+        }
+        double secs = runtimePodRight.seconds();
+        runtime.reset();
+        dAngleRight = (error - pAngleRight) / secs;
+        iAngleRight = iAngleRight + (error * secs);
+        pAngleRight = error;
+        double total = (kpPod* pAngleRight + kiPod* iAngleRight + kdPod* dAngleRight)/100;
+        if(total > 1){
+            iAngleRight = 0;
+            total = 1;
+        }
+        if(total < -1){
+            iAngleRight = 0;
+            total = -1;
+        }
+        return total;
+    }
 }
