@@ -65,10 +65,10 @@ public class EarlyDiffyTeleop extends OpMode {
             speedMod = 1;
         }
 
-        robot.leftOne.setVelocity((leftPodPower/speedMod+leftTurnPower)*250*10);
-        robot.leftTwo.setVelocity((leftPodPower/speedMod-leftTurnPower)*250*10);
-        robot.rightOne.setVelocity((rightPodPower/speedMod+rightTurnPower)*250*10);
-        robot.rightTwo.setVelocity((rightPodPower/speedMod-rightTurnPower)*250*10);
+        robot.leftOne.setVelocity((leftPodPower/speedMod+leftTurnPower)*2500);
+        robot.leftTwo.setVelocity((leftPodPower/speedMod-leftTurnPower)*2500);
+        robot.rightOne.setVelocity((rightPodPower/speedMod+rightTurnPower)*2500);
+        robot.rightTwo.setVelocity((rightPodPower/speedMod-rightTurnPower)*2500);
     }
 
     double kp = 1.2;
