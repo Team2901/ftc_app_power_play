@@ -10,7 +10,6 @@ import org.firstinspires.ftc.teamcode.Outreach.Hardware.ClawbotHardware;
 /**
  * Created by Kearneyg20428 on 2/7/2017.
  */
-@Disabled
 @TeleOp(name = "Clawbot", group = "Outreach")
 public class ClawbotTeleOp extends OpMode {
 
