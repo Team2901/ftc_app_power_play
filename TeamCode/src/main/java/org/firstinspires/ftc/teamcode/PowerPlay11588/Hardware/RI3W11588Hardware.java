@@ -5,6 +5,12 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.OpenCVPipelines.RI3W11588OpenCV;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+
 public class RI3W11588Hardware {
     public DcMotor frontLeft;
     public DcMotor frontRight;
@@ -12,6 +18,8 @@ public class RI3W11588Hardware {
     public DcMotor backRight;
     public DcMotor arm;
     public Servo claw;
+    public OpenCvCamera camera;
+    public Telemetry telemetry;
 
     public static final double TICKS_PER_MOTOR_REV = 537.7;
     public static final double FRONT_GEAR_RATIO = 64/72;
@@ -27,9 +35,17 @@ public class RI3W11588Hardware {
         backRight = hardwareMap.dcMotor.get("backRight");
         arm = hardwareMap.dcMotor.get("arm");
         claw = hardwareMap.servo.get("claw");
+        WebcamName webcam = hardwareMap.get(WebcamName.class, "Webcam 1");
 
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         backRight.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        int cameraMonitorViewID = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewID", "id", hardwareMap.appContext.getPackageName());
+
+        camera = OpenCvCameraFactory.getInstance().createWebcam(webcam, cameraMonitorViewID);
+
+        RI3W11588OpenCV pipeLine = new RI3W11588OpenCV(telemetry);
+        camera.setPipeline(pipeLine);
 
         frontLeft.setPower(0);
         frontRight.setPower(0);

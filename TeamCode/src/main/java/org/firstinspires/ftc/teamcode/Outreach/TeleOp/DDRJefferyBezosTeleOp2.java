@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Shared.TeleOp;
+package org.firstinspires.ftc.teamcode.Outreach.TeleOp;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
@@ -16,7 +16,7 @@ import org.firstinspires.ftc.teamcode.Shared.Gamepad.DDRGamepad;
 import org.firstinspires.ftc.teamcode.Shared.Gamepad.ImprovedGamepad;
 import org.firstinspires.ftc.teamcode.Utility.CountDownTimer;
 
-@TeleOp(name = "DDR Jeffrey Bezos 2", group = "Shared")
+@TeleOp(name = "DDR Jeffrey Bezos 2", group = "Outreach")
 public class DDRJefferyBezosTeleOp2 extends OpMode {
 
     private ElapsedTime runtime = new ElapsedTime();

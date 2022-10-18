@@ -1,10 +1,19 @@
 package org.firstinspires.ftc.teamcode.PowerPlay2901.EarlyDiffy;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
+import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 public class EarlyDiffyHardware {
     private ElapsedTime runtime = new ElapsedTime();
@@ -26,6 +35,11 @@ public class EarlyDiffyHardware {
     public DcMotorEx leftTwo;
     public DcMotorEx rightOne;
     public DcMotorEx rightTwo;
+    //public DcMotor liftOne;
+    //public DcMotor liftTwo;
+    public Servo clawOne;
+    public Servo clawTwo;
+    //public Rev2mDistanceSensor clawSensor;
 
     public int currentLeftPosition = 0;
     public int currentRightPosition = 0;
@@ -36,25 +50,32 @@ public class EarlyDiffyHardware {
     private int oldBackPosition = 0;
 
     /*public XYhVector START_POS = new XYhVector(0, 0, getAngle());
-    public XYhVector pos = new XYhVector(START_POS);
+    public XYhVector pos = new XYhVector(START_POS);*/
 
 
-    public BNO055IMU imu;*/
+    public BNO055IMU imu;
 
     public void init(HardwareMap hardwareMap) {
         leftOne = hardwareMap.get(DcMotorEx.class, "left 1");
         leftTwo = hardwareMap.get(DcMotorEx.class, "left 2");
         rightOne = hardwareMap.get(DcMotorEx.class, "right 1");
         rightTwo = hardwareMap.get(DcMotorEx.class, "right 2");
+        //liftOne = hardwareMap.get(DcMotor.class, "lift 1");
+        //liftTwo = hardwareMap.get(DcMotor.class, "lift 2");
+        clawOne = hardwareMap.get(Servo.class, "claw 1");
+        clawTwo = hardwareMap.get(Servo.class, "claw 2");
+        //clawSensor = hardwareMap.get(Rev2mDistanceSensor.class, "claw sensor");
 
         leftTwo.setDirection(DcMotorSimple.Direction.REVERSE);
         rightTwo.setDirection(DcMotorSimple.Direction.REVERSE);
+        //liftTwo.setDirection(DcMotorSimple.Direction.REVERSE);
 
         leftOne.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftTwo.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightOne.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightTwo.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        /*BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
         parameters.calibrationDataFile = "BNO055IMUCalibration.json";
@@ -63,7 +84,7 @@ public class EarlyDiffyHardware {
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
-        imu.initialize(parameters);*/
+        imu.initialize(parameters);
     }
 
     /*public void odometry(){
@@ -87,10 +108,10 @@ public class EarlyDiffyHardware {
         pos.x += dx * Math.cos(theta) - dy * Math.sin(theta);
         pos.y += dx * Math.sin(theta) + dy * Math.cos(theta);
         pos.h += dtheta;
-    }
+    }*/
 
     public double getAngle() {
         Orientation orientation = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
         return AngleUnit.normalizeDegrees(orientation.firstAngle);
-    }*/
+    }
 }

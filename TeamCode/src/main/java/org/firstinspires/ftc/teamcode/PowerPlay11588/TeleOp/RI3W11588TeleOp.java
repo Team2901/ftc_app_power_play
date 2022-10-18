@@ -13,6 +13,7 @@ import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.RI3W11588Hardware;
 @TeleOp(name = "3 Week 11588")
 public class RI3W11588TeleOp extends OpMode {
     RI3W11588Hardware robot = new RI3W11588Hardware();
+    RI3W11588OpenCV pipeline = new RI3W11588OpenCV(telemetry);
 
     double triggerValue = 0;
     enum ClawPosition{Open, Closed}
@@ -32,6 +33,8 @@ public class RI3W11588TeleOp extends OpMode {
 
     @Override
     public void loop() {
+        pipeline.openCVTelemetry();
+
         try {
             previousGamepad1.copy(currentGamepad1);
             previousGamepad2.copy(currentGamepad2);
