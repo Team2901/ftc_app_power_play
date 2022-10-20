@@ -64,6 +64,11 @@ public class RI3W11588TeleOp extends OpMode {
 
         robot.arm.setPower(.3 * gamepad1.right_stick_y);
 
+        telemetry.addData("frp: ", "%f", y - x - rx);
+        telemetry.addData("fr: ", "%d", robot.frontRight.getCurrentPosition());
+        telemetry.addData("brp: ", "%f", y + x - rx);
+        telemetry.addData("br: ", "%d",  robot.backRight.getCurrentPosition());
+
         /*
         if(currentGamepad1.b && !previousGamepad1.b) {
             robot.claw.setPosition(1);

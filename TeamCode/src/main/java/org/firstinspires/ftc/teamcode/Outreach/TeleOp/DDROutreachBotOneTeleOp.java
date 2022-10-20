@@ -13,19 +13,24 @@ import org.firstinspires.ftc.teamcode.Utility.CountDownTimer;
 public class DDROutreachBotOneTeleOp extends OpMode {
     OutreachBotOneHardware robot = new OutreachBotOneHardware();
     CountDownTimer countDownTimer = new CountDownTimer(ElapsedTime.Resolution.MILLISECONDS);
+    CountDownTimer boostTimer = new CountDownTimer(ElapsedTime.Resolution.MILLISECONDS);
+    ElapsedTime timer = new ElapsedTime();
     boolean isClawOpen = false;
     boolean override = false;
     int difficultyMode = 1;
     String[] difficultyNames = {"Beginner", "Intermediate", "Lawsuit"};
     DDRGamepad participantGP;
     ImprovedGamepad gameMasterGP;
-    ElapsedTime timer = new ElapsedTime();
+
     int konamiCodeProgress = 0;
     int beginnerKonamiCodeProgress = 0;
     int cardinalCodeProgress = 0;
     int swiftStepProgress = 0;
     int grapeVineProgress = 0;
     int hopScotchProgress = 0;
+
+    double boostPower = 1;
+
     boolean isActive = false;
 
     double participantLeftPower = 0;
@@ -128,6 +133,11 @@ public class DDROutreachBotOneTeleOp extends OpMode {
             isClawOpen = !isClawOpen;
         }
 
+        isBeginnerKonamiCodeComplete();
+        if(boostTimer.getRemainingTime() == 0){
+            boostPower = 1;
+        }
+
         final boolean participantInput = participantGP.areButtonsActive();
 
         if (isClawOpen) {
@@ -143,6 +153,8 @@ public class DDROutreachBotOneTeleOp extends OpMode {
                 participantLeftPower *= 2.0 / 3;
                 participantRightPower *= 2.0 / 3;
             }
+            participantLeftPower *= boostPower;
+            participantRightPower *= boostPower;
             // Sets power to motors
             power(participantLeftPower, participantRightPower);
         } else {
@@ -162,6 +174,28 @@ public class DDROutreachBotOneTeleOp extends OpMode {
     public void power(double left, double right) {
         robot.leftDrive.setPower(-left);
         robot.rightDrive.setPower(-right);
+    }
+
+    public void isBeginnerKonamiCodeComplete() {
+        if (!participantGP.areButtonsInitialPress()) {
+            return;
+        }
+        if (beginnerKonamiCodeProgress == 0) {
+            beginnerKonamiCodeProgress = this.participantGP.upArrow.isInitialPress() ? 1:0;
+        } else if (beginnerKonamiCodeProgress == 1) {
+            beginnerKonamiCodeProgress = this.participantGP.downArrow.isInitialPress() ? 2:0;
+        } else if (beginnerKonamiCodeProgress == 2) {
+            beginnerKonamiCodeProgress = this.participantGP.leftArrow.isInitialPress() ? 3:0;
+        } else if (beginnerKonamiCodeProgress == 3) {
+            beginnerKonamiCodeProgress = this.participantGP.rightArrow.isInitialPress() ? 4:0;
+        } else if (beginnerKonamiCodeProgress == 4) {
+            beginnerKonamiCodeProgress = this.participantGP.topLeftArrow.isInitialPress() ? 5:0;
+        }
+        if (beginnerKonamiCodeProgress == 5) {
+            boostPower = 1.25;
+            boostTimer.setTargetTime(15000);
+            beginnerKonamiCodeProgress = 0;
+        }
     }
 
     public void telemetryDDRGraphic() {
