@@ -56,6 +56,7 @@ public class IntelRealsense extends OpMode
 
     double positionX;
     double positionY;
+    double targetAngle = 0;
 
     double angleToTarget;
 
@@ -176,9 +177,11 @@ public class IntelRealsense extends OpMode
             }
         } else {
             outputLeft = 0;}
-        outputRight = outputLeft;
-        double leftTurnPower = leftPodTurn(-angleToTarget);
-        double rightTurnPower = rightPodTurn(-angleToTarget);
+        double turnPower = AngleUnit.normalizeDegrees(targetAngle - rotation.getDegrees())/500;
+        outputRight = outputLeft - (turnPower*rotation.getCos());
+        outputLeft += turnPower*rotation.getCos();
+        double leftTurnPower = leftPodTurn(-angleToTarget-((outputRight/speedMod)*turnPower*rotation.getSin()));
+        double rightTurnPower = rightPodTurn(-angleToTarget+((outputRight/speedMod)*turnPower*rotation.getSin()));
         robot.leftOne.setPower((outputLeft/speedMod + leftTurnPower)*2500);
         robot.leftTwo.setPower((outputLeft/speedMod - leftTurnPower)*2500);
         robot.leftOne.setPower((outputRight/speedMod + rightTurnPower)*2500);
@@ -220,7 +223,12 @@ public class IntelRealsense extends OpMode
     public void move(double x, double y) {
         positionX = x + translation.getX();
         positionY = y + translation.getY();
+    }
 
+    public void move(double x, double y, double angle){
+        positionX = x + translation.getX();
+        positionY = y + translation.getY();
+        targetAngle = angle;
     }
 
     private ElapsedTime runtimePodLeft = new ElapsedTime();
