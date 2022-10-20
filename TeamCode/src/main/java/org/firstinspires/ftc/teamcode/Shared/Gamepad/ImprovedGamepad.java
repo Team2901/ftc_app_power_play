@@ -147,4 +147,7 @@ public class ImprovedGamepad {
     return AngleUtilities.getNormalizedAngle(angleDegrees - 90);
   }
 
+  public boolean areButtonsActive(){
+    return dpad_left.pressed || dpad_down.pressed || a.pressed || dpad_up.pressed || dpad_right.pressed || !(right_stick_y.getValue()==0);
+  }
 }
