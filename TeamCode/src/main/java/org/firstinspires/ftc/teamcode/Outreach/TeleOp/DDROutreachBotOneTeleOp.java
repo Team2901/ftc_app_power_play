@@ -14,6 +14,9 @@ public class DDROutreachBotOneTeleOp extends OpMode {
     OutreachBotOneHardware robot = new OutreachBotOneHardware();
     CountDownTimer countDownTimer = new CountDownTimer(ElapsedTime.Resolution.MILLISECONDS);
     CountDownTimer boostTimer = new CountDownTimer(ElapsedTime.Resolution.MILLISECONDS);
+    /*
+    CountDownTimer maxBoostTimer = new CountdownTimer(ElapsedTime.Resolution.MILLISECONDS);
+     */
     ElapsedTime timer = new ElapsedTime();
     boolean isClawOpen = false;
     boolean override = false;
@@ -29,7 +32,9 @@ public class DDROutreachBotOneTeleOp extends OpMode {
     int grapeVineProgress = 0;
     int hopScotchProgress = 0;
 
+    int powerUpProgress = 0;
     double boostPower = 1;
+    boolean isBoost = false;
 
     boolean isActive = false;
 
@@ -133,10 +138,17 @@ public class DDROutreachBotOneTeleOp extends OpMode {
             isClawOpen = !isClawOpen;
         }
 
-        isBeginnerKonamiCodeComplete();
+        isPowerUpComplete();
         if(boostTimer.getRemainingTime() == 0){
             boostPower = 1;
+            isBoost = false;
         }
+
+        /*
+        isCardinalCodeComplete();
+        if(boostTimer.getRemainingTime() == 0){
+            boostPower = 1;
+         */
 
         final boolean participantInput = participantGP.areButtonsActive();
 
@@ -168,6 +180,10 @@ public class DDROutreachBotOneTeleOp extends OpMode {
         telemetry.addData("Participant Input", participantInput);
         telemetry.addData("Konami Code Progress", konamiCodeProgress);
         telemetry.addData("Beginner Konami Code Progress", beginnerKonamiCodeProgress);
+        telemetry.addData("Power Up Progress", powerUpProgress);
+        telemetry.addData("Boosting", isBoost);
+        telemetry.addData("Left Power", robot.leftDrive.getPower());
+        telemetry.addData("Right Power", robot.rightDrive.getPower());
         telemetry.update();
     }
 
@@ -176,26 +192,45 @@ public class DDROutreachBotOneTeleOp extends OpMode {
         robot.rightDrive.setPower(-right);
     }
 
-    public void isBeginnerKonamiCodeComplete() {
+    public void isPowerUpComplete() {
         if (!participantGP.areButtonsInitialPress()) {
             return;
         }
-        if (beginnerKonamiCodeProgress == 0) {
-            beginnerKonamiCodeProgress = this.participantGP.upArrow.isInitialPress() ? 1:0;
-        } else if (beginnerKonamiCodeProgress == 1) {
-            beginnerKonamiCodeProgress = this.participantGP.downArrow.isInitialPress() ? 2:0;
-        } else if (beginnerKonamiCodeProgress == 2) {
-            beginnerKonamiCodeProgress = this.participantGP.leftArrow.isInitialPress() ? 3:0;
-        } else if (beginnerKonamiCodeProgress == 3) {
-            beginnerKonamiCodeProgress = this.participantGP.rightArrow.isInitialPress() ? 4:0;
-        } else if (beginnerKonamiCodeProgress == 4) {
-            beginnerKonamiCodeProgress = this.participantGP.topLeftArrow.isInitialPress() ? 5:0;
+        if (powerUpProgress == 0) {
+            powerUpProgress = this.participantGP.upArrow.isInitialPress() ? 1:0;
+        } else if (powerUpProgress == 1) {
+            powerUpProgress = this.participantGP.upArrow.isInitialPress() ? 2:0;
+        } else if (powerUpProgress == 2) {
+            powerUpProgress = this.participantGP.upArrow.isInitialPress() ? 3:0;
+        } else if (powerUpProgress == 3) {
+            powerUpProgress = this.participantGP.rightArrow.isInitialPress() ? 4:0;
         }
-        if (beginnerKonamiCodeProgress == 5) {
-            boostPower = 1.25;
+        if (powerUpProgress == 4) {
+            boostPower = 2;
             boostTimer.setTargetTime(15000);
-            beginnerKonamiCodeProgress = 0;
+            isBoost = true;
+            powerUpProgress = 0;
         }
+
+        /*
+        if (cardinalCodeProgressProgress == 0) {
+            cardinalCodeProgressProgress = this.participantGP.upArrow.isInitialPress() ? 1:0;
+        } else if (cardinalCodeProgressProgress == 1) {
+            cardinalCodeProgressProgress = this.participantGP.downArrow.isInitialPress() ? 2:0;
+        } else if (cardinalCodeProgressProgress == 2) {
+            cardinalCodeProgressProgress = this.participantGP.leftArrow.isInitialPress() ? 3:0;
+        } else if (cardinalCodeProgressProgress == 3) {
+            cardinalCodeProgressProgress = this.participantGP.rightArrow.isInitialPress() ? 4:0;
+        } else if (cardinalCodeProgressProgress == 4) {
+            cardinalCodeProgressProgress = this.participantGP.topLeftArrow.isInitialPress() ? 5:0;
+        }
+        if (cardinalCodeProgressProgress == 5) {
+            boostPower = 1.25; ???
+            maxBoostTimer.setTargetTime(15000);
+            cardinalCodeProgressProgress = 0;
+
+         */
+
     }
 
     public void telemetryDDRGraphic() {
