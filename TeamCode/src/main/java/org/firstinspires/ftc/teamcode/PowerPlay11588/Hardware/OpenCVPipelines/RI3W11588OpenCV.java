@@ -17,6 +17,12 @@ public class RI3W11588OpenCV extends OpenCvPipeline {
     public double redAmount;
     public double blueAmount;
     public double greenAmount;
+    public double redAmountAllTime;
+    public double greenAmountAllTime;
+    public double blueAmountAllTime;
+    public double redAmountAverage;
+    public double greenAmountAverage;
+    public double blueAmountAverage;
     public int framesProceeded;
     Rect r = new Rect(100, 100, 100, 100);
     Mat redMask = new Mat();
@@ -53,17 +59,11 @@ public class RI3W11588OpenCV extends OpenCvPipeline {
         Imgproc.cvtColor(lastImage, lastImage, Imgproc.COLOR_RGBA2RGB);
         subMat = lastImage.submat(r);
 
-
         Imgproc.rectangle(lastImage, r , new Scalar(100, 0, 0));
-
-
 
         Core.inRange(subMat, new Scalar(100, 50, 50), new Scalar(255, 100, 155), redMask);
         Core.inRange(subMat, new Scalar(0, 0, 80), new Scalar(70, 70, 255), blueMask);
         Core.inRange(subMat, new Scalar(0, 80, 0), new Scalar(80, 255, 80), greenMask);
-
-
-
 
         double nonZeroPixelsRed = Core.countNonZero(redMask);
 
@@ -83,11 +83,25 @@ public class RI3W11588OpenCV extends OpenCvPipeline {
         //Core.bitwise_and(subMat, redMask, lastImage);
         //Core.bitwise_and(subMat, subMat, subMat, redMask);
 
-        telemetry.addData("Red Amount", redAmount);
-        telemetry.addData("Blue Amount", blueAmount);
-        telemetry.addData("Green Amount", greenAmount);
-        telemetry.addData("Frames Proceeded", framesProceeded);
-        telemetry.update();
+        redAmountAllTime = redAmountAllTime + redAmount;
+        blueAmountAllTime = blueAmountAllTime + blueAmount;
+        greenAmountAllTime = greenAmountAllTime + greenAmount;
+
+
+        redAmountAverage = redAmountAllTime / framesProceeded;
+        greenAmountAverage = greenAmountAllTime / framesProceeded;
+        blueAmountAverage = blueAmountAllTime / framesProceeded;
+
+        //Telemetry code is only for simulation
+//        telemetry.addData("Red Amount", redAmount);
+//        telemetry.addData("Blue Amount", blueAmount);
+//        telemetry.addData("Green Amount", greenAmount);
+//        telemetry.addData("Frames Proceeded", framesProceeded);
+//        telemetry.addData("Red average", redAmountAverage);
+//        telemetry.addData("Blue average", blueAmountAverage);
+//        telemetry.addData("Green average", greenAmountAverage);
+//        telemetry.update();
+
         //All Pipeline code must be written above here
 
 
@@ -100,6 +114,9 @@ public class RI3W11588OpenCV extends OpenCvPipeline {
         telemetry.addData("Blue Amount", blueAmount);
         telemetry.addData("Green Amount", greenAmount);
         telemetry.addData("Frames Proceeded", framesProceeded);
+        telemetry.addData("Red average", redAmountAverage);
+        telemetry.addData("Blue average", blueAmountAverage);
+        telemetry.addData("Green average", greenAmountAverage);
         telemetry.update();
     }
 
