@@ -8,7 +8,7 @@ public class RI3W11588BlueLower extends RI3W11588BaseAutonomous{
     ElapsedTime runTime = new ElapsedTime();
     @Override
     public void runOpMode() throws InterruptedException {
-        robot.init(this.hardwareMap);
+        robot.init(this.hardwareMap, telemetry);
         waitForStart();
         runTime.reset();
         while(runTime.milliseconds() < 2000){
