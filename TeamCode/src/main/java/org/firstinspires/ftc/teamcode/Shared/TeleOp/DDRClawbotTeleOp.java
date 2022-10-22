@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.Utility.CountDownTimer;
  * Created by Kearneyg20428 on 2/7/2017.
  */
 
-@TeleOp(name = "DDR Clawbot v1", group = "Shared")
+@TeleOp(name = "DDR Clawbot V1", group = "Shared")
 public class DDRClawbotTeleOp extends OpMode {
 
     final double CLAW_SPEED = 0.05;
