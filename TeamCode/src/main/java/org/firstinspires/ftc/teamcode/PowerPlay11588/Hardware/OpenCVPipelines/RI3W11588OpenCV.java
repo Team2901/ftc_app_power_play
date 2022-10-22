@@ -10,12 +10,15 @@ import org.openftc.easyopencv.OpenCvPipeline;
 
 public class RI3W11588OpenCV extends OpenCvPipeline {
 
-    public Mat lastImage = null;
+    private Mat lastImage = null;
+    private Mat subMat = null;
     public static enum ConeColor { red, green, blue};
     public ConeColor coneColor = null;
     public double redAmount;
     public double blueAmount;
     public double greenAmount;
+    public int framesProceeded;
+    Rect r = new Rect(100, 100, 100, 100);
     Mat redMask = new Mat();
     Mat blueMask = new Mat();
     Mat greenMask = new Mat();
@@ -25,42 +28,42 @@ public class RI3W11588OpenCV extends OpenCvPipeline {
 
 
     Telemetry telemetry;
-    public int nonZeroPixels;
 
     public RI3W11588OpenCV(Telemetry telemetry) {
         this.telemetry = telemetry;
     }
-    //Constuctor for NickJFIrstVisionPipeLine class
+    //Constructor for RI3W11588OpenCV class
 
+    public void init(Mat input) {
 
+        lastImage = new Mat(input.rows(), input.cols(), input.type());
+
+    }
     @Override
     public Mat processFrame(Mat input) {
+        framesProceeded++;
         if (input == null) {
             return null;
 //Makes sure doesn't crash when the camera does nothing
         }
 
-        if(lastImage != null) {
-            lastImage.release();
-            //releases memory(openCV is written in C, so memory managment is needed
-        }
-
-        lastImage = new Mat();
-
         input.copyTo(lastImage);
         //copies the last input to lastImage, actually assigning it
 
         Imgproc.cvtColor(lastImage, lastImage, Imgproc.COLOR_RGBA2RGB);
+        subMat = lastImage.submat(r);
 
-        Rect r = new Rect(100, 100, 100, 100);
 
         Imgproc.rectangle(lastImage, r , new Scalar(100, 0, 0));
 
-        Mat subMat = lastImage.submat(r);
+
 
         Core.inRange(subMat, new Scalar(100, 50, 50), new Scalar(255, 100, 155), redMask);
         Core.inRange(subMat, new Scalar(0, 0, 80), new Scalar(70, 70, 255), blueMask);
         Core.inRange(subMat, new Scalar(0, 80, 0), new Scalar(80, 255, 80), greenMask);
+
+
+
 
         double nonZeroPixelsRed = Core.countNonZero(redMask);
 
@@ -76,10 +79,15 @@ public class RI3W11588OpenCV extends OpenCvPipeline {
 
         greenAmount = nonZeroPixelsGreen / subMat.total() * 100;
 
+        //Imgproc.cvtColor(redMask, redMask, Imgproc.COLOR_GRAY2RGB);
+        //Core.bitwise_and(subMat, redMask, lastImage);
+        //Core.bitwise_and(subMat, subMat, subMat, redMask);
 
-        //THESE ARE NOT REALLY PERCENTAGES: THIS WILL NEED TO BE FIXED IN THE FUTURE
-
-
+        telemetry.addData("Red Amount", redAmount);
+        telemetry.addData("Blue Amount", blueAmount);
+        telemetry.addData("Green Amount", greenAmount);
+        telemetry.addData("Frames Proceeded", framesProceeded);
+        telemetry.update();
         //All Pipeline code must be written above here
 
 
@@ -91,6 +99,7 @@ public class RI3W11588OpenCV extends OpenCvPipeline {
         telemetry.addData("Red Amount", redAmount);
         telemetry.addData("Blue Amount", blueAmount);
         telemetry.addData("Green Amount", greenAmount);
+        telemetry.addData("Frames Proceeded", framesProceeded);
         telemetry.update();
     }
 
