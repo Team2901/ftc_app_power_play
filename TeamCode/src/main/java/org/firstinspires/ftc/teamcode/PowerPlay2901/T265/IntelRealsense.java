@@ -221,8 +221,8 @@ public class IntelRealsense extends OpMode
         double turnPower = AngleUnit.normalizeDegrees(targetAngle - rotation.getDegrees())/500;
         outputRight = outputLeft - (turnPower*rotation.getCos());
         outputLeft += turnPower*rotation.getCos();
-        double leftTurnPower = leftPodTurn(-angleToTarget-(Math.abs(1/(outputRight/speedMod))*turnPower*rotation.getSin()));
-        double rightTurnPower = rightPodTurn(-angleToTarget+(Math.abs(1/(outputRight/speedMod))*turnPower*rotation.getSin()));
+        double leftTurnPower = leftPodTurn(-angleToTarget-(Math.abs(1/(outputRight/speedMod))*turnPower*Math.sin(Math.toRadians(-angleToTarget))));
+        double rightTurnPower = rightPodTurn(-angleToTarget+(Math.abs(1/(outputRight/speedMod))*turnPower*Math.sin(Math.toRadians(-angleToTarget))));
         robot.leftOne.setPower((outputLeft/speedMod + leftTurnPower)*2500);
         robot.leftTwo.setPower((outputLeft/speedMod - leftTurnPower)*2500);
         robot.leftOne.setPower((outputRight/speedMod + rightTurnPower)*2500);
