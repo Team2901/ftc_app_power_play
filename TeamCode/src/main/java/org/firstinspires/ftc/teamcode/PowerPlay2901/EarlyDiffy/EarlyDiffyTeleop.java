@@ -38,7 +38,7 @@ public class EarlyDiffyTeleop extends OpMode {
             rightTurnPower = rightPodTurn(0);
         } else {
             double moveAngle = Math.toDegrees(Math.atan2(sidePower, -forwardPower+.001));
-            //moveAngle = AngleUnit.normalizeDegrees(moveAngle+robot.getAngle());
+            //moveAngle = AngleUnit.normalizeDegrees(moveAngle+robot.getAngle()); //uncomment this for field oriented
             leftPodPower = Math.sqrt(forwardPower*forwardPower+sidePower*sidePower)+(turnPower*Math.cos(Math.toRadians(moveAngle)));
             rightPodPower = Math.sqrt(forwardPower*forwardPower+sidePower*sidePower)-(turnPower*Math.cos(Math.toRadians(moveAngle)));
             leftTurnPower = leftPodTurn(moveAngle-(45*turnPower*Math.sin(Math.toRadians(moveAngle))));
