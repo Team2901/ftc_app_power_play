@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.RI3W11588Hardware;
 @TeleOp(name = "3 Week 11588")
 public class RI3W11588TeleOp extends OpMode {
     RI3W11588Hardware robot = new RI3W11588Hardware();
-    RI3W11588OpenCV pipeline = new RI3W11588OpenCV(telemetry);
+
 
     double triggerValue = 0;
     enum ClawPosition{Open, Closed}
@@ -28,12 +28,13 @@ public class RI3W11588TeleOp extends OpMode {
 
     @Override
     public void init() {
-        robot.init(this.hardwareMap);
+        robot.init(this.hardwareMap, telemetry);
+
     }
 
     @Override
     public void loop() {
-        pipeline.openCVTelemetry();
+        robot.pipeLine.openCVTelemetry();
 
         try {
             previousGamepad1.copy(currentGamepad1);
@@ -64,10 +65,10 @@ public class RI3W11588TeleOp extends OpMode {
 
         robot.arm.setPower(.3 * gamepad1.right_stick_y);
 
-        telemetry.addData("frp: ", "%f", y - x - rx);
-        telemetry.addData("fr: ", "%d", robot.frontRight.getCurrentPosition());
-        telemetry.addData("brp: ", "%f", y + x - rx);
-        telemetry.addData("br: ", "%d",  robot.backRight.getCurrentPosition());
+//        telemetry.addData("frp: ", "%f", y - x - rx);
+//        telemetry.addData("fr: ", "%d", robot.frontRight.getCurrentPosition());
+//        telemetry.addData("brp: ", "%f", y + x - rx);
+//        telemetry.addData("br: ", "%d",  robot.backRight.getCurrentPosition());
 
         /*
         if(currentGamepad1.b && !previousGamepad1.b) {

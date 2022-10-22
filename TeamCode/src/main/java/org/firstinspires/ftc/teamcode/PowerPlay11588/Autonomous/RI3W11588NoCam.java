@@ -9,7 +9,7 @@ public class RI3W11588NoCam extends RI3W11588BaseAutonomous{
     ElapsedTime runTime = new ElapsedTime();
     @Override
     public void runOpMode() throws InterruptedException {
-        robot.init(this.hardwareMap);
+        robot.init(this.hardwareMap, telemetry);
         waitForStart();
         runTime.reset();
         robot.arm.setTargetPosition(500);
