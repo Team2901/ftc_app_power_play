@@ -26,10 +26,12 @@ public class RI3W11588Hardware implements OpenCvCamera.AsyncCameraOpenListener {
 
     public static final double TICKS_PER_MOTOR_REV = 537.7;
     public static final double FRONT_GEAR_RATIO = 64/72;
+    public static final double BACK_GEAR_RATIO = 1/1;
     public static final double FRONT_TICKS_PER_DRIVE_REV = TICKS_PER_MOTOR_REV * FRONT_GEAR_RATIO;
+    public static final double BACK_TICKS_PER_DRIVE_REV = TICKS_PER_MOTOR_REV * BACK_GEAR_RATIO;
     public static final double WHEEL_CIRCUMFERENCE = 4 * Math.PI;
     public static final double FRONT_TICKS_PER_INCH = FRONT_TICKS_PER_DRIVE_REV/WHEEL_CIRCUMFERENCE;
-    public static final double BACK_TICKS_PER_INCH = TICKS_PER_MOTOR_REV/WHEEL_CIRCUMFERENCE;
+    public static final double BACK_TICKS_PER_INCH = BACK_TICKS_PER_DRIVE_REV/WHEEL_CIRCUMFERENCE;
 
     public static final double ARM_GEAR_RATIO = 16/80;
 
