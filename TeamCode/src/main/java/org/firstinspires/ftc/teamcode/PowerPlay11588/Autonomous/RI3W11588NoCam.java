@@ -12,12 +12,7 @@ public class RI3W11588NoCam extends RI3W11588BaseAutonomous{
         robot.init(this.hardwareMap, telemetry);
         waitForStart();
         runTime.reset();
-        robot.arm.setTargetPosition(500);
-        robot.arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.arm.setPower(.5);
         moveXY(0, -24);
         moveXY(36, 0);
-        robot.arm.setPower(0);
-        robot.arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 }
