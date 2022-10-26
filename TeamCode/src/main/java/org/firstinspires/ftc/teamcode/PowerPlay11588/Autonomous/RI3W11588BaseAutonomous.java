@@ -106,8 +106,8 @@ public class RI3W11588BaseAutonomous extends LinearOpMode {
 
         ElapsedTime pidTimer = new ElapsedTime();
 
-        double kp = 0;
-        double ki = 0;
+        double kp = 2.12;
+        double ki = 0.39;
         double kd = 0;
         double pArm = 0;
         double iArm = 0;
