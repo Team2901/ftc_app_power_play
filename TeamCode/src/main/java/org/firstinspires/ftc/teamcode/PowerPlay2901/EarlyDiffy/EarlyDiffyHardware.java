@@ -35,8 +35,8 @@ public class EarlyDiffyHardware {
     public DcMotorEx leftTwo;
     public DcMotorEx rightOne;
     public DcMotorEx rightTwo;
-    //public DcMotor liftOne;
-    //public DcMotor liftTwo;
+    public DcMotor liftOne;
+    public DcMotor liftTwo;
     public Servo clawOne;
     public Servo clawTwo;
     //public Rev2mDistanceSensor clawSensor;
@@ -60,15 +60,15 @@ public class EarlyDiffyHardware {
         leftTwo = hardwareMap.get(DcMotorEx.class, "left 2");
         rightOne = hardwareMap.get(DcMotorEx.class, "right 1");
         rightTwo = hardwareMap.get(DcMotorEx.class, "right 2");
-        //liftOne = hardwareMap.get(DcMotor.class, "lift 1");
-        //liftTwo = hardwareMap.get(DcMotor.class, "lift 2");
+        liftOne = hardwareMap.get(DcMotor.class, "lift 1");
+        liftTwo = hardwareMap.get(DcMotor.class, "lift 2");
         clawOne = hardwareMap.get(Servo.class, "claw 1");
         clawTwo = hardwareMap.get(Servo.class, "claw 2");
         //clawSensor = hardwareMap.get(Rev2mDistanceSensor.class, "claw sensor");
 
         leftTwo.setDirection(DcMotorSimple.Direction.REVERSE);
         rightTwo.setDirection(DcMotorSimple.Direction.REVERSE);
-        //liftTwo.setDirection(DcMotorSimple.Direction.REVERSE);
+        liftTwo.setDirection(DcMotorSimple.Direction.REVERSE);
 
         leftOne.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftTwo.setMode(DcMotor.RunMode.RUN_USING_ENCODER);

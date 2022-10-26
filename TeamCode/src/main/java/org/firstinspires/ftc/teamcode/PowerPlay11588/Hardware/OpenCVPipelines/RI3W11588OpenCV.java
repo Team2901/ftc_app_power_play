@@ -12,7 +12,7 @@ public class RI3W11588OpenCV extends OpenCvPipeline {
 
     private Mat lastImage = null;
     private Mat subMat = null;
-    public static enum ConeColor { red, green, blue};
+    public enum ConeColor { red, green, blue};
     public ConeColor coneColor = null;
     public double redAmount;
     public double blueAmount;
@@ -28,10 +28,6 @@ public class RI3W11588OpenCV extends OpenCvPipeline {
     Mat redMask = new Mat();
     Mat blueMask = new Mat();
     Mat greenMask = new Mat();
-    //lastImage is used to store an unedited version of the last frame, can be used for comparision
-    //Mat class is for matracies. 3 dimensions, width, height, and color(color is stored in the 3rd value)
-
-
 
     Telemetry telemetry;
 
@@ -53,60 +49,74 @@ public class RI3W11588OpenCV extends OpenCvPipeline {
 //Makes sure doesn't crash when the camera does nothing
         }
 
-        input.copyTo(lastImage);
-        //copies the last input to lastImage, actually assigning it
+        if(coneColor == null) {
+            input.copyTo(lastImage);
+            //copies the last input to lastImage, actually assigning it
 
-        Imgproc.cvtColor(lastImage, lastImage, Imgproc.COLOR_RGBA2RGB);
-        subMat = lastImage.submat(r);
+            Imgproc.cvtColor(lastImage, lastImage, Imgproc.COLOR_RGBA2RGB);
+            subMat = lastImage.submat(r);
 
-        Imgproc.rectangle(lastImage, r , new Scalar(100, 0, 0));
+            Imgproc.rectangle(lastImage, r, new Scalar(100, 0, 0));
 
-        Core.inRange(subMat, new Scalar(100, 50, 50), new Scalar(255, 100, 155), redMask);
-        Core.inRange(subMat, new Scalar(0, 0, 80), new Scalar(70, 70, 255), blueMask);
-        Core.inRange(subMat, new Scalar(0, 80, 0), new Scalar(80, 255, 80), greenMask);
+            Core.inRange(subMat, new Scalar(100, 50, 50), new Scalar(255, 100, 155), redMask);
+            Core.inRange(subMat, new Scalar(0, 0, 80), new Scalar(70, 70, 255), blueMask);
+            Core.inRange(subMat, new Scalar(0, 80, 0), new Scalar(80, 255, 80), greenMask);
+            /*
+            This statement above creates the 3 different masks that act as filters. Do not think of this
+            as one image, it is really 3 different images with different filters. We use a range for the RBG
+            values. If this ever in the future this code doesn't work or isn't sensitive enough try changing the
+            values for the filter.
+             */
 
-        double nonZeroPixelsRed = Core.countNonZero(redMask);
+            double nonZeroPixelsRed = Core.countNonZero(redMask);
 
-        double nonZeroPixelsBlue = Core.countNonZero(blueMask);
+            double nonZeroPixelsBlue = Core.countNonZero(blueMask);
 
-        double nonZeroPixelsGreen = Core.countNonZero(greenMask);
+            double nonZeroPixelsGreen = Core.countNonZero(greenMask);
+            //This counts the number of non zero pixels in each mask
 
-        //This method creates a new mask that isolates a range of colors
+            redAmount = nonZeroPixelsRed / subMat.total() * 100;
 
-        redAmount = nonZeroPixelsRed / subMat.total() * 100;
+            blueAmount = nonZeroPixelsBlue / subMat.total() * 100;
 
-        blueAmount = nonZeroPixelsBlue / subMat.total() * 100;
-
-        greenAmount = nonZeroPixelsGreen / subMat.total() * 100;
-
-        //Imgproc.cvtColor(redMask, redMask, Imgproc.COLOR_GRAY2RGB);
-        //Core.bitwise_and(subMat, redMask, lastImage);
-        //Core.bitwise_and(subMat, subMat, subMat, redMask);
-
-        redAmountAllTime = redAmountAllTime + redAmount;
-        blueAmountAllTime = blueAmountAllTime + blueAmount;
-        greenAmountAllTime = greenAmountAllTime + greenAmount;
-
-
-        redAmountAverage = redAmountAllTime / framesProceeded;
-        greenAmountAverage = greenAmountAllTime / framesProceeded;
-        blueAmountAverage = blueAmountAllTime / framesProceeded;
-
-        //Telemetry code is only for simulation
-//        telemetry.addData("Red Amount", redAmount);
-//        telemetry.addData("Blue Amount", blueAmount);
-//        telemetry.addData("Green Amount", greenAmount);
-//        telemetry.addData("Frames Proceeded", framesProceeded);
-//        telemetry.addData("Red average", redAmountAverage);
-//        telemetry.addData("Blue average", blueAmountAverage);
-//        telemetry.addData("Green average", greenAmountAverage);
-//        telemetry.update();
-
-        //All Pipeline code must be written above here
+            greenAmount = nonZeroPixelsGreen / subMat.total() * 100;
+            //This creates a percentage of pixels on the screen, this are not scaled to each other
+            //TO a degree each value/mask is arbitrary
 
 
+            //Imgproc.cvtColor(redMask, redMask, Imgproc.COLOR_GRAY2RGB);
+            //Core.bitwise_and(subMat, redMask, lastImage);
+            //Core.bitwise_and(subMat, subMat, subMat, redMask);
+            //This commented out code is only for visualizing the pipeline
+
+            redAmountAllTime = redAmountAllTime + redAmount;
+            blueAmountAllTime = blueAmountAllTime + blueAmount;
+            greenAmountAllTime = greenAmountAllTime + greenAmount;
+
+            redAmountAverage = redAmountAllTime / framesProceeded;
+            greenAmountAverage = greenAmountAllTime / framesProceeded;
+            blueAmountAverage = blueAmountAllTime / framesProceeded;
+            //This code is literally only for testing and getting an average
+
+
+
+            //All Pipeline code must be written above here
+            if (redAmount > greenAmount && greenAmount > blueAmount) {
+                coneColor = ConeColor.red;
+            } else if (greenAmount > redAmount && redAmount > blueAmount) {
+                coneColor = ConeColor.green;
+            } else if (blueAmount > greenAmount && greenAmount > redAmount) {
+                coneColor = ConeColor.blue;
+            }
+            //Simple if statement to determine what is the largest amount/percentage of a color
+
+        }
         return lastImage;
-        //what is returned is what you will see
+        /*The entire thing is in an if statement because we only want process frame to run one until
+        we get a value for coneColor because we don't want it to change in the middle of our run because that
+        might change what color it thinks the cone is.
+        */
+
     }
 
     public void openCVTelemetry() {
@@ -119,5 +129,6 @@ public class RI3W11588OpenCV extends OpenCvPipeline {
         telemetry.addData("Green average", greenAmountAverage);
         telemetry.update();
     }
+    //This is a separate method because you will not always want to see OpenCV Telemetry
 
 }

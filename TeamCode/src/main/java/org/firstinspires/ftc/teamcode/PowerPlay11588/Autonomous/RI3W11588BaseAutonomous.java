@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.PowerPlay11588.Autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.OpenCVPipelines.RI3W11588OpenCV;
 import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.RI3W11588Hardware;
@@ -9,6 +10,15 @@ import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.RI3W11588Hardware;
 public class RI3W11588BaseAutonomous extends LinearOpMode {
     RI3W11588Hardware robot = new RI3W11588Hardware();
     RI3W11588OpenCV pipeline = new RI3W11588OpenCV(telemetry);
+    enum Height{
+        INTAKE,
+        GROUND,
+        LOW,
+        MEDIUM,
+        HIGH
+    }
+    //These are set positions for the arm
+
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -19,6 +29,7 @@ public class RI3W11588BaseAutonomous extends LinearOpMode {
         int frontTicksX = (int) (x * robot.FRONT_TICKS_PER_INCH);
         int backTicksY = (int) (y * robot.BACK_TICKS_PER_INCH);
         int backTicksX = (int) (x * robot.BACK_TICKS_PER_INCH);
+        //This method takes in a parameter of inches, we must convert these to ticks
 
         robot.frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -29,6 +40,7 @@ public class RI3W11588BaseAutonomous extends LinearOpMode {
         robot.frontRight.setTargetPosition(frontTicksY - frontTicksX);
         robot.backLeft.setTargetPosition(backTicksY - backTicksX);
         robot.backRight.setTargetPosition(backTicksY + backTicksX);
+        //We will want to be moving forwards, and some of the wheels are actually positioned backwards, so we must set their desitination negative
 
         robot.frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -80,6 +92,46 @@ public class RI3W11588BaseAutonomous extends LinearOpMode {
             moveXY(0, 24);
             // Move forward 36 inches
             moveXY(36, 0);
+        }
+    }
+    public void moveArm(Height height){
+        int armTarget = 0;
+        if(height == Height.INTAKE){
+            armTarget = 0;
+        }else if(height == Height.GROUND){
+            armTarget = 50;
+        }else if(height == Height.LOW){
+            armTarget = 100;
+        }else if(height == Height.MEDIUM){
+            armTarget = 200;
+        }else if(height == Height.HIGH){
+            armTarget = 300;
+        }
+
+        ElapsedTime pidTimer = new ElapsedTime();
+
+        double kp = 2.12;
+        double ki = 0.39;
+        double kd = 0;
+        double pArm = 0;
+        double iArm = 0;
+        double dArm = 0;
+
+        double error = armTarget - robot.arm.getCurrentPosition();
+
+        while(opModeIsActive() && !(error < 30 && error > -30)){
+            error = armTarget - robot.arm.getCurrentPosition();
+            //Subtract the old error from the current one. Could use a separate variable
+            // but pArm hasn't been updated to the new error yet so why not
+            dArm = (error - pArm) / pidTimer.seconds();
+            iArm = iArm + (error * pidTimer.seconds());
+            pArm = error;
+
+            double total = (kp * pArm) + (ki * iArm) + (kd * dArm);
+
+            robot.arm.setPower(total);
+
+            pidTimer.reset();
         }
     }
 }
