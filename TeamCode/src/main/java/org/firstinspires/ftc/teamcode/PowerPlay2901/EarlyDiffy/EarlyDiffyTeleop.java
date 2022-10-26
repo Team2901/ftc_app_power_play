@@ -45,23 +45,24 @@ public class EarlyDiffyTeleop extends OpMode {
             rightTurnPower = rightPodTurn(moveAngle+(45*turnPower*Math.sin(Math.toRadians(moveAngle))));
         }
 
-        if(gamepad1.a||gamepad2.left_bumper){
-            robot.clawOne.setPosition(0.1);
+        if(gamepad1.a||gamepad2.a){
+            robot.clawOne.setPosition(0);
             robot.clawTwo.setPosition(0.9);
-        } else if(gamepad2.right_bumper||gamepad1.x/*robot.clawSensor.getDistance(DistanceUnit.INCH)<1.5*/){
-            robot.clawOne.setPosition(.2);
-            robot.clawTwo.setPosition(.8);
+        } else if(gamepad1.x||gamepad2.x/*robot.clawSensor.getDistance(DistanceUnit.INCH)<1.5*/){
+            robot.clawOne.setPosition(.18);
+            robot.clawTwo.setPosition(.7);
         }
 
-        double liftHeight = 0;
+        double liftPower = gamepad2.left_stick_y;
+        if(robot.liftOne.getCurrentPosition()<10&&liftPower>0){
+            liftPower = 0;
+        }
 
-        double liftPower = gamepad1.right_stick_y;
-
-        //robot.liftOne.setPower(liftPower);
-        //robot.leftTwo.setPower(liftPower);
+        robot.liftOne.setPower(liftPower);
+        robot.liftTwo.setPower(liftPower);
 
         int speedMod = 3;
-        if(gamepad1.left_bumper/*&&!(robot.liftOne.getCurrentPosition()>=50)*/){
+        if(gamepad1.left_bumper&&!(robot.liftOne.getCurrentPosition()>=600)){
             speedMod = 1;
         }
 
@@ -69,6 +70,11 @@ public class EarlyDiffyTeleop extends OpMode {
         robot.leftTwo.setVelocity((leftPodPower/speedMod-leftTurnPower)*2500);
         robot.rightOne.setVelocity((rightPodPower/speedMod+rightTurnPower)*2500);
         robot.rightTwo.setVelocity((rightPodPower/speedMod-rightTurnPower)*2500);
+
+        telemetry.addData("Left Pod Angle", leftPodAngle);
+        telemetry.addData("Right Pod Angle", rightPodAngle);
+        telemetry.addData("Lift Position", robot.liftOne.getCurrentPosition());
+        telemetry.update();
     }
 
     double kp = 1.2;
@@ -135,7 +141,7 @@ public class EarlyDiffyTeleop extends OpMode {
         return total;
     }
 
-    /*double klp = 0;
+    double klp = .5;
     double kli = 0;
     double kld = 0;
 
@@ -161,5 +167,5 @@ public class EarlyDiffyTeleop extends OpMode {
             total = -1;
         }
         return total;
-    }*/
+    }
 }
