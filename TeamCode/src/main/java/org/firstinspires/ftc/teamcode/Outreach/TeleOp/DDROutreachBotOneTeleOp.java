@@ -12,9 +12,16 @@ import org.firstinspires.ftc.teamcode.Utility.CountDownTimer;
 
 @TeleOp(name = "DDR Outreach Bot One Teleop", group = "Outreach")
 public class DDROutreachBotOneTeleOp extends OpMode {
+    final static int WAITING = 0;
+    final static int PWRUP_UP1 = 1;
+    final static int PWRUP_UP2 = 2;
+    final static int PWRUP_UP3 = 3;
+    final static int PWRUP_FINISHED = 4;
+    final static int PWRUP_TAPTIME = 1000;
     OutreachBotOneHardware robot = new OutreachBotOneHardware();
     CountDownTimer countDownTimer = new CountDownTimer(ElapsedTime.Resolution.MILLISECONDS);
     CountDownTimer boostTimer = new CountDownTimer(ElapsedTime.Resolution.MILLISECONDS);
+    CountDownTimer tapCountDownTimer = new CountDownTimer(ElapsedTime.Resolution.MILLISECONDS);
     /*
     CountDownTimer maxBoostTimer = new CountdownTimer(ElapsedTime.Resolution.MILLISECONDS);
      */
@@ -197,21 +204,51 @@ public class DDROutreachBotOneTeleOp extends OpMode {
         if (!participantGP.areButtonsInitialPress()) {
             return;
         }
-        if (powerUpProgress == 0) {
-            powerUpProgress = this.participantGP.upArrow.isInitialPress() ? 1:0;
-        } else if (powerUpProgress == 1) {
-            powerUpProgress = this.participantGP.upArrow.isInitialPress() ? 2:0;
-        } else if (powerUpProgress == 2) {
-            powerUpProgress = this.participantGP.upArrow.isInitialPress() ? 3:0;
-        } else if (powerUpProgress == 3) {
-            powerUpProgress = this.participantGP.rightArrow.isInitialPress() ? 4:0;
+        switch (powerUpProgress) {
+            case WAITING: {
+                if (this.participantGP.upArrow.isInitialPress()) {
+                    powerUpProgress = PWRUP_UP1;
+                    tapCountDownTimer.setTargetTime(PWRUP_TAPTIME);
+                } else {
+                    powerUpProgress = WAITING;
+                }
+                break;
+            }
+            case PWRUP_UP1: {
+                if (this.participantGP.upArrow.isInitialPress() && tapCountDownTimer.hasRemainingTime()) {
+                    powerUpProgress = PWRUP_UP2;
+                    tapCountDownTimer.setTargetTime(PWRUP_TAPTIME);
+                } else {
+                    powerUpProgress = WAITING;
+                }
+                break;
+            }
+            case PWRUP_UP2: {
+                if (this.participantGP.upArrow.isInitialPress() && tapCountDownTimer.hasRemainingTime()) {
+                    powerUpProgress = PWRUP_UP3;
+                    tapCountDownTimer.setTargetTime(PWRUP_TAPTIME);
+                } else {
+                    powerUpProgress = WAITING;
+                }
+                break;
+            }
+            case PWRUP_UP3: {
+                if (this.participantGP.rightArrow.isInitialPress() && tapCountDownTimer.hasRemainingTime()) {
+                    powerUpProgress = PWRUP_FINISHED;
+                    tapCountDownTimer.setTargetTime(PWRUP_TAPTIME);
+                } else {
+                    powerUpProgress = WAITING;
+                }
+                break;
+            }
+            case PWRUP_FINISHED: {
+                boostPower = 2;
+                boostTimer.setTargetTime(15000);
+                isBoost = true;
+                powerUpProgress = WAITING;
+            }
         }
-        if (powerUpProgress == 4) {
-            boostPower = 2;
-            boostTimer.setTargetTime(15000);
-            isBoost = true;
-            powerUpProgress = 0;
-        }
+
 
         /*
         if (cardinalCodeProgressProgress == 0) {
