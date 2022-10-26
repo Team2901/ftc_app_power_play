@@ -152,24 +152,29 @@ public class IntelRealsense extends OpMode
             move(addX, addY);
         }
 
+        //
         if(autoState == AutoState.MOVE_FORWARD){
-            move(24, 0);
+            moveTo(48, 0);
         } else if(autoState == AutoState.TURN_45){
             turnByAngle(45);
         } else if(autoState == AutoState.LIFT_SLIDES){
             //Slides stuff
         } else if(autoState == AutoState.RELEASE_CLAW){
-            //servo claw
+            robot.clawOne.setPosition(0.1);
+            robot.clawTwo.setPosition(0.9);
+            autoState = AutoState.RETRACT_SLIDES;
         } else if(autoState == AutoState.RETRACT_SLIDES){
             //Slides stuff
         } else if(autoState == AutoState.TURN_452){
             turnByAngle(45);
         } else if(autoState == AutoState.MOVE_BACK){
-            move(24, 12);
+            moveTo(48, 24);
         } else if(autoState == AutoState.GRIP_CLAW){
-            //servo claw
+            robot.clawOne.setPosition(.2);
+            robot.clawTwo.setPosition(.8);
+            autoState = AutoState.MOVE_FORWARD2;
         } else if(autoState == AutoState.MOVE_FORWARD2){
-            move(24, 0);
+            moveTo(48, 0);
         } else if(autoState == AutoState.TURN_N45){
             turnByAngle(-45);
         }
@@ -225,8 +230,8 @@ public class IntelRealsense extends OpMode
         double rightTurnPower = rightPodTurn(-angleToTarget+(Math.abs(1/(outputRight/speedMod))*turnPower*Math.sin(Math.toRadians(-angleToTarget))));
         robot.leftOne.setPower((outputLeft/speedMod + leftTurnPower)*2500);
         robot.leftTwo.setPower((outputLeft/speedMod - leftTurnPower)*2500);
-        robot.leftOne.setPower((outputRight/speedMod + rightTurnPower)*2500);
-        robot.leftTwo.setPower((outputRight/speedMod - rightTurnPower)*2500);
+        robot.rightOne.setPower((outputRight/speedMod + rightTurnPower)*2500);
+        robot.rightTwo.setPower((outputRight/speedMod - rightTurnPower)*2500);
 
         if(autoState == AutoState.MOVE_FORWARD && robot.leftOne.getPower() == 0){
             autoState = AutoState.TURN_45;
@@ -236,6 +241,7 @@ public class IntelRealsense extends OpMode
             autoState = AutoState.TURN_N45;
         }
 
+        telemetry.addData("Auto State", autoState);
         telemetry.addData("output", outputLeft);
         telemetry.addData("x1", String.format("%.2f", x1));
         telemetry.addData("y1", String.format("%.2f", y1));
@@ -265,6 +271,11 @@ public class IntelRealsense extends OpMode
     public void move(double x, double y) {
         positionX = x + translation.getX();
         positionY = y + translation.getY();
+    }
+
+    public void moveTo(double x, double y) {
+        positionX = x;
+        positionY = y;
     }
 
     public void move(double x, double y, double angle){

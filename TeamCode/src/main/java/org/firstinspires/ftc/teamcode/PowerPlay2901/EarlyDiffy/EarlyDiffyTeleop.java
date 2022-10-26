@@ -58,7 +58,7 @@ public class EarlyDiffyTeleop extends OpMode {
         double liftPower = gamepad1.right_stick_y;
 
         //robot.liftOne.setPower(liftPower);
-        //robot.leftTwo.setPower(liftPower);
+        //robot.liftTwo.setPower(liftPower);
 
         int speedMod = 3;
         if(gamepad1.left_bumper/*&&!(robot.liftOne.getCurrentPosition()>=50)*/){

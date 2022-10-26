@@ -74,6 +74,8 @@ public class EarlyDiffyHardware {
         leftTwo.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightOne.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightTwo.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        liftOne.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        liftTwo.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
