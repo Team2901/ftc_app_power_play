@@ -17,6 +17,8 @@ public class RI3W11588BaseAutonomous extends LinearOpMode {
         MEDIUM,
         HIGH
     }
+    //These are set positions for the arm
+
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -27,6 +29,7 @@ public class RI3W11588BaseAutonomous extends LinearOpMode {
         int frontTicksX = (int) (x * robot.FRONT_TICKS_PER_INCH);
         int backTicksY = (int) (y * robot.BACK_TICKS_PER_INCH);
         int backTicksX = (int) (x * robot.BACK_TICKS_PER_INCH);
+        //This method takes in a parameter of inches, we must convert these to ticks
 
         robot.frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -37,6 +40,7 @@ public class RI3W11588BaseAutonomous extends LinearOpMode {
         robot.frontRight.setTargetPosition(frontTicksY - frontTicksX);
         robot.backLeft.setTargetPosition(backTicksY - backTicksX);
         robot.backRight.setTargetPosition(backTicksY + backTicksX);
+        //We will want to be moving forwards, and some of the wheels are actually positioned backwards, so we must set their desitination negative
 
         robot.frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);

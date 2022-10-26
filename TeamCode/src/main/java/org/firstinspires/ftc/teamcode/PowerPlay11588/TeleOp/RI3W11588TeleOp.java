@@ -35,6 +35,8 @@ public class RI3W11588TeleOp extends OpMode {
     @Override
     public void loop() {
         robot.pipeLine.openCVTelemetry();
+        //Only call this method above if testing OpenCV, otherwise comment out
+        //If it is commented out, that is because you are not currently testing openCV
 
         try {
             previousGamepad1.copy(currentGamepad1);
