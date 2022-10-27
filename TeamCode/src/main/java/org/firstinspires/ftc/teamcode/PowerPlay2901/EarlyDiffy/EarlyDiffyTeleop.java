@@ -19,6 +19,8 @@ public class EarlyDiffyTeleop extends OpMode {
     public double leftTurnPower = 0;
     public double rightTurnPower = 0;
 
+    double moveAngle;
+
     @Override
     public void init() {
         robot.init(hardwareMap);
@@ -38,7 +40,7 @@ public class EarlyDiffyTeleop extends OpMode {
             leftTurnPower = leftPodTurn(0);
             rightTurnPower = rightPodTurn(0);
         } else {
-            double moveAngle = Math.toDegrees(Math.atan2(sidePower, -forwardPower+.001));
+            moveAngle = Math.toDegrees(Math.atan2(sidePower, -forwardPower+.001));
             //moveAngle = AngleUnit.normalizeDegrees(moveAngle+robot.getAngle()); //uncomment this for field oriented
             leftPodPower = Math.sqrt(forwardPower*forwardPower+sidePower*sidePower)+(turnPower*Math.cos(Math.toRadians(moveAngle)));
             rightPodPower = Math.sqrt(forwardPower*forwardPower+sidePower*sidePower)-(turnPower*Math.cos(Math.toRadians(moveAngle)));
@@ -87,6 +89,7 @@ public class EarlyDiffyTeleop extends OpMode {
         telemetry.addData("Lift Position", robot.liftOne.getCurrentPosition());
         telemetry.addData("Claw one position", robot.clawOne.getPosition());
         telemetry.addData("Claw two position", robot.clawTwo.getPosition());
+        telemetry.addData("joy angle", moveAngle);
         telemetry.update();
     }
 

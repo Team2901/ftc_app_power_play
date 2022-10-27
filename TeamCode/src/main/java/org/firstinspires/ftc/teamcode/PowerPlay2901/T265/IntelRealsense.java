@@ -192,14 +192,22 @@ public class IntelRealsense extends OpMode
             double angle = Math.atan(dy/dx);
             double hypotenuse = Math.sqrt((Math.pow(dx, 2)+Math.pow(dy, 2)));
             currentError = hypotenuse;
-            angleToTarget = Math.toDegrees(angle)+180;
+            angleToTarget = -Math.toDegrees(angle);
 
-            if(dx < 0){
-                angleToTarget += 180;
-            } else if(dx > 0 && dy < 0){
-                angleToTarget += 360;
+            if(dy > 0){
+                angleToTarget +=180;
+            } else if (dx < 0 && dy < 0){
+                angleToTarget +=360;
             }
-
+            if(dx > 0 && dy < 0){
+                angleToTarget -=180;
+            }
+            if(dx < 0 && dy > 0){
+                angleToTarget += 180;
+            }
+            if(angleToTarget > 180){
+                angleToTarget -= 360;
+            }
 
             currentTime = time.time(TimeUnit.MILLISECONDS);
 
@@ -226,20 +234,22 @@ public class IntelRealsense extends OpMode
             if(currentError - Math.sqrt(Math.pow(translation.getX(), 2) + Math.pow(translation.getY(), 2)) < 0){
                 outputLeft = -outputLeft;
             }
+            telemetry.addData("dx", dx);
+            telemetry.addData("dy", dy);
         } else {
             outputLeft = 0;
         }
 
         double turnPower = AngleUnit.normalizeDegrees(targetAngle - rotation.getDegrees())/500;
-        outputRight = outputLeft - (turnPower*rotation.getCos());
-        outputLeft += turnPower*rotation.getCos();
+        outputRight = outputLeft - (turnPower*Math.cos(Math.toRadians(angleToTarget)));
+        outputLeft += turnPower*Math.cos(Math.toRadians(angleToTarget));
         double leftTurnPower = leftPodTurn(angleToTarget-(45*turnPower*Math.sin(Math.toRadians(angleToTarget))));
         double rightTurnPower = rightPodTurn(angleToTarget+(45*turnPower*Math.sin(Math.toRadians(angleToTarget))));
 
-        /*robot.leftOne.setVelocity((outputLeft/speedMod+leftTurnPower)*2500);
+        robot.leftOne.setVelocity((outputLeft/speedMod+leftTurnPower)*2500);
         robot.leftTwo.setVelocity((outputLeft/speedMod-leftTurnPower)*2500);
         robot.rightOne.setVelocity((outputRight/speedMod+rightTurnPower)*2500);
-        robot.rightTwo.setVelocity((outputRight/speedMod-rightTurnPower)*2500);*/
+        robot.rightTwo.setVelocity((outputRight/speedMod-rightTurnPower)*2500);
 
         /*if(autoState == AutoState.MOVE_FORWARD && robot.leftOne.getPower() == 0){
             autoState = AutoState.TURN_45;
