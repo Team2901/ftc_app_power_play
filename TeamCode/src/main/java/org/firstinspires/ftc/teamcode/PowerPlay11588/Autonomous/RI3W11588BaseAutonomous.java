@@ -52,12 +52,16 @@ public class RI3W11588BaseAutonomous extends LinearOpMode {
         robot.backLeft.setPower(0.5);
         robot.backRight.setPower(0.5);
 
-        while(opModeIsActive() || (robot.frontLeft.isBusy() || robot.frontRight.isBusy() || robot.backLeft.isBusy() ||
+        while(opModeIsActive() && (robot.frontLeft.isBusy() || robot.frontRight.isBusy() || robot.backLeft.isBusy() ||
                 robot.backRight.isBusy())){
+            telemetry.addData("Front Left Target", robot.frontLeft.getTargetPosition());
             telemetry.addData("Front Left Position", robot.frontLeft.getCurrentPosition());
+            telemetry.addData("Front Right Target", robot.frontRight.getTargetPosition());
             telemetry.addData("Front Right Position", robot.frontRight.getCurrentPosition());
-            telemetry.addData("Front Right Position", robot.backLeft.getCurrentPosition());
-            telemetry.addData("Front Right Position", robot.backRight.getCurrentPosition());
+            telemetry.addData("Back Left Target", robot.backLeft.getTargetPosition());
+            telemetry.addData("Back Left Position", robot.backLeft.getCurrentPosition());
+            telemetry.addData("Back Right Target", robot.backRight.getTargetPosition());
+            telemetry.addData("Back Right Position", robot.backRight.getCurrentPosition());
             telemetry.update();
         }
 
@@ -95,31 +99,34 @@ public class RI3W11588BaseAutonomous extends LinearOpMode {
         }
     }
     public void moveArm(Height height){
-        int armTarget = 0;
+        int armTarget = 50;
+        int lastTarget = armTarget;
         if(height == Height.INTAKE){
-            armTarget = 0;
+            armTarget = 50;
         }else if(height == Height.GROUND){
             armTarget = 50;
         }else if(height == Height.LOW){
-            armTarget = 100;
+            armTarget = 600;
         }else if(height == Height.MEDIUM){
-            armTarget = 200;
+            armTarget = 950;
         }else if(height == Height.HIGH){
-            armTarget = 300;
+            armTarget = 1000;
         }
 
         ElapsedTime pidTimer = new ElapsedTime();
 
-        double kp = 2.12;
-        double ki = 0.39;
-        double kd = 0;
+        double kp = 0.5;
+        double ki = 0.5;
+        double kd = 0.01;
         double pArm = 0;
         double iArm = 0;
         double dArm = 0;
+        double iArmMax = .25;
 
         double error = armTarget - robot.arm.getCurrentPosition();
+        pidTimer.reset();
 
-        while(opModeIsActive() && !(error < 30 && error > -30)){
+        while(opModeIsActive() && !(error < 5 && error > -5) && !(dArm < .02 && dArm > 0)){
             error = armTarget - robot.arm.getCurrentPosition();
             //Subtract the old error from the current one. Could use a separate variable
             // but pArm hasn't been updated to the new error yet so why not
@@ -127,11 +134,26 @@ public class RI3W11588BaseAutonomous extends LinearOpMode {
             iArm = iArm + (error * pidTimer.seconds());
             pArm = error;
 
-            double total = (kp * pArm) + (ki * iArm) + (kd * dArm);
+            if(armTarget != lastTarget){
+                iArm = 0;
+            }
+            if (iArm > iArmMax){
+                iArm = iArmMax;
+            }else if (iArm < -iArmMax){
+                iArm = -iArmMax;
+            }
+            double total = ((kp * pArm) + (ki * iArm) + (kd * dArm))/100;
 
             robot.arm.setPower(total);
 
+            telemetry.addData("Arm Error", error);
+            telemetry.addData("Arm Target", armTarget);
+            telemetry.addData("Arm Position", robot.arm.getCurrentPosition());
+            telemetry.addData("Arm Power", total);
+            telemetry.update();
+
             pidTimer.reset();
         }
+        robot.arm.setPower(0.01);
     }
 }

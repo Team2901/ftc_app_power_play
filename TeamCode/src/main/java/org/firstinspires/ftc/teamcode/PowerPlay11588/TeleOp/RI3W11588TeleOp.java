@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.RI3W11588Hardware;
 
-@TeleOp(name = "3 Week 11588")
+@TeleOp(name = "3 Week 11588", group = "11588")
 public class RI3W11588TeleOp extends OpMode {
     RI3W11588Hardware robot = new RI3W11588Hardware();
 
@@ -23,13 +23,16 @@ public class RI3W11588TeleOp extends OpMode {
     Gamepad previousGamepad1 = new Gamepad();
     Gamepad previousGamepad2 = new Gamepad();
 
-    int armTarget = 0;
-    double pArm = 0;
-    double iArm = 0;
-    double dArm = 0;
+    int armTarget = 50;
+    int lastTarget = armTarget;
+    double total = 0;
+    double pArm = 0.5;
+    double iArm = 0.5;
+    double dArm = 0.02;
     double kp = 0;
     double ki = 0;
     double kd = 0;
+    double iArmMax = .25;
 
     enum Height{
         INTAKE,
@@ -49,10 +52,6 @@ public class RI3W11588TeleOp extends OpMode {
 
     @Override
     public void loop() {
-        robot.pipeLine.openCVTelemetry();
-        //Only call this method above if testing OpenCV, otherwise comment out
-        //If it is commented out, that is because you are not currently testing openCV
-
         try {
             previousGamepad1.copy(currentGamepad1);
             previousGamepad2.copy(currentGamepad2);
@@ -81,19 +80,20 @@ public class RI3W11588TeleOp extends OpMode {
         robot.backRight.setPower(y + x - rx);
 
         if(gamepad1.dpad_left){
-            armTarget = 0;
-        }
-        if(gamepad1.dpad_down){
             armTarget = 50;
         }
+        if(gamepad1.dpad_down){
+            armTarget = 600;
+        }
         if(gamepad1.dpad_right){
-            armTarget = 100;
+            armTarget = 950;
         }
         if(gamepad1.dpad_up){
-            armTarget = 200;
+            armTarget = 1000;
         }
 
-        robot.arm.setPower(armPower());
+        //robot.arm.setPower(armPower());
+        armPowerer();
 
         switch (currentClawPosition){
             case Open:
@@ -109,7 +109,16 @@ public class RI3W11588TeleOp extends OpMode {
                 }
         }
 
+        telemetry.addData("Front Left Position", robot.frontLeft.getCurrentPosition());
+        telemetry.addData("Front Right Position", robot.frontRight.getCurrentPosition());
+        telemetry.addData("Back Left Position", robot.backLeft.getCurrentPosition());
+        telemetry.addData("Back Right Position", robot.backRight.getCurrentPosition());
         telemetry.addData("Arm Position", robot.arm.getCurrentPosition());
+        telemetry.addData("Arm Target", armTarget);
+        telemetry.addData("P Arm", pArm);
+        telemetry.addData("I Arm", iArm);
+        telemetry.addData("D Arm", dArm);
+        telemetry.addData("Pid Total", total);
         telemetry.addData("Claw State", currentClawPosition);
         telemetry.update();
 
@@ -135,15 +144,44 @@ public class RI3W11588TeleOp extends OpMode {
 
     public double armPower(){
         double error = armTarget - robot.arm.getCurrentPosition();
-        pidTimer.reset();
         dArm = (error - pArm) / pidTimer.seconds();
         iArm = iArm + (error * pidTimer.seconds());
         pArm = error;
 
-        double total = (kp * pArm) + (ki * iArm) + (kd * dArm);
+        if(armTarget != lastTarget){
+            iArm = 0;
+        }
+        if(iArm > iArmMax){
+            iArm = iArmMax;
+        }else if(iArm < -iArmMax){
+            iArm = -iArmMax;
+        }
+
+        total = ((kp * pArm) + (ki * iArm) + (kd * dArm))/100;
+        lastTarget = armTarget;
 
         pidTimer.reset();
-
         return total;
+    }
+
+    public void armPowerer(){
+        double error = armTarget - robot.arm.getCurrentPosition();
+        dArm = (error - pArm) / pidTimer.seconds();
+        iArm = iArm + (error * pidTimer.seconds());
+        pArm = error;
+
+        if(armTarget != lastTarget){
+            iArm = 0;
+        }
+        if(iArm > iArmMax){
+            iArm = iArmMax;
+        }else if(iArm < -iArmMax){
+            iArm = -iArmMax;
+        }
+
+        total = ((kp * pArm) + (ki * iArm) + (kd * dArm))/100;
+        lastTarget = armTarget;
+
+        pidTimer.reset();
     }
 }
