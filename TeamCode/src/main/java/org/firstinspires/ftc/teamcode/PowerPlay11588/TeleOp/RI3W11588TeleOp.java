@@ -26,12 +26,12 @@ public class RI3W11588TeleOp extends OpMode {
     int armTarget = 50;
     int lastTarget = armTarget;
     double total = 0;
-    double pArm = 0.5;
-    double iArm = 0.5;
-    double dArm = 0.02;
-    double kp = 0;
-    double ki = 0;
-    double kd = 0;
+    double pArm = 0;
+    double iArm = 0;
+    double dArm = 0;
+    double kp = 0.5;
+    double ki = 0.5;
+    double kd = 0.01;
     double iArmMax = .25;
 
     enum Height{
@@ -92,8 +92,8 @@ public class RI3W11588TeleOp extends OpMode {
             armTarget = 1000;
         }
 
-        //robot.arm.setPower(armPower());
-        armPowerer();
+        robot.arm.setPower(armPower());
+        //armPowerer();
 
         switch (currentClawPosition){
             case Open:
@@ -118,6 +118,9 @@ public class RI3W11588TeleOp extends OpMode {
         telemetry.addData("P Arm", pArm);
         telemetry.addData("I Arm", iArm);
         telemetry.addData("D Arm", dArm);
+        telemetry.addData("Proportional Stuff", pArm * kp);
+        telemetry.addData("Integral Stuff", iArm * ki);
+        telemetry.addData("Derivative Stuff", dArm * kd);
         telemetry.addData("Pid Total", total);
         telemetry.addData("Claw State", currentClawPosition);
         telemetry.update();
@@ -148,6 +151,8 @@ public class RI3W11588TeleOp extends OpMode {
         iArm = iArm + (error * pidTimer.seconds());
         pArm = error;
 
+        total = ((kp * pArm) + (ki * iArm) + (kd * dArm))/100;
+
         if(armTarget != lastTarget){
             iArm = 0;
         }
@@ -157,7 +162,6 @@ public class RI3W11588TeleOp extends OpMode {
             iArm = -iArmMax;
         }
 
-        total = ((kp * pArm) + (ki * iArm) + (kd * dArm))/100;
         lastTarget = armTarget;
 
         pidTimer.reset();
@@ -170,6 +174,8 @@ public class RI3W11588TeleOp extends OpMode {
         iArm = iArm + (error * pidTimer.seconds());
         pArm = error;
 
+        total = ((kp * pArm) + (ki * iArm) + (kd * dArm))/100;
+
         if(armTarget != lastTarget){
             iArm = 0;
         }
@@ -178,8 +184,6 @@ public class RI3W11588TeleOp extends OpMode {
         }else if(iArm < -iArmMax){
             iArm = -iArmMax;
         }
-
-        total = ((kp * pArm) + (ki * iArm) + (kd * dArm))/100;
         lastTarget = armTarget;
 
         pidTimer.reset();

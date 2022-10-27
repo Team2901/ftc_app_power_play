@@ -154,6 +154,6 @@ public class RI3W11588BaseAutonomous extends LinearOpMode {
 
             pidTimer.reset();
         }
-        robot.arm.setPower(0.01);
+        robot.arm.setPower(0.005);
     }
 }
