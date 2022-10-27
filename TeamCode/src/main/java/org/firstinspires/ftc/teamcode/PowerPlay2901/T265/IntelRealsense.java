@@ -18,14 +18,14 @@ import org.firstinspires.ftc.teamcode.Shared.Gamepad.ImprovedGamepad;
 import java.util.concurrent.TimeUnit;
 
 
-@Autonomous(name="Test T265", group="Iterative Opmode")
+@TeleOp(name="Test T265", group="Iterative Opmode")
 public class IntelRealsense extends OpMode
 {
     // We treat this like a singleton because there should only ever be one object per camera
     private static T265Camera slamra = null;
     public double initTheta;
 
-    final double angleOffset = 45;
+    final double angleOffset = -40;
 
     T265Camera.CameraUpdate up;
 
@@ -66,23 +66,23 @@ public class IntelRealsense extends OpMode
 
     double turnByAngle;
 
-    public enum AutoState {
-        MOVE_FORWARD,
-        TURN_45,
-
-        //loop next part
-        LIFT_SLIDES,
-        RELEASE_CLAW,
-        RETRACT_SLIDES,
-        TURN_452,
-        MOVE_BACK,
-        GRIP_CLAW,
-        MOVE_FORWARD2,
-        TURN_N45
-
-
-    }
-    AutoState autoState = AutoState.MOVE_FORWARD;
+//    public enum AutoState {
+//        MOVE_FORWARD,
+//        TURN_45,
+//
+//        //loop next part
+//        LIFT_SLIDES,
+//        RELEASE_CLAW,
+//        RETRACT_SLIDES,
+//        TURN_452,
+//        MOVE_BACK,
+//        GRIP_CLAW,
+//        MOVE_FORWARD2,
+//        TURN_N45
+//
+//
+//    }
+    //AutoState autoState = AutoState.MOVE_FORWARD;
 
 
     double outputLeft;
@@ -152,8 +152,15 @@ public class IntelRealsense extends OpMode
             move(addX, addY);
         }
 
+        if(improvedGamepad.a.isInitialPress()){
+            kp +=0.01;
+        }else if(improvedGamepad.y.isInitialPress()){
+            kp -=0.01;
+        }
+
+
         //
-        if(autoState == AutoState.MOVE_FORWARD){
+        /*if(autoState == AutoState.MOVE_FORWARD){
             moveTo(48, 0);
         } else if(autoState == AutoState.TURN_45){
             turnByAngle(45);
@@ -177,15 +184,15 @@ public class IntelRealsense extends OpMode
             moveTo(48, 0);
         } else if(autoState == AutoState.TURN_N45){
             turnByAngle(-45);
-        }
+        }*/
 
-        if(Math.abs(positionX - translation.getX()) > .1 || Math.abs(positionY - translation.getY()) > .1){
+        if(Math.abs(positionX - translation.getX()) > .5 || Math.abs(positionY - translation.getY()) > .5){
             double dx = positionX - translation.getX();
             double dy = positionY - translation.getY();
-            double angle = Math.atan(dy/dx) + angleOffset;
+            double angle = Math.atan(dy/dx);
             double hypotenuse = Math.sqrt((Math.pow(dx, 2)+Math.pow(dy, 2)));
             currentError = hypotenuse;
-            angleToTarget = Math.toDegrees(angle);
+            angleToTarget = Math.toDegrees(angle)+180;
 
             if(dx < 0){
                 angleToTarget += 180;
@@ -226,27 +233,28 @@ public class IntelRealsense extends OpMode
         double turnPower = AngleUnit.normalizeDegrees(targetAngle - rotation.getDegrees())/500;
         outputRight = outputLeft - (turnPower*rotation.getCos());
         outputLeft += turnPower*rotation.getCos();
-        double leftTurnPower = leftPodTurn(-angleToTarget-(Math.abs(1/(outputRight/speedMod))*turnPower*Math.sin(Math.toRadians(-angleToTarget))));
-        double rightTurnPower = rightPodTurn(-angleToTarget+(Math.abs(1/(outputRight/speedMod))*turnPower*Math.sin(Math.toRadians(-angleToTarget))));
-        robot.leftOne.setPower((outputLeft/speedMod + leftTurnPower)*2500);
-        robot.leftTwo.setPower((outputLeft/speedMod - leftTurnPower)*2500);
-        robot.rightOne.setPower((outputRight/speedMod + rightTurnPower)*2500);
-        robot.rightTwo.setPower((outputRight/speedMod - rightTurnPower)*2500);
+        double leftTurnPower = leftPodTurn(angleToTarget-(45*turnPower*Math.sin(Math.toRadians(angleToTarget))));
+        double rightTurnPower = rightPodTurn(angleToTarget+(45*turnPower*Math.sin(Math.toRadians(angleToTarget))));
 
-        if(autoState == AutoState.MOVE_FORWARD && robot.leftOne.getPower() == 0){
+        /*robot.leftOne.setVelocity((outputLeft/speedMod+leftTurnPower)*2500);
+        robot.leftTwo.setVelocity((outputLeft/speedMod-leftTurnPower)*2500);
+        robot.rightOne.setVelocity((outputRight/speedMod+rightTurnPower)*2500);
+        robot.rightTwo.setVelocity((outputRight/speedMod-rightTurnPower)*2500);*/
+
+        /*if(autoState == AutoState.MOVE_FORWARD && robot.leftOne.getPower() == 0){
             autoState = AutoState.TURN_45;
         } else if(autoState == AutoState.MOVE_BACK && robot.leftOne.getPower() == 0){
             autoState = AutoState.GRIP_CLAW;
         } else if(autoState == AutoState.MOVE_FORWARD2 && robot.leftOne.getPower() == 0){
             autoState = AutoState.TURN_N45;
-        }
+        }*/
 
-        telemetry.addData("Auto State", autoState);
+        //telemetry.addData("Auto State", autoState);
         telemetry.addData("output", outputLeft);
-        telemetry.addData("x1", String.format("%.2f", x1));
-        telemetry.addData("y1", String.format("%.2f", y1));
-        telemetry.addData("x2", String.format("%.2f", x2));
-        telemetry.addData("y2", String.format("%.2f", y2));
+//        telemetry.addData("x1", String.format("%.2f", x1));
+//        telemetry.addData("y1", String.format("%.2f", y1));
+//        telemetry.addData("x2", String.format("%.2f", x2));
+//        telemetry.addData("y2", String.format("%.2f", y2));
         telemetry.addData("Raw Rotation", rotation);
         telemetry.addData("Adjusted Rotation", String.format("%.2f", fieldTheta) + "°");
         telemetry.addData("Adjusted x", String.format("%.2f", adjustX) + " inches");
@@ -392,10 +400,10 @@ public class IntelRealsense extends OpMode
         robot.rightOne.setPower(0);
         robot.rightTwo.setPower(0);
 
-        if((autoState == AutoState.TURN_45 && robot.leftTwo.getPower() == 0) || (autoState == AutoState.TURN_N45 && robot.leftTwo.getPower() == 0)){
-            autoState = AutoState.LIFT_SLIDES;
-        } else if(autoState == AutoState.TURN_452 && robot.leftTwo.getPower() == 0){
-            autoState = AutoState.MOVE_BACK;
-        }
+//        if((autoState == AutoState.TURN_45 && robot.leftTwo.getPower() == 0) || (autoState == AutoState.TURN_N45 && robot.leftTwo.getPower() == 0)){
+//            autoState = AutoState.LIFT_SLIDES;
+//        } else if(autoState == AutoState.TURN_452 && robot.leftTwo.getPower() == 0){
+//            autoState = AutoState.MOVE_BACK;
+//        }
     }
 }
