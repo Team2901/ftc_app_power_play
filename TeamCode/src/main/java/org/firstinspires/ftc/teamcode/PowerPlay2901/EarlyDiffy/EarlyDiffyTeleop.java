@@ -27,6 +27,7 @@ public class EarlyDiffyTeleop extends OpMode {
 
     @Override
     public void loop() {
+        impGamepad1.update();
         double forwardPower = gamepad1.left_stick_y;
         double sidePower = gamepad1.left_stick_x;
         double turnPower = gamepad1.right_stick_x;
@@ -53,6 +54,16 @@ public class EarlyDiffyTeleop extends OpMode {
             robot.clawTwo.setPosition(.7);
         }
 
+        if(impGamepad1.dpad_left.isInitialPress()){
+            robot.clawOne.setPosition(robot.clawOne.getPosition() - 0.01);
+        } else if(impGamepad1.dpad_right.isInitialPress()){
+            robot.clawOne.setPosition(robot.clawOne.getPosition() + 0.01);
+        } else if(impGamepad1.dpad_up.isInitialPress()){
+            robot.clawTwo.setPosition(robot.clawTwo.getPosition() + 0.01);
+        } else if(impGamepad1.dpad_down.isInitialPress()){
+            robot.clawTwo.setPosition(robot.clawTwo.getPosition() - 0.01);
+        }
+
         double liftPower = gamepad2.left_stick_y;
         if(robot.liftOne.getCurrentPosition()<10&&liftPower>0){
             liftPower = 0;
@@ -74,6 +85,8 @@ public class EarlyDiffyTeleop extends OpMode {
         telemetry.addData("Left Pod Angle", leftPodAngle);
         telemetry.addData("Right Pod Angle", rightPodAngle);
         telemetry.addData("Lift Position", robot.liftOne.getCurrentPosition());
+        telemetry.addData("Claw one position", robot.clawOne.getPosition());
+        telemetry.addData("Claw two position", robot.clawTwo.getPosition());
         telemetry.update();
     }
 
