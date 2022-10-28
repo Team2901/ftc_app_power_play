@@ -14,7 +14,7 @@ public class RI3W11588TeleOp extends OpMode {
 
     double triggerValue = 0;
     enum ClawPosition{Open, Closed}
-    ClawPosition currentClawPosition = ClawPosition.Open;
+    ClawPosition currentClawPosition = ClawPosition.Closed;
 
     //I can't decide which one to use, imp gamepad or checking ourselves
     Gamepad currentGamepad1 = new Gamepad();
@@ -23,12 +23,12 @@ public class RI3W11588TeleOp extends OpMode {
     Gamepad previousGamepad1 = new Gamepad();
     Gamepad previousGamepad2 = new Gamepad();
 
-    int armTarget = 50;
+    int armTarget = 75;
     int lastTarget = armTarget;
-    double total = 0;
-    double pArm = 0;
-    double iArm = 0;
-    double dArm = 0;
+    double total = 0.0;
+    double pArm = 0.0;
+    double iArm = 0.0;
+    double dArm = 0.0;
     double kp = 0.5;
     double ki = 0.5;
     double kd = 0.01;
@@ -72,7 +72,8 @@ public class RI3W11588TeleOp extends OpMode {
         }
         double y = -.5 * gamepad1.left_stick_y;
         double x = .5 * gamepad1.left_stick_x;
-        double rx = triggerValue;
+        double rx = gamepad1.right_stick_x;
+        //double rx = triggerValue;
 
         robot.frontLeft.setPower(y + x + rx);
         robot.frontRight.setPower(y - x - rx);
@@ -80,7 +81,7 @@ public class RI3W11588TeleOp extends OpMode {
         robot.backRight.setPower(y + x - rx);
 
         if(gamepad1.dpad_left){
-            armTarget = 50;
+            armTarget = 75;
         }
         if(gamepad1.dpad_down){
             armTarget = 600;
@@ -90,6 +91,12 @@ public class RI3W11588TeleOp extends OpMode {
         }
         if(gamepad1.dpad_up){
             armTarget = 1000;
+        }
+        if(currentGamepad1.a && !previousGamepad1.a){
+            armTarget = armTarget - 10;
+        }
+        if(currentGamepad1.y && !previousGamepad1.y){
+            armTarget = armTarget + 10;
         }
 
         robot.arm.setPower(armPower());
@@ -107,6 +114,10 @@ public class RI3W11588TeleOp extends OpMode {
                     robot.claw.setPosition(.5);
                     currentClawPosition = ClawPosition.Open;
                 }
+        }
+        if(currentGamepad1.x && !currentGamepad1.x){
+            robot.claw.setPosition(0);
+            currentClawPosition = ClawPosition.Closed;
         }
 
         telemetry.addData("Front Left Position", robot.frontLeft.getCurrentPosition());
@@ -153,6 +164,10 @@ public class RI3W11588TeleOp extends OpMode {
 
         total = ((kp * pArm) + (ki * iArm) + (kd * dArm))/100;
 
+        if(total > .5) {
+            total = .5;
+        }
+
         if(armTarget != lastTarget){
             iArm = 0;
         }
@@ -166,26 +181,5 @@ public class RI3W11588TeleOp extends OpMode {
 
         pidTimer.reset();
         return total;
-    }
-
-    public void armPowerer(){
-        double error = armTarget - robot.arm.getCurrentPosition();
-        dArm = (error - pArm) / pidTimer.seconds();
-        iArm = iArm + (error * pidTimer.seconds());
-        pArm = error;
-
-        total = ((kp * pArm) + (ki * iArm) + (kd * dArm))/100;
-
-        if(armTarget != lastTarget){
-            iArm = 0;
-        }
-        if(iArm > iArmMax){
-            iArm = iArmMax;
-        }else if(iArm < -iArmMax){
-            iArm = -iArmMax;
-        }
-        lastTarget = armTarget;
-
-        pidTimer.reset();
     }
 }

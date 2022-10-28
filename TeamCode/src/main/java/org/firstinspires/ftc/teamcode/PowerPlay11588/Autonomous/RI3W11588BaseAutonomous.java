@@ -99,12 +99,12 @@ public class RI3W11588BaseAutonomous extends LinearOpMode {
         }
     }
     public void moveArm(Height height){
-        int armTarget = 50;
+        int armTarget = 75;
         int lastTarget = armTarget;
         if(height == Height.INTAKE){
-            armTarget = 50;
+            armTarget = 75;
         }else if(height == Height.GROUND){
-            armTarget = 50;
+            armTarget = 75;
         }else if(height == Height.LOW){
             armTarget = 600;
         }else if(height == Height.MEDIUM){
@@ -143,6 +143,10 @@ public class RI3W11588BaseAutonomous extends LinearOpMode {
                 iArm = -iArmMax;
             }
             double total = ((kp * pArm) + (ki * iArm) + (kd * dArm))/100;
+
+            if(total > .5) {
+                total = .5;
+            }
 
             robot.arm.setPower(total);
 

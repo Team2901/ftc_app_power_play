@@ -11,6 +11,7 @@ public class RI3W11588BlueUpper extends RI3W11588BaseAutonomous{
         robot.init(this.hardwareMap, telemetry);
         waitForStart();
         runTime.reset();
+        moveArm(Height.GROUND);
         while(runTime.milliseconds() < 2000){}
         park();
     }
