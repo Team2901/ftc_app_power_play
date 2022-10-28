@@ -56,14 +56,22 @@ public class EarlyDiffyTeleop extends OpMode {
             robot.clawTwo.setPosition(.7);
         }
 
-        if(impGamepad1.dpad_left.isInitialPress()){
+        if(gamepad1.dpad_left && robot.clawOne.getPosition() > 0){
             robot.clawOne.setPosition(robot.clawOne.getPosition() - 0.01);
-        } else if(impGamepad1.dpad_right.isInitialPress()){
+        } else if(gamepad1.dpad_right && robot.clawOne.getPosition() < 1){
             robot.clawOne.setPosition(robot.clawOne.getPosition() + 0.01);
-        } else if(impGamepad1.dpad_up.isInitialPress()){
+        } else if(gamepad1.dpad_up && robot.clawTwo.getPosition() < 1){
             robot.clawTwo.setPosition(robot.clawTwo.getPosition() + 0.01);
-        } else if(impGamepad1.dpad_down.isInitialPress()){
+        } else if(gamepad1.dpad_down && robot.clawTwo.getPosition() > 0){
             robot.clawTwo.setPosition(robot.clawTwo.getPosition() - 0.01);
+        }
+
+        if(gamepad2.dpad_up){
+            robot.clawOne.setPosition(0.08);
+            robot.clawTwo.setPosition(0.14);
+        } else if(gamepad2.dpad_down){
+            robot.clawOne.setPosition(0.0);
+            robot.clawTwo.setPosition(0.25);
         }
 
         double liftPower = gamepad2.left_stick_y;
