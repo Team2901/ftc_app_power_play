@@ -1,6 +1,9 @@
 package org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.OpenCVPipelines;
 
+import android.graphics.Color;
+
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.PowerPlay11588.Autonomous.RI3W11588BaseAutonomous;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Rect;
@@ -15,7 +18,7 @@ public class RI3W11588OpenCV extends OpenCvPipeline {
     public enum ConeColor { red, green, blue};
     public ConeColor coneColor = null;
     public double redAmount;
-    public double blueAmount;
+    public double blueAmount = -1;
     public double greenAmount;
     public double redAmountAllTime;
     public double greenAmountAllTime;
@@ -49,7 +52,6 @@ public class RI3W11588OpenCV extends OpenCvPipeline {
 //Makes sure doesn't crash when the camera does nothing
         }
 
-        if(coneColor == null) {
             input.copyTo(lastImage);
             //copies the last input to lastImage, actually assigning it
 
@@ -101,16 +103,9 @@ public class RI3W11588OpenCV extends OpenCvPipeline {
 
 
             //All Pipeline code must be written above here
-            if (redAmount > greenAmount && greenAmount > blueAmount) {
-                coneColor = ConeColor.red;
-            } else if (greenAmount > redAmount && redAmount > blueAmount) {
-                coneColor = ConeColor.green;
-            } else if (blueAmount > greenAmount && greenAmount > redAmount) {
-                coneColor = ConeColor.blue;
-            }
-            //Simple if statement to determine what is the largest amount/percentage of a color
 
-        }
+
+
         return lastImage;
         /*The entire thing is in an if statement because we only want process frame to run one until
         we get a value for coneColor because we don't want it to change in the middle of our run because that
@@ -119,14 +114,23 @@ public class RI3W11588OpenCV extends OpenCvPipeline {
 
     }
 
+    public void setColorFromCam() {
+        if (blueAmount == -1) {
+            setColorFromCam();
+        }
+        if (redAmount > greenAmount && greenAmount > blueAmount) {
+            coneColor = ConeColor.red;
+        } else if (greenAmount > redAmount && redAmount > blueAmount) {
+            coneColor = ConeColor.green;
+        } else if (blueAmount > greenAmount && greenAmount > redAmount) {
+            coneColor = ConeColor.blue;
+        }
+        //Simple if statement to determine what is the largest amount/percentage of a color
+
+    }
+
     public void openCVTelemetry() {
-        telemetry.addData("Red Amount", redAmount);
-        telemetry.addData("Blue Amount", blueAmount);
-        telemetry.addData("Green Amount", greenAmount);
-        telemetry.addData("Frames Proceeded", framesProceeded);
-        telemetry.addData("Red average", redAmountAverage);
-        telemetry.addData("Blue average", blueAmountAverage);
-        telemetry.addData("Green average", greenAmountAverage);
+        telemetry.addData("Current Color", coneColor);
         telemetry.update();
     }
     //This is a separate method because you will not always want to see OpenCV Telemetry

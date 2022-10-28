@@ -65,6 +65,8 @@ public class RI3W11588BaseAutonomous extends LinearOpMode {
             telemetry.update();
         }
 
+        robot.pipeLine.openCVTelemetry();
+
         robot.frontLeft.setPower(0);
         robot.frontRight.setPower(0);
         robot.backLeft.setPower(0);
@@ -99,12 +101,12 @@ public class RI3W11588BaseAutonomous extends LinearOpMode {
         }
     }
     public void moveArm(Height height){
-        int armTarget = 75;
+        int armTarget = 100;
         int lastTarget = armTarget;
         if(height == Height.INTAKE){
-            armTarget = 75;
+            armTarget = 100;
         }else if(height == Height.GROUND){
-            armTarget = 75;
+            armTarget = 100;
         }else if(height == Height.LOW){
             armTarget = 600;
         }else if(height == Height.MEDIUM){

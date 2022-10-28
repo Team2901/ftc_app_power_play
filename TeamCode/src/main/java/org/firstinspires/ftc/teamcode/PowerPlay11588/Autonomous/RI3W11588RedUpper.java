@@ -10,7 +10,9 @@ public class RI3W11588RedUpper extends RI3W11588BaseAutonomous{
 
     @Override
     public void runOpMode() throws InterruptedException {
-        robot.init(this.hardwareMap, telemetry);
+        robot.init(this.hardwareMap, telemetry, true);
+        robot.pipeLine.setColorFromCam();
+        robot.camera.stopStreaming();
         waitForStart();
         runTime.reset();
         moveArm(Height.GROUND);

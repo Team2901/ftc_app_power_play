@@ -23,7 +23,7 @@ public class RI3W11588TeleOp extends OpMode {
     Gamepad previousGamepad1 = new Gamepad();
     Gamepad previousGamepad2 = new Gamepad();
 
-    int armTarget = 75;
+    int armTarget = 100;
     int lastTarget = armTarget;
     double total = 0.0;
     double pArm = 0.0;
@@ -81,7 +81,7 @@ public class RI3W11588TeleOp extends OpMode {
         robot.backRight.setPower(y + x - rx);
 
         if(gamepad1.dpad_left){
-            armTarget = 75;
+            armTarget = 100;
         }
         if(gamepad1.dpad_down){
             armTarget = 600;

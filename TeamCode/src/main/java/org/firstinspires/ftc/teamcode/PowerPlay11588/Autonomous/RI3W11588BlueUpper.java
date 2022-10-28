@@ -8,7 +8,9 @@ public class RI3W11588BlueUpper extends RI3W11588BaseAutonomous{
     ElapsedTime runTime = new ElapsedTime();
     @Override
     public void runOpMode() throws InterruptedException {
-        robot.init(this.hardwareMap, telemetry);
+        robot.init(this.hardwareMap, telemetry, true);
+        robot.pipeLine.setColorFromCam();
+        robot.camera.stopStreaming();
         waitForStart();
         runTime.reset();
         moveArm(Height.GROUND);
