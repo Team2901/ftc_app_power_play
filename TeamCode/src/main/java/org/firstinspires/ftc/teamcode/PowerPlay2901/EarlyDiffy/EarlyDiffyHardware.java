@@ -66,6 +66,9 @@ public class EarlyDiffyHardware {
         clawTwo = hardwareMap.get(Servo.class, "claw 2");
         //clawSensor = hardwareMap.get(Rev2mDistanceSensor.class, "claw sensor");
 
+        clawOne.setPosition(0.08);
+        clawTwo.setPosition(0.14);
+
         leftTwo.setDirection(DcMotorSimple.Direction.REVERSE);
         rightTwo.setDirection(DcMotorSimple.Direction.REVERSE);
         liftTwo.setDirection(DcMotorSimple.Direction.REVERSE);
