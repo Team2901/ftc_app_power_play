@@ -49,7 +49,7 @@ public class EarlyDiffyTeleop extends OpMode {
         }
 
         if(gamepad1.a||gamepad2.a){
-            robot.clawOne.setPosition(0.08);
+            robot.clawOne.setPosition(0.12);
 //            robot.clawTwo.setPosition(0.14);
         } else if(gamepad1.x||gamepad2.x/*robot.clawSensor.getDistance(DistanceUnit.INCH)<1.5*/){
             robot.clawOne.setPosition(0);
@@ -75,9 +75,6 @@ public class EarlyDiffyTeleop extends OpMode {
 //        }
 
         double liftPower = gamepad2.left_stick_y;
-        if(robot.liftOne.getCurrentPosition()<10&&liftPower>0){
-            liftPower = 0;
-        }
 
         robot.liftOne.setPower(liftPower);
         robot.liftTwo.setPower(liftPower);

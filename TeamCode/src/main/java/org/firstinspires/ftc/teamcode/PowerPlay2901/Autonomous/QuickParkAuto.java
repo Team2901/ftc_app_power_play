@@ -29,29 +29,29 @@ public class QuickParkAuto extends LinearOpMode {
         robot.rightOne.setVelocity(0);
         robot.rightTwo.setVelocity(0);
 
-        countDownTimer.setTargetTime(500);
-        while (countDownTimer.hasRemainingTime()) {
-            robot.leftOne.setVelocity(-0.3 * 2500);
-            robot.leftTwo.setVelocity(-0.3 * 2500);
-            robot.rightOne.setVelocity(0.3 * 2500);
-            robot.rightTwo.setVelocity(0.3 * 2500);
-        }
-
-        robot.liftOne.setTargetPosition(850);
-        robot.liftOne.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.liftOne.setPower(0.9);
-        robot.liftTwo.setTargetPosition(850);
-        robot.liftTwo.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.liftTwo.setPower(0.9);
-
-        robot.clawOne.setPosition(0.00);
-//        robot.clawTwo.setPosition(0.25);
-
-        robot.liftOne.setTargetPosition(15);
-        robot.liftOne.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.liftOne.setPower(-0.9);
-        robot.liftTwo.setTargetPosition(15);
-        robot.liftTwo.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.liftTwo.setPower(-0.9);
+//        countDownTimer.setTargetTime(500);
+//        while (countDownTimer.hasRemainingTime()) {
+//            robot.leftOne.setVelocity(-0.3 * 2500);
+//            robot.leftTwo.setVelocity(-0.3 * 2500);
+//            robot.rightOne.setVelocity(0.3 * 2500);
+//            robot.rightTwo.setVelocity(0.3 * 2500);
+//        }
+//
+////        robot.liftOne.setTargetPosition(850);
+////        robot.liftOne.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+////        robot.liftOne.setPower(0.9);
+////        robot.liftTwo.setTargetPosition(850);
+////        robot.liftTwo.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+////        robot.liftTwo.setPower(0.9);
+////
+////        robot.clawOne.setPosition(0.00);
+//////        robot.clawTwo.setPosition(0.25);
+////
+////        robot.liftOne.setTargetPosition(15);
+////        robot.liftOne.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+////        robot.liftOne.setPower(-0.9);
+////        robot.liftTwo.setTargetPosition(15);
+////        robot.liftTwo.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+////        robot.liftTwo.setPower(-0.9);
     }
 }
