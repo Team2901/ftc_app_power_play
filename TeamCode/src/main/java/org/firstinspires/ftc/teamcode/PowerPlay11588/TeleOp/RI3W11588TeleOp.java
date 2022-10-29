@@ -135,9 +135,9 @@ public class RI3W11588TeleOp extends OpMode {
         telemetry.addData("Derivative Stuff", dArm * kd);
         telemetry.addData("Pid Total", total);
         telemetry.addData("Claw State", currentClawPosition);
-        telemetry.addData("Blue", robot.pipeLine.blueAmount);
-        telemetry.addData("Green", robot.pipeLine.greenAmount);
-        telemetry.addData("red", robot.pipeLine.redAmount);
+        telemetry.addData("Blue", robot.pipeLine.blueAmountAverage);
+        telemetry.addData("Green", robot.pipeLine.greenAmountAverage);
+        telemetry.addData("red", robot.pipeLine.redAmountAverage);
         telemetry.update();
 
         /*

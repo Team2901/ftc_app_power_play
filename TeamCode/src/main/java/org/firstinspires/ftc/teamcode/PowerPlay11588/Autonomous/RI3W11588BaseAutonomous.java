@@ -79,24 +79,21 @@ public class RI3W11588BaseAutonomous extends LinearOpMode {
     public void park(){
         if(robot.pipeLine.coneColor == RI3W11588OpenCV.ConeColor.red){
             telemetry.addData("Saw red, going to spot 1", "");
-            // Move left 24 inches
-            moveXY(0, -24);
-            // Move forward 36 inches
-            moveXY(36, 0);
+            // Move forward 24 inches
+            moveXY(24, 0);
+            // Move left 27 inches
+            moveXY(0, -27);
         }else if(robot.pipeLine.coneColor == RI3W11588OpenCV.ConeColor.green) {
             telemetry.addData("Saw green, going to spot 2", "");
-            // Move left 24 inches
-            moveXY(0, -24);
             // Move forward 36 inches
             moveXY(36, 0);
-            // Move right 24 inches
-            moveXY(0, 24);
+
         }else if(robot.pipeLine.coneColor == RI3W11588OpenCV.ConeColor.blue){
             telemetry.addData("Saw blue, going to spot 3", "");
-            // Move right 24 inches
-            moveXY(0, 24);
-            // Move forward 36 inches
-            moveXY(36, 0);
+            // Move forward 24 inches
+            moveXY(24, 0);
+            // Move right 27 inches
+            moveXY(0, 27);
         }
     }
     public void moveArm(Height height){
