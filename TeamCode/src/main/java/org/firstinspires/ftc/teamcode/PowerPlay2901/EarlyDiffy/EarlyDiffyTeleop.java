@@ -50,10 +50,10 @@ public class EarlyDiffyTeleop extends OpMode {
 
         if(gamepad1.a||gamepad2.a){
             robot.clawOne.setPosition(0);
-            robot.clawTwo.setPosition(0.9);
+//            robot.clawTwo.setPosition(0.9);
         } else if(gamepad1.x||gamepad2.x/*robot.clawSensor.getDistance(DistanceUnit.INCH)<1.5*/){
             robot.clawOne.setPosition(.18);
-            robot.clawTwo.setPosition(.7);
+//            robot.clawTwo.setPosition(.7);
         }
 
         if(gamepad1.dpad_left && robot.clawOne.getPosition() > 0){
@@ -67,17 +67,14 @@ public class EarlyDiffyTeleop extends OpMode {
         }
 
         if(gamepad2.dpad_up){
-            robot.clawOne.setPosition(0.08);
-            robot.clawTwo.setPosition(0.14);
+            robot.clawOne.setPosition(0.12);
+//            robot.clawTwo.setPosition(0.18);
         } else if(gamepad2.dpad_down){
             robot.clawOne.setPosition(0.0);
-            robot.clawTwo.setPosition(0.25);
+//            robot.clawTwo.setPosition(0.25);
         }
 
         double liftPower = gamepad2.left_stick_y;
-        if(robot.liftOne.getCurrentPosition()<10&&liftPower>0){
-            liftPower = 0;
-        }
 
         robot.liftOne.setPower(liftPower);
         robot.liftTwo.setPower(liftPower);
