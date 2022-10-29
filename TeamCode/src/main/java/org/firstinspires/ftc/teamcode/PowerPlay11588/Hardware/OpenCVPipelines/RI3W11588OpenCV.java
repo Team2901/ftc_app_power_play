@@ -1,9 +1,6 @@
 package org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.OpenCVPipelines;
 
-import android.graphics.Color;
-
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.PowerPlay11588.Autonomous.RI3W11588BaseAutonomous;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Rect;
@@ -114,23 +111,10 @@ public class RI3W11588OpenCV extends OpenCvPipeline {
 
     }
 
-    public void setColorFromCam() {
-        if (blueAmount == -1) {
-            setColorFromCam();
-        }
-        if (redAmount > greenAmount && greenAmount > blueAmount) {
-            coneColor = ConeColor.red;
-        } else if (greenAmount > redAmount && redAmount > blueAmount) {
-            coneColor = ConeColor.green;
-        } else if (blueAmount > greenAmount && greenAmount > redAmount) {
-            coneColor = ConeColor.blue;
-        }
-        //Simple if statement to determine what is the largest amount/percentage of a color
 
-    }
 
     public void openCVTelemetry() {
-        telemetry.addData("Current Color", coneColor);
+        telemetry.addData("Blue", blueAmount);
         telemetry.update();
     }
     //This is a separate method because you will not always want to see OpenCV Telemetry

@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.exception.RobotCoreException;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.onbotjava.handlers.admin.ResetOnBotJava;
 import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.RI3W11588Hardware;
 
 @TeleOp(name = "3 Week 11588", group = "11588")
@@ -47,7 +48,7 @@ public class RI3W11588TeleOp extends OpMode {
     @Override
     public void init() {
         robot.init(this.hardwareMap, telemetry);
-
+        robot.camera.stopStreaming();
     }
 
     @Override
@@ -134,6 +135,9 @@ public class RI3W11588TeleOp extends OpMode {
         telemetry.addData("Derivative Stuff", dArm * kd);
         telemetry.addData("Pid Total", total);
         telemetry.addData("Claw State", currentClawPosition);
+        telemetry.addData("Blue", robot.pipeLine.blueAmount);
+        telemetry.addData("Green", robot.pipeLine.greenAmount);
+        telemetry.addData("red", robot.pipeLine.redAmount);
         telemetry.update();
 
         /*

@@ -43,11 +43,18 @@ public class RI3W11588Hardware implements OpenCvCamera.AsyncCameraOpenListener {
         arm = hardwareMap.dcMotor.get("arm");
         claw = hardwareMap.servo.get("claw");
         this.telemetry = telemetry;
+        WebcamName webcam = hardwareMap.get(WebcamName.class, "Webcam 1");
 
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         backRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        int cameraMonitorViewID = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
 
+        camera = OpenCvCameraFactory.getInstance().createWebcam(webcam, cameraMonitorViewID);
+
+        pipeLine = new RI3W11588OpenCV(telemetry);
+        camera.setPipeline(pipeLine);
+        camera.openCameraDeviceAsync(this);
 
         frontLeft.setPower(0);
         frontRight.setPower(0);
@@ -67,19 +74,6 @@ public class RI3W11588Hardware implements OpenCvCamera.AsyncCameraOpenListener {
         backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    }
-
-    public void init(HardwareMap hardwareMap, Telemetry telemetry, boolean useCamera) {
-        init(hardwareMap, telemetry);
-        WebcamName webcam = hardwareMap.get(WebcamName.class, "Webcam 1");
-
-        int cameraMonitorViewID = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-
-        camera = OpenCvCameraFactory.getInstance().createWebcam(webcam, cameraMonitorViewID);
-
-        pipeLine = new RI3W11588OpenCV(telemetry);
-        camera.setPipeline(pipeLine);
-        camera.openCameraDeviceAsync(this);
     }
 
     @Override

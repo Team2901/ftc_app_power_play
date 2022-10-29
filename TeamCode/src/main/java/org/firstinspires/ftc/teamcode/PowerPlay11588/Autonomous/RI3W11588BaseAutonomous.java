@@ -9,7 +9,6 @@ import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.RI3W11588Hardware;
 
 public class RI3W11588BaseAutonomous extends LinearOpMode {
     RI3W11588Hardware robot = new RI3W11588Hardware();
-    RI3W11588OpenCV pipeline = new RI3W11588OpenCV(telemetry);
     enum Height{
         INTAKE,
         GROUND,
@@ -65,7 +64,6 @@ public class RI3W11588BaseAutonomous extends LinearOpMode {
             telemetry.update();
         }
 
-        robot.pipeLine.openCVTelemetry();
 
         robot.frontLeft.setPower(0);
         robot.frontRight.setPower(0);
@@ -77,14 +75,15 @@ public class RI3W11588BaseAutonomous extends LinearOpMode {
         robot.backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
+
     public void park(){
-        if(pipeline.coneColor == RI3W11588OpenCV.ConeColor.red){
+        if(robot.pipeLine.coneColor == RI3W11588OpenCV.ConeColor.red){
             telemetry.addData("Saw red, going to spot 1", "");
             // Move left 24 inches
             moveXY(0, -24);
             // Move forward 36 inches
             moveXY(36, 0);
-        }else if(pipeline.coneColor == RI3W11588OpenCV.ConeColor.green) {
+        }else if(robot.pipeLine.coneColor == RI3W11588OpenCV.ConeColor.green) {
             telemetry.addData("Saw green, going to spot 2", "");
             // Move left 24 inches
             moveXY(0, -24);
@@ -92,7 +91,7 @@ public class RI3W11588BaseAutonomous extends LinearOpMode {
             moveXY(36, 0);
             // Move right 24 inches
             moveXY(0, 24);
-        }else if(pipeline.coneColor == RI3W11588OpenCV.ConeColor.blue){
+        }else if(robot.pipeLine.coneColor == RI3W11588OpenCV.ConeColor.blue){
             telemetry.addData("Saw blue, going to spot 3", "");
             // Move right 24 inches
             moveXY(0, 24);
@@ -156,6 +155,10 @@ public class RI3W11588BaseAutonomous extends LinearOpMode {
             telemetry.addData("Arm Target", armTarget);
             telemetry.addData("Arm Position", robot.arm.getCurrentPosition());
             telemetry.addData("Arm Power", total);
+            telemetry.addData("Red", robot.pipeLine.redAmount);
+            telemetry.addData("Blue", robot.pipeLine.blueAmount);
+            telemetry.addData("Green", robot.pipeLine.greenAmount);
+            telemetry.addData("Cone Color", robot.pipeLine.coneColor);
             telemetry.update();
 
             pidTimer.reset();
