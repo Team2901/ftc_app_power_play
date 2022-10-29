@@ -14,11 +14,12 @@ import com.spartronics4915.lib.T265Camera;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.PowerPlay2901.EarlyDiffy.EarlyDiffyHardware;
 import org.firstinspires.ftc.teamcode.Shared.Gamepad.ImprovedGamepad;
+import org.firstinspires.ftc.teamcode.Utility.CountDownTimer;
 
 import java.util.concurrent.TimeUnit;
 
 
-@TeleOp(name="Test T265", group="Iterative Opmode")
+@Autonomous(name="Test T265", group="Iterative Opmode")
 public class IntelRealsense extends OpMode
 {
     // We treat this like a singleton because there should only ever be one object per camera
@@ -29,6 +30,7 @@ public class IntelRealsense extends OpMode
 
     T265Camera.CameraUpdate up;
 
+    CountDownTimer countDownTimer = new CountDownTimer(ElapsedTime.Resolution.SECONDS);
     Translation2d translation;
     Rotation2d rotation;
 
@@ -50,7 +52,7 @@ public class IntelRealsense extends OpMode
     double i;
     double d;
 
-    double kp = 0.03;
+    double kp = 0.07;
     double ki = 0;
     double kd = 0;
     final double max_i = 1;
@@ -142,20 +144,21 @@ public class IntelRealsense extends OpMode
         double adjustX = ((x2*Math.cos(angleOffset)) - (y2*Math.sin(angleOffset)));
         double adjustY = ((x2*Math.sin(angleOffset)) + (y2*Math.cos(angleOffset)));
 
+        moveTo(-48, 0);
         //Changes target Position
         if(improvedGamepad.dpad_right.isInitialPress()){
             moveTo(24, 0);
-           // kp +=0.01;
+//           kp +=0.01;
         } else if(improvedGamepad.dpad_left.isInitialPress()){
             moveTo(-52, 0);
-            //kp -=0.01;
+//            kp -=0.01;
         }
         if(improvedGamepad.dpad_up.isInitialPress()){
             moveTo(-52, 24);
-           // kd += 0.01;
+//           kd += 0.01;
         } else if(improvedGamepad.dpad_down.isInitialPress()){
             moveTo(0, -24);
-          //  kd -= 0.01;
+//           kd -= 0.01;
         }
 
 
@@ -173,24 +176,38 @@ public class IntelRealsense extends OpMode
 //            moveTo(-50, 20);
 //        }
 //        if(autoState == AutoState.MOVE_FORWARD){
-//            moveTo(48, 0);
+//            moveTo(-48, 0);
 //        } else if(autoState == AutoState.TURN_45){
-//            move(0,0, 45);
+//            turnByAngle(45);
 //        } else if(autoState == AutoState.LIFT_SLIDES){
-//            //Slides stuff
+//            robot.liftOne.setTargetPosition(850);
+//            robot.liftOne.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//            robot.liftOne.setPower(0.9);
+//            countDownTimer.setTargetTime(10);
+//            if(countDownTimer.hasRemainingTime()) {
+//            } else {
+//                autoState = AutoState.RELEASE_CLAW;
+//            }
 //        } else if(autoState == AutoState.RELEASE_CLAW){
-//            robot.clawOne.setPosition(0.1);
-//            robot.clawTwo.setPosition(0.9);
+//            robot.clawOne.setPosition(0);
+//            robot.clawTwo.setPosition(0.25);
 //            autoState = AutoState.RETRACT_SLIDES;
 //        } else if(autoState == AutoState.RETRACT_SLIDES){
-//            //Slides stuff
+//            robot.liftOne.setTargetPosition(10);
+//            robot.liftOne.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//            robot.liftOne.setPower(-0.9);
+//            countDownTimer.setTargetTime(10);
+//            if(!countDownTimer.hasRemainingTime()) {
+//            } else {
+//                autoState = AutoState.TURN_452;
+//            }
 //        } else if(autoState == AutoState.TURN_452){
 //            turnByAngle(45);
 //        } else if(autoState == AutoState.MOVE_BACK){
-//            moveTo(48, 24);
+//            moveTo(-48, 24);
 //        } else if(autoState == AutoState.GRIP_CLAW){
-//            robot.clawOne.setPosition(.2);
-//            robot.clawTwo.setPosition(.8);
+//            robot.clawOne.setPosition(.12);
+//            robot.clawTwo.setPosition(.18);
 //            autoState = AutoState.MOVE_FORWARD2;
 //        } else if(autoState == AutoState.MOVE_FORWARD2){
 //            moveTo(48, 0);
@@ -221,10 +238,10 @@ public class IntelRealsense extends OpMode
         }
 
         //Movement PID code
-        if(Math.abs(((positionX) - (translation.getX()))) > 1 && Math.abs((positionY) - (translation.getY())) > 1) {
+        if(Math.abs(((positionX) - (translation.getX()))) < -1 || Math.abs((positionY) - (translation.getY())) > 1) {
 
-            double dx = ((positionX) - (translation.getX()));
-            double dy = ((positionY) - (translation.getY()));
+            double dx = ((positionY) - (translation.getY()));
+            double dy = -((positionX) - (translation.getX()));
             double angle = Math.atan(dy / dx);
             double hypotenuse = Math.sqrt((Math.pow(dx, 2) + Math.pow(dy, 2)));
             currentError = hypotenuse;
@@ -280,27 +297,22 @@ public class IntelRealsense extends OpMode
         outputLeft /= 100.0;
 
         double turnPower = AngleUnit.normalizeDegrees(targetAngle - rotation.getDegrees())/500;
-        outputRight = outputLeft - (turnPower*Math.cos(Math.toRadians(angleToTarget)));
-        outputLeft += turnPower*Math.cos(Math.toRadians(angleToTarget));
-        double leftTurnPower = leftPodTurn(angleToTarget-(45*turnPower*Math.sin(Math.toRadians(angleToTarget))));
-        double rightTurnPower = rightPodTurn(angleToTarget+(45*turnPower*Math.sin(Math.toRadians(angleToTarget))));
+        outputRight = outputLeft;
+        double leftTurnPower = leftPodTurn(angleToTarget);
+        double rightTurnPower = rightPodTurn(angleToTarget);
 
         robot.leftOne.setVelocity((outputLeft/speedMod+leftTurnPower)*2500);
         robot.leftTwo.setVelocity((outputLeft/speedMod-leftTurnPower)*2500);
         robot.rightOne.setVelocity((outputRight/speedMod+rightTurnPower)*2500);
         robot.rightTwo.setVelocity((outputRight/speedMod-rightTurnPower)*2500);
 
-        if(autoState == AutoState.MOVE_FORWARD && robot.leftOne.getPower() == 0 && isSecond){
-            autoState = AutoState.TURN_45;
-        } else if(autoState == AutoState.MOVE_BACK && robot.leftOne.getPower() == 0){
-            autoState = AutoState.GRIP_CLAW;
-        } else if(autoState == AutoState.MOVE_FORWARD2 && robot.leftOne.getPower() == 0){
-            autoState = AutoState.TURN_N45;
-        } else if((autoState == AutoState.TURN_45 && robot.leftTwo.getPower() == 0) || (autoState == AutoState.TURN_N45 && robot.leftTwo.getPower() == 0)){
-            autoState = AutoState.LIFT_SLIDES;
-        } else if(autoState == AutoState.TURN_452 && robot.leftTwo.getPower() == 0){
-            autoState = AutoState.MOVE_BACK;
-        }
+//        if(autoState == AutoState.MOVE_FORWARD && robot.leftOne.getVelocity() == 0 && isSecond){
+//            autoState = AutoState.TURN_45;
+//        } else if(autoState == AutoState.MOVE_BACK && robot.leftOne.getVelocity() == 0){
+//            autoState = AutoState.GRIP_CLAW;
+//        } else if(autoState == AutoState.MOVE_FORWARD2 && robot.leftOne.getVelocity() == 0) {
+//            autoState = AutoState.TURN_N45;
+//        }
 
         telemetry.addData("Auto State", autoState);
         telemetry.addData("output", outputLeft);
@@ -335,19 +347,19 @@ public class IntelRealsense extends OpMode
 //    }
     //enter (x, y) coordinates to move robot wheels to angle and position
     public void move(double x, double y) {
-        positionX = x + translation.getX();
-        positionY = y + translation.getY();
+        positionX = y + translation.getY();
+        positionY = -(x + translation.getX());
     }
 
     public void moveTo(double x, double y) {
-        positionX = x;
-        positionY = y;
+        positionX = y;
+        positionY = -x;
         isSecond = true;
     }
 
     public void move(double x, double y, double angle){
-        positionX = x + translation.getX();
-        positionY = y + translation.getY();
+        positionX = y + translation.getY();
+        positionY = -(x + translation.getX());
         targetAngle = angle;
     }
 
@@ -452,6 +464,8 @@ public class IntelRealsense extends OpMode
             robot.rightOne.setPower(total);
             robot.leftTwo.setPower(total);
             robot.rightTwo.setPower(total);
+            positionX = translation.getX();
+            positionY = translation.getY();
         }
 
         robot.leftOne.setPower(0);
