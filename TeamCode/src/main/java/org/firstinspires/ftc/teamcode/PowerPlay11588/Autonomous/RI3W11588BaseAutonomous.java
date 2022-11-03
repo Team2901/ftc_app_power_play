@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.PowerPlay11588.Autonomous;
 
+import static org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.RI3W11588Hardware.FRONT_GEAR_RATIO;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
