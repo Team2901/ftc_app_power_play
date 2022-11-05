@@ -48,13 +48,13 @@ public class EarlyDiffyTeleop extends OpMode {
             rightTurnPower = rightPodTurn(moveAngle+(45*turnPower*Math.sin(Math.toRadians(moveAngle))));
         }
 
-        if(gamepad1.a||gamepad2.a){
-            robot.clawOne.setPosition(0.12);
-//            robot.clawTwo.setPosition(0.14);
-        } else if(gamepad1.x||gamepad2.x/*robot.clawSensor.getDistance(DistanceUnit.INCH)<1.5*/){
-            robot.clawOne.setPosition(0);
-//            robot.clawTwo.setPosition(0.25);
-        }
+//        if(gamepad1.a||gamepad2.a){
+//            robot.clawOne.setPosition(0.12);
+////            robot.clawTwo.setPosition(0.14);
+//        } else if(gamepad1.x||gamepad2.x/*robot.clawSensor.getDistance(DistanceUnit.INCH)<1.5*/){
+//            robot.clawOne.setPosition(0);
+////            robot.clawTwo.setPosition(0.25);
+//        }
 
 //        if(gamepad1.dpad_left && robot.clawOne.getPosition() > 0){
 //            robot.clawOne.setPosition(robot.clawOne.getPosition() - 0.01);
@@ -76,11 +76,11 @@ public class EarlyDiffyTeleop extends OpMode {
 
         double liftPower = gamepad2.left_stick_y;
 
-        robot.liftOne.setPower(liftPower);
-        robot.liftTwo.setPower(liftPower);
+//        robot.liftOne.setPower(liftPower);
+//        robot.liftTwo.setPower(liftPower);
 
         int speedMod = 3;
-        if(gamepad1.left_bumper&&!(robot.liftOne.getCurrentPosition()>=600)){
+        if(gamepad1.left_bumper){
             speedMod = 1;
         }
 
@@ -91,9 +91,9 @@ public class EarlyDiffyTeleop extends OpMode {
 
         telemetry.addData("Left Pod Angle", leftPodAngle);
         telemetry.addData("Right Pod Angle", rightPodAngle);
-        telemetry.addData("Lift Position", robot.liftOne.getCurrentPosition());
-        telemetry.addData("Claw one position", robot.clawOne.getPosition());
-        telemetry.addData("Claw two position", robot.clawTwo.getPosition());
+        //telemetry.addData("Lift Position", robot.liftOne.getCurrentPosition());
+//        telemetry.addData("Claw one position", robot.clawOne.getPosition());
+//        telemetry.addData("Claw two position", robot.clawTwo.getPosition());
         telemetry.addData("joy angle", moveAngle);
         telemetry.update();
     }
@@ -171,7 +171,7 @@ public class EarlyDiffyTeleop extends OpMode {
     double liftI = 0;
     double liftD = 0;
 
-    public double liftPower(double target){
+    /*public double liftPower(double target){
         double error = target-robot.liftOne.getCurrentPosition();
         double secs = runtimeLift.seconds();
         runtime.reset();
@@ -188,5 +188,5 @@ public class EarlyDiffyTeleop extends OpMode {
             total = -1;
         }
         return total;
-    }
+    }*/
 }
