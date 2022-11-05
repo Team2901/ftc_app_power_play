@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.PowerPlay11588.TeleOp;
 
+import static org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.RI3W11588Hardware.FRONT_GEAR_RATIO;
+
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.exception.RobotCoreException;
@@ -12,7 +14,7 @@ import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.RI3W11588Hardware;
 public class RI3W11588TeleOp extends OpMode {
     RI3W11588Hardware robot = new RI3W11588Hardware();
 
-    double triggerValue = 0;
+    double turningPower = 0;
     enum ClawPosition{Open, Closed}
     ClawPosition currentClawPosition = ClawPosition.Closed;
 
@@ -23,7 +25,7 @@ public class RI3W11588TeleOp extends OpMode {
     Gamepad previousGamepad1 = new Gamepad();
     Gamepad previousGamepad2 = new Gamepad();
 
-    int armTarget = 75;
+    int armTarget = 100;
     int lastTarget = armTarget;
     double total = 0.0;
     double pArm = 0.0;
@@ -47,7 +49,7 @@ public class RI3W11588TeleOp extends OpMode {
     @Override
     public void init() {
         robot.init(this.hardwareMap, telemetry);
-
+        robot.camera.stopStreaming();
     }
 
     @Override
@@ -64,24 +66,25 @@ public class RI3W11588TeleOp extends OpMode {
 
         //I fixed turning I think, definately test
         if(gamepad1.right_trigger > 0){
-            triggerValue = gamepad1.right_trigger;
+            turningPower = 0.3 * gamepad1.right_trigger;
         }else if(gamepad1.left_trigger > 0){
-            triggerValue = -gamepad1.left_trigger;
+            turningPower = -.3 * gamepad1.left_trigger;
         }else{
-            triggerValue = 0;
+            turningPower = gamepad1.right_stick_x;
         }
         double y = -.5 * gamepad1.left_stick_y;
         double x = .5 * gamepad1.left_stick_x;
-        double rx = gamepad1.right_stick_x;
-        //double rx = triggerValue;
+        //double rx = gamepad1.right_stick_x;
+        double rx = turningPower;
+
 
         robot.frontLeft.setPower(y + x + rx);
         robot.frontRight.setPower(y - x - rx);
-        robot.backLeft.setPower(y - x + rx);
-        robot.backRight.setPower(y + x - rx);
+        robot.backLeft.setPower((y - x + rx)*FRONT_GEAR_RATIO);
+        robot.backRight.setPower((y + x - rx)*FRONT_GEAR_RATIO);
 
         if(gamepad1.dpad_left){
-            armTarget = 75;
+            armTarget = 100;
         }
         if(gamepad1.dpad_down){
             armTarget = 600;
@@ -134,6 +137,9 @@ public class RI3W11588TeleOp extends OpMode {
         telemetry.addData("Derivative Stuff", dArm * kd);
         telemetry.addData("Pid Total", total);
         telemetry.addData("Claw State", currentClawPosition);
+        telemetry.addData("Blue", robot.pipeLine.blueAmountAverage);
+        telemetry.addData("Green", robot.pipeLine.greenAmountAverage);
+        telemetry.addData("red", robot.pipeLine.redAmountAverage);
         telemetry.update();
 
         /*
