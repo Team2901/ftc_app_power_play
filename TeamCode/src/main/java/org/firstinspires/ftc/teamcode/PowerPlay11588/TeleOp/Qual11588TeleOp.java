@@ -11,6 +11,7 @@ public class Qual11588TeleOp extends OpMode {
     public ElapsedTime gamepadTimer = new ElapsedTime();
     public ImprovedGamepad impGamepad1;
     public ImprovedGamepad impGamepad2;
+    double turningPower = 0;
 
     @Override
     public void init() {
@@ -21,8 +22,20 @@ public class Qual11588TeleOp extends OpMode {
 
     @Override
     public void loop() {
+        if(impGamepad1.right_trigger.getValue() > 0){
+            turningPower = .3 * impGamepad1.right_trigger.getValue();
+        }else if(impGamepad1.left_trigger.getValue() > 0){
+            turningPower = -.3 * impGamepad1.left_trigger.getValue();
+        }else{
+            turningPower = impGamepad1.right_stick_x.getValue();
+        }
         double y = -.5 * impGamepad1.left_stick_y.getValue();
         double x = .5 * impGamepad1.left_stick_x.getValue();
+        double rx = turningPower;
 
+        robot.frontLeft.setPower(y + x + rx);
+        robot.frontRight.setPower(y - x - rx);
+        robot.backLeft.setPower(y - x + rx);
+        robot.backRight.setPower(y + x - rx);
     }
 }
