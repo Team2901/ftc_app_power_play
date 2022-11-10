@@ -32,7 +32,6 @@ public class Qual11588Hardware {
         arm = hardwareMap.get(DcMotorEx.class, "arm");
         claw = hardwareMap.servo.get("claw");
 
-
         frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);

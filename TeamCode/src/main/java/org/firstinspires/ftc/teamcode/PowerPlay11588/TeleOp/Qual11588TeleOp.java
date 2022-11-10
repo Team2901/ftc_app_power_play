@@ -9,6 +9,8 @@ import org.firstinspires.ftc.teamcode.Shared.Gamepad.ImprovedGamepad;
 public class Qual11588TeleOp extends OpMode {
     Qual11588Hardware robot = new Qual11588Hardware();
     public ElapsedTime gamepadTimer = new ElapsedTime();
+    public enum ClawPosition{Open, Closed};
+    ClawPosition currentClawPosition = ClawPosition.Closed;
     public ImprovedGamepad impGamepad1;
     public ImprovedGamepad impGamepad2;
     double turningPower = 0;
@@ -37,5 +39,19 @@ public class Qual11588TeleOp extends OpMode {
         robot.frontRight.setPower(y - x - rx);
         robot.backLeft.setPower(y - x + rx);
         robot.backRight.setPower(y + x - rx);
+
+        switch (currentClawPosition){
+            case Open:
+                robot.claw.setPosition(.5);
+                if(impGamepad1.b.isInitialPress()){
+                    currentClawPosition = ClawPosition.Closed;
+                }
+                break;
+            case Closed:
+                robot.claw.setPosition(0);
+                if(impGamepad1.b.isInitialPress()){
+                    currentClawPosition = ClawPosition.Open;
+                }
+        }
     }
 }
