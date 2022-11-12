@@ -63,8 +63,8 @@ public class IntelRealsense extends OpMode
     double positionX, positionY;
     double targetAngle = 0;
 
-    double cameraXOffset = 7; //lies 7 inches in front of middle
-    double cameraYOffset = 3.75; //lies 3.75 inches up from the middle
+    double cameraXOffset = 5.75; //lies 7 inches in front of middle
+    double cameraYOffset = -4; //lies 3.75 inches up from the middle
 
     double angleToTarget = 0;
 
@@ -103,6 +103,9 @@ public class IntelRealsense extends OpMode
     boolean isSecond = false;
 
     ImprovedGamepad improvedGamepad;
+
+    double robotCenterX;
+    double robotCenterY;
 
 
     @Override
@@ -150,20 +153,23 @@ public class IntelRealsense extends OpMode
         double adjustX = ((x2*Math.cos(angleOffset)) - (y2*Math.sin(angleOffset)));
         double adjustY = ((x2*Math.sin(angleOffset)) + (y2*Math.cos(angleOffset)));
 
+//        robotCenterX = (((x1-(cameraXOffset * Math.cos(AngleUnit.normalizeRadians(rotation.getRadians()))))*Math.cos(AngleUnit.normalizeRadians(rotation.getRadians()))) + ((x1-(cameraXOffset * Math.sin(AngleUnit.normalizeRadians(rotation.getRadians()))))*Math.sin(AngleUnit.normalizeRadians(rotation.getRadians()))));
+//        robotCenterY = (((y1-(cameraYOffset * Math.cos(AngleUnit.normalizeRadians(rotation.getRadians()))))*Math.cos(AngleUnit.normalizeRadians(rotation.getRadians()))) + ((y1-(cameraYOffset * Math.sin(AngleUnit.normalizeRadians(rotation.getRadians()))))*Math.sin(AngleUnit.normalizeRadians(rotation.getRadians()))));
+
         //Changes target Position
         //Changes target Position
         if(improvedGamepad.dpad_right.isInitialPress()){
-            moveTo(10, 0);
+            move(48, 0);
 //           kp +=0.01;
         } else if(improvedGamepad.dpad_left.isInitialPress()){
-            moveTo(-10, 0);
+            move(-48, 0);
 //            kp -=0.01;
         }
         if(improvedGamepad.dpad_up.isInitialPress()){
-            moveTo(0, 10);
+            move(0, 24);
 //           kd += 0.01;
         } else if(improvedGamepad.dpad_down.isInitialPress()){
-            moveTo(0, -10);
+            move(0, -24);
 //           kd -= 0.01;
         }
 
@@ -310,7 +316,10 @@ public class IntelRealsense extends OpMode
         leftTurnPower = leftPodTurn(angleToTarget);
         rightTurnPower = rightPodTurn(angleToTarget);
 
-        if(isMoving && (Math.abs(((positionX) - (translation.getX()))) < 0.5 || Math.abs((positionY) - (translation.getY())) < 0.5)){
+
+        telemetry.addData("position x", positionX);
+        telemetry.addData("translation x", translation.getX());
+        if(isMoving && (Math.abs(((positionX) - (translation.getX()))) < 0.5 && Math.abs((positionY) - (translation.getY())) < 0.5)){
             outputLeft = 0;
             outputRight = 0;
             leftTurnPower = 0;
@@ -353,7 +362,8 @@ public class IntelRealsense extends OpMode
         telemetry.addData("ki", ki);
         telemetry.addData("Angle to Target", angleToTarget + "°");
         telemetry.addData("Raw Rotation", rotation);
-
+//        telemetry.addData("offsetted x", robotCenterX);
+//        telemetry.addData("offsetted y", robotCenterY);
     }
 
     @Override
