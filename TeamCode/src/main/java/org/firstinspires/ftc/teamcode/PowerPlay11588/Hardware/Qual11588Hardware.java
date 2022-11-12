@@ -7,9 +7,15 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.OpenCVPipelines.RI3W11588OpenCV;
 import org.firstinspires.ftc.teamcode.Shared.Gamepad.ImprovedGamepad;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvCameraRotation;
 
-public class Qual11588Hardware {
+public class Qual11588Hardware implements OpenCvCamera.AsyncCameraOpenListener {
     //Ticks per motor rev for a gobilda yellowjacket 312
     public static final double TICKS_PER_MOTOR_REV = 537.7;
     public static final double DRIVE_GEAR_RATIO = 1;
@@ -23,6 +29,9 @@ public class Qual11588Hardware {
     public DcMotorEx backRight;
     public DcMotorEx arm;
     public Servo claw;
+    public OpenCvCamera camera;
+    public RI3W11588OpenCV pipeLine;
+    public Telemetry telemetry;
 
     public void init(HardwareMap hardwareMap){
         frontLeft = hardwareMap.get(DcMotorEx.class, "frontLeft");
@@ -31,6 +40,15 @@ public class Qual11588Hardware {
         backRight = hardwareMap.get(DcMotorEx.class, "backRight");
         arm = hardwareMap.get(DcMotorEx.class, "arm");
         claw = hardwareMap.servo.get("claw");
+        WebcamName webcam = hardwareMap.get(WebcamName.class, "Webcam 1");
+
+        int cameraMonitorViewID = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+
+        camera = OpenCvCameraFactory.getInstance().createWebcam(webcam, cameraMonitorViewID);
+
+        pipeLine = new RI3W11588OpenCV(telemetry);
+        camera.setPipeline(pipeLine);
+        camera.openCameraDeviceAsync(this);
 
         frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -58,5 +76,15 @@ public class Qual11588Hardware {
         backRight.setPower(0);
         arm.setPower(0);
         claw.setPosition(0);
+    }
+
+    @Override
+    public void onOpened() {
+        camera.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+    }
+
+    @Override
+    public void onError(int errorCode) {
+
     }
 }
