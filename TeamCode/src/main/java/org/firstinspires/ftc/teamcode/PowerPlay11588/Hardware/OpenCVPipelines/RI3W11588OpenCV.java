@@ -17,12 +17,12 @@ public class RI3W11588OpenCV extends OpenCvPipeline {
     public double redAmount;
     public double blueAmount;
     public double greenAmount;
-    public double redAmountAllTime;
-    public double greenAmountAllTime;
-    public double blueAmountAllTime;
-    public double redAmountAverage;
-    public double greenAmountAverage;
-    public double blueAmountAverage;
+//    public double redAmountAllTime;
+//    public double greenAmountAllTime;
+//    public double blueAmountAllTime;
+//    public double redAmountAverage;
+//    public double greenAmountAverage;
+//    public double blueAmountAverage;
     public int framesProceeded;
     Rect r = new Rect(100, 100, 100, 100);
     Mat redMask = new Mat();
@@ -89,25 +89,19 @@ public class RI3W11588OpenCV extends OpenCvPipeline {
             //Core.bitwise_and(subMat, subMat, subMat, redMask);
             //This commented out code is only for visualizing the pipeline
 
-            redAmountAllTime = redAmountAllTime + redAmount;
-            blueAmountAllTime = blueAmountAllTime + blueAmount;
-            greenAmountAllTime = greenAmountAllTime + greenAmount;
+//            redAmountAllTime = redAmountAllTime + redAmount;
+//            blueAmountAllTime = blueAmountAllTime + blueAmount;
+//            greenAmountAllTime = greenAmountAllTime + greenAmount;
+//
+//            redAmountAverage = redAmountAllTime / framesProceeded;
+//            greenAmountAverage = greenAmountAllTime / framesProceeded;
+//            blueAmountAverage = blueAmountAllTime / framesProceeded;
 
-            redAmountAverage = redAmountAllTime / framesProceeded;
-            greenAmountAverage = greenAmountAllTime / framesProceeded;
-            blueAmountAverage = blueAmountAllTime / framesProceeded;
-            //This code is literally only for testing and getting an average
+//            This code is literally only for testing and getting an average
 
 
 
             //All Pipeline code must be written above here
-            if (redAmount > greenAmount && greenAmount > blueAmount) {
-                coneColor = ConeColor.red;
-            } else if (greenAmount > redAmount && redAmount > blueAmount) {
-                coneColor = ConeColor.green;
-            } else if (blueAmount > greenAmount && greenAmount > redAmount) {
-                coneColor = ConeColor.blue;
-            }
             //Simple if statement to determine what is the largest amount/percentage of a color
 
         }
@@ -119,16 +113,18 @@ public class RI3W11588OpenCV extends OpenCvPipeline {
 
     }
 
-    public void openCVTelemetry() {
-        telemetry.addData("Red Amount", redAmount);
-        telemetry.addData("Blue Amount", blueAmount);
-        telemetry.addData("Green Amount", greenAmount);
-        telemetry.addData("Frames Proceeded", framesProceeded);
-        telemetry.addData("Red average", redAmountAverage);
-        telemetry.addData("Blue average", blueAmountAverage);
-        telemetry.addData("Green average", greenAmountAverage);
-        telemetry.update();
+
     }
+
+//    public void openCVTelemetry() {
+//        telemetry.addData("Red Amount", redAmount);
+//        telemetry.addData("Blue Amount", blueAmount);
+//        telemetry.addData("Green Amount", greenAmount);
+//        telemetry.addData("Frames Proceeded", framesProceeded);
+//        telemetry.addData("Red average", redAmountAverage);telemetry.addData("Blue average", blueAmountAverage);
+//        telemetry.addData("Green average", greenAmountAverage);
+//        telemetry.update();
+//    }
     //This is a separate method because you will not always want to see OpenCV Telemetry
 
-}
+
