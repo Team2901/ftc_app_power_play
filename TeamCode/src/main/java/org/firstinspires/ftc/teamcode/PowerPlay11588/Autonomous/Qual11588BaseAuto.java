@@ -8,10 +8,10 @@ import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.Qual11588Hardware;
 public class Qual11588BaseAuto extends LinearOpMode {
     Qual11588Hardware robot = new Qual11588Hardware();
     public enum Height{
-        Ground,
-        Low,
-        Medium,
-        High
+        GROUND,
+        LOW,
+        MEDIUM,
+        HIGH
     }
     @Override
     public void runOpMode() throws InterruptedException {
@@ -65,4 +65,5 @@ public class Qual11588BaseAuto extends LinearOpMode {
         robot.backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
+
 }

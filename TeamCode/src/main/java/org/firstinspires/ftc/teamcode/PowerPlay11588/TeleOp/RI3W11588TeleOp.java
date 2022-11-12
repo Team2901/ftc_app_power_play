@@ -84,22 +84,22 @@ public class RI3W11588TeleOp extends OpMode {
         robot.backRight.setPower((y + x - rx)*FRONT_GEAR_RATIO);
 
         if(gamepad1.dpad_left){
-            armTarget = 100;
+            armTarget = 25;
         }
         if(gamepad1.dpad_down){
-            armTarget = 600;
+            armTarget = 200;
         }
         if(gamepad1.dpad_right){
-            armTarget = 950;
+            armTarget = 300;
         }
         if(gamepad1.dpad_up){
-            armTarget = 1000;
+            armTarget = 400;
         }
         if(currentGamepad1.a && !previousGamepad1.a){
-            armTarget = armTarget - 10;
+            armTarget = armTarget - 5;
         }
         if(currentGamepad1.y && !previousGamepad1.y){
-            armTarget = armTarget + 10;
+            armTarget = armTarget + 5;
         }
 
         robot.arm.setPower(armPower());
