@@ -99,16 +99,16 @@ public class RI3W11588BaseAutonomous extends LinearOpMode {
         }
     }
     public void moveArm(Height height){
-        int armTarget = 25;
+        int armTarget = 40;
         int lastTarget = armTarget;
         if(height == Height.INTAKE){
-            armTarget = 25;
+            armTarget = 40;
         }else if(height == Height.GROUND){
-            armTarget = 25;
+            armTarget = 40;
         }else if(height == Height.LOW){
             armTarget = 200;
         }else if(height == Height.MEDIUM){
-            armTarget = 300;
+            armTarget = 315;
         }else if(height == Height.HIGH){
             armTarget = 400;
         }
