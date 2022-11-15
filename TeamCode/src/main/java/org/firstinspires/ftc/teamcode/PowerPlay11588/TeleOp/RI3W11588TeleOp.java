@@ -49,7 +49,6 @@ public class RI3W11588TeleOp extends OpMode {
     @Override
     public void init() {
         robot.init(this.hardwareMap, telemetry);
-        robot.camera.stopStreaming();
     }
 
     @Override
@@ -84,22 +83,22 @@ public class RI3W11588TeleOp extends OpMode {
         robot.backRight.setPower((y + x - rx)*FRONT_GEAR_RATIO);
 
         if(gamepad1.dpad_left){
-            armTarget = 100;
+            armTarget = 40;
         }
         if(gamepad1.dpad_down){
-            armTarget = 600;
+            armTarget = 200;
         }
         if(gamepad1.dpad_right){
-            armTarget = 950;
+            armTarget = 315;
         }
         if(gamepad1.dpad_up){
-            armTarget = 1000;
+            armTarget = 400;
         }
         if(currentGamepad1.a && !previousGamepad1.a){
-            armTarget = armTarget - 10;
+            armTarget = armTarget - 5;
         }
         if(currentGamepad1.y && !previousGamepad1.y){
-            armTarget = armTarget + 10;
+            armTarget = armTarget + 5;
         }
 
         robot.arm.setPower(armPower());
@@ -137,9 +136,9 @@ public class RI3W11588TeleOp extends OpMode {
         telemetry.addData("Derivative Stuff", dArm * kd);
         telemetry.addData("Pid Total", total);
         telemetry.addData("Claw State", currentClawPosition);
-        telemetry.addData("Blue", robot.pipeLine.blueAmountAverage);
-        telemetry.addData("Green", robot.pipeLine.greenAmountAverage);
-        telemetry.addData("red", robot.pipeLine.redAmountAverage);
+//        telemetry.addData("Blue", robot.pipeLine.blueAmountAverage);
+//        telemetry.addData("Green", robot.pipeLine.greenAmountAverage);
+//        telemetry.addData("red", robot.pipeLine.redAmountAverage);
         telemetry.update();
 
         /*

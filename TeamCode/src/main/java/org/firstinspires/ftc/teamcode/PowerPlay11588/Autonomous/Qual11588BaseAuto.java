@@ -9,10 +9,10 @@ import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.Qual11588Hardware;
 public class Qual11588BaseAuto extends LinearOpMode {
     Qual11588Hardware robot = new Qual11588Hardware();
     public enum Height{
-        Ground,
-        Low,
-        Medium,
-        High
+        GROUND,
+        LOW,
+        MEDIUM,
+        HIGH
     }
     @Override
     public void runOpMode() throws InterruptedException {
@@ -69,13 +69,13 @@ public class Qual11588BaseAuto extends LinearOpMode {
     public void moveArm(Height height){
         int armTarget = 50;
         int lastTarget = armTarget;
-        if(height == Height.Ground){
+        if(height == Height.GROUND){
             armTarget = 50;
-        } else if(height == Height.Low){
+        } else if(height == Height.LOW){
             armTarget = 100;
-        } else if(height == Height.Medium){
+        } else if(height == Height.MEDIUM){
             armTarget = 150;
-        } else if(height == Height.High){
+        } else if(height == Height.HIGH){
             armTarget = 200;
         }
         ElapsedTime PIDTimer = new ElapsedTime();
