@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.PowerPlay11588.Autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.Qual11588Hardware;
 
@@ -64,5 +65,47 @@ public class Qual11588BaseAuto extends LinearOpMode {
         robot.frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+    public void moveArm(Height height){
+        int armTarget = 50;
+        int lastTarget = armTarget;
+        if(height == Height.Ground){
+            armTarget = 50;
+        } else if(height == Height.Low){
+            armTarget = 100;
+        } else if(height == Height.Medium){
+            armTarget = 150;
+        } else if(height == Height.High){
+            armTarget = 200;
+        }
+        ElapsedTime PIDTimer = new ElapsedTime();
+
+        double kp = 0;
+        double ki = 0;
+        double kd = 0;
+        double pArm = 0;
+        double iArm = 0;
+        double dArm = 0;
+        double iArmMax = .25;
+
+        double error = armTarget - robot.arm.getCurrentPosition();
+        PIDTimer.reset();
+
+        while(opModeIsActive() && !(error < 5 && error > -5)){
+            error = armTarget - robot.arm.getCurrentPosition();
+            dArm = (error - pArm)/PIDTimer.seconds();
+            iArm = iArm + (error * PIDTimer.seconds());
+            pArm = error;
+            double total = ((kp*pArm) + (ki*iArm) + (kd*dArm))/100;
+            robot.arm.setPower(total);
+
+            if(iArm > iArmMax){
+                iArm = iArmMax;
+            } else if(iArm < -iArmMax){
+                iArm = -iArmMax;
+            }
+
+            PIDTimer.reset();
+        }
     }
 }
