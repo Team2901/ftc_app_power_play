@@ -8,6 +8,18 @@ import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.Qual11588Hardware;
 
 public class Qual11588BaseAuto extends LinearOpMode {
     Qual11588Hardware robot = new Qual11588Hardware();
+    ElapsedTime PIDTimer = new ElapsedTime();
+    //Defining the variables outside the method so they can be used in a telemetry method
+    int armTarget = 50;
+    int error = 0;
+    double total = 0;
+    double kp = 0;
+    double ki = 0;
+    double kd = 0;
+    double pArm = 0;
+    double iArm = 0;
+    double dArm = 0;
+    double iArmMax = .25;
     public enum Height{
         GROUND,
         LOW,
@@ -45,6 +57,8 @@ public class Qual11588BaseAuto extends LinearOpMode {
 
         while (opModeIsActive() && (robot.frontLeft.isBusy() || robot.frontRight.isBusy() ||
                 robot.backLeft.isBusy() || robot.backRight.isBusy())){
+            telemetryStuff();
+            /*
             telemetry.addData("Front Left Target", robot.frontLeft.getTargetPosition());
             telemetry.addData("Front Left Position", robot.frontLeft.getCurrentPosition());
             telemetry.addData("Front Right Target", robot.frontRight.getTargetPosition());
@@ -54,6 +68,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
             telemetry.addData("Back Right Target", robot.backRight.getTargetPosition());
             telemetry.addData("Back Right Position", robot.backRight.getCurrentPosition());
             telemetry.update();
+            */
         }
 
         robot.frontLeft.setPower(0);
@@ -67,8 +82,6 @@ public class Qual11588BaseAuto extends LinearOpMode {
         robot.backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
     public void moveArm(Height height){
-        int armTarget = 50;
-        int lastTarget = armTarget;
         if(height == Height.GROUND){
             armTarget = 50;
         } else if(height == Height.LOW){
@@ -78,17 +91,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
         } else if(height == Height.HIGH){
             armTarget = 200;
         }
-        ElapsedTime PIDTimer = new ElapsedTime();
-
-        double kp = 0;
-        double ki = 0;
-        double kd = 0;
-        double pArm = 0;
-        double iArm = 0;
-        double dArm = 0;
-        double iArmMax = .25;
-
-        double error = armTarget - robot.arm.getCurrentPosition();
+        error = armTarget - robot.arm.getCurrentPosition();
         PIDTimer.reset();
 
         while(opModeIsActive() && !(error < 5 && error > -5)){
@@ -96,7 +99,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
             dArm = (error - pArm)/PIDTimer.seconds();
             iArm = iArm + (error * PIDTimer.seconds());
             pArm = error;
-            double total = ((kp*pArm) + (ki*iArm) + (kd*dArm))/100;
+            total = ((kp*pArm) + (ki*iArm) + (kd*dArm))/100;
             robot.arm.setPower(total);
 
             if(iArm > iArmMax){
@@ -104,8 +107,22 @@ public class Qual11588BaseAuto extends LinearOpMode {
             } else if(iArm < -iArmMax){
                 iArm = -iArmMax;
             }
-
             PIDTimer.reset();
         }
+    }
+    public void telemetryStuff(){
+        telemetry.addData("Front Left Target", robot.frontLeft.getTargetPosition());
+        telemetry.addData("Front Left Position", robot.frontLeft.getCurrentPosition());
+        telemetry.addData("Front Right Target", robot.frontRight.getTargetPosition());
+        telemetry.addData("Front Right Position", robot.frontRight.getCurrentPosition());
+        telemetry.addData("Back Left Target", robot.backLeft.getTargetPosition());
+        telemetry.addData("Back Left Position", robot.backLeft.getCurrentPosition());
+        telemetry.addData("Back Right Target", robot.backRight.getTargetPosition());
+        telemetry.addData("Back Right Position", robot.backRight.getCurrentPosition());
+        telemetry.addData("Arm Target", armTarget);
+        telemetry.addData("Arm Position", robot.arm.getCurrentPosition());
+        telemetry.addData("Arm Error", error);
+        telemetry.addData("Arm Power", total);
+        telemetry.update();
     }
 }

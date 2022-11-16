@@ -93,6 +93,7 @@ public class Qual11588TeleOp extends OpMode {
                     currentClawPosition = ClawPosition.Open;
                 }
         }
+        telemetryHell();
     }
 
     public double armPower(int target){
@@ -115,5 +116,23 @@ public class Qual11588TeleOp extends OpMode {
         lastTarget = armTarget;
 
         return total;
+    }
+
+    public void telemetryHell(){
+        telemetry.addData("Front Left Position", robot.frontLeft.getCurrentPosition());
+        telemetry.addData("Front Right Position", robot.frontRight.getCurrentPosition());
+        telemetry.addData("Back Left Position", robot.backLeft.getCurrentPosition());
+        telemetry.addData("Back Right Position", robot.backRight.getCurrentPosition());
+        telemetry.addData("Claw State", currentClawPosition);
+        telemetry.addData("Arm Target", armTarget);
+        telemetry.addData("Arm Position", robot.arm.getCurrentPosition());
+        telemetry.addData("PID Total", total);
+        telemetry.addData("P Arm", pArm);
+        telemetry.addData("I Arm", iArm);
+        telemetry.addData("D Arm", dArm);
+        telemetry.addData("Proportional Stuff", pArm * kp);
+        telemetry.addData("Integral Stuff", iArm * ki);
+        telemetry.addData("Derivative Stuff", dArm * kd);
+        telemetry.update();
     }
 }
