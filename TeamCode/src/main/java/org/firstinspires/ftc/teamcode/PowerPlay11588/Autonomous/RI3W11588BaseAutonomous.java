@@ -134,9 +134,11 @@ public class RI3W11588BaseAutonomous extends LinearOpMode {
             iArm = iArm + (error * pidTimer.seconds());
             pArm = error;
 
+            /*
             if(armTarget != lastTarget){
                 iArm = 0;
             }
+             */
             if (iArm > iArmMax){
                 iArm = iArmMax;
             }else if (iArm < -iArmMax){

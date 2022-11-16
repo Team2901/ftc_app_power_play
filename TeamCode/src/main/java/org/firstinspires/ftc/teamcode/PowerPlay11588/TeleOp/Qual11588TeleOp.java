@@ -15,6 +15,22 @@ public class Qual11588TeleOp extends OpMode {
     public ImprovedGamepad impGamepad2;
     double turningPower = 0;
 
+    //All the variables that are needed for pid
+    ElapsedTime PIDTimer = new ElapsedTime();
+    int armTarget = 50;
+    int lastTarget = armTarget;
+    int modifier = 0;
+    double error = 0;
+    double total = 0;
+    double kp = 0;
+    double ki = 0;
+    double kd = 0;
+    double pArm = 0;
+    double iArm = 0;
+    double dArm = 0;
+    double iArmMax = .25;
+
+
     @Override
     public void init() {
         robot.init(hardwareMap);
@@ -24,6 +40,30 @@ public class Qual11588TeleOp extends OpMode {
 
     @Override
     public void loop() {
+        if(impGamepad1.dpad_left.isInitialPress()){
+            //Sets the armTarget to ground/intake
+            armTarget = 50;
+        }else if(impGamepad1.dpad_down.isInitialPress()){
+            //Sets the armTarget to the low pole
+            armTarget = 100;
+        }else if(impGamepad1.dpad_right.isInitialPress()){
+            //Sets the armTarget to the mid pole
+            armTarget = 150;
+        }else if(impGamepad1.dpad_up.isInitialPress()){
+            //Sets the armTarget to the high pole
+            armTarget = 200;
+        }
+        /*Allows for the armTarget to be changed for the duration of the TeleOp rather than resetting
+        when you change height*/
+        if(impGamepad1.y.isInitialPress()){
+            modifier += 5;
+        }
+        if(impGamepad1.a.isInitialPress()){
+            modifier -= 5;
+        }
+        armTarget += modifier;
+        robot.arm.setPower(armPower(armTarget));
+
         if(impGamepad1.right_trigger.getValue() > 0){
             turningPower = .3 * impGamepad1.right_trigger.getValue();
         }else if(impGamepad1.left_trigger.getValue() > 0){
@@ -53,5 +93,27 @@ public class Qual11588TeleOp extends OpMode {
                     currentClawPosition = ClawPosition.Open;
                 }
         }
+    }
+
+    public double armPower(int target){
+        error = target - robot.arm.getCurrentPosition();
+        dArm = (error - pArm) / PIDTimer.seconds();
+        iArm = iArm + (error * PIDTimer.seconds());
+        pArm = error;
+        total = ((pArm * kp) + (iArm * ki) + (dArm * kd))/100;
+        PIDTimer.reset();
+
+        if(armTarget != lastTarget){
+            iArm = 0;
+        }
+
+        if(iArm > iArmMax){
+            iArm = iArmMax;
+        }else if(iArm < -iArmMax){
+            iArm = -iArmMax;
+        }
+        lastTarget = armTarget;
+
+        return total;
     }
 }
