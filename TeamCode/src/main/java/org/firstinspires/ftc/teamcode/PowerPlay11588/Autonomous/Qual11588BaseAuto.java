@@ -147,4 +147,12 @@ public class Qual11588BaseAuto extends LinearOpMode {
         telemetry.addData("Arm Power", total);
         telemetry.update();
     }
+
+    public void placeCone() {
+        moveArm(Height.MEDIUM);
+        moveXY(0, 12);
+        moveXY(6, 0);
+        moveArm(Height.LOW);
+        robot.claw.setPosition(1);
+    }
 }
