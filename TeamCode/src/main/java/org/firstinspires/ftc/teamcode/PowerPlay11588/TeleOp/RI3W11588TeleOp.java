@@ -48,11 +48,12 @@ public class RI3W11588TeleOp extends OpMode {
 
     @Override
     public void init() {
-        robot.init(this.hardwareMap, telemetry);
+        robot.init(this.hardwareMap, telemetry, false);
     }
 
     @Override
     public void loop() {
+
         try {
             previousGamepad1.copy(currentGamepad1);
             previousGamepad2.copy(currentGamepad2);
@@ -118,7 +119,7 @@ public class RI3W11588TeleOp extends OpMode {
                 }
         }
         if(currentGamepad1.x && !currentGamepad1.x){
-            robot.claw.setPosition(0);
+            robot.claw.setPosition(.3);
             currentClawPosition = ClawPosition.Closed;
         }
 

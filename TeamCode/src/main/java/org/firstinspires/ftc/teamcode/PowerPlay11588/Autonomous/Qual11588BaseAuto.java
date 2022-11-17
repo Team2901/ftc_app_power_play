@@ -163,4 +163,6 @@ public class Qual11588BaseAuto extends LinearOpMode {
         moveArm(Height.LOW);
         robot.claw.setPosition(1);
     }
+
+
 }
