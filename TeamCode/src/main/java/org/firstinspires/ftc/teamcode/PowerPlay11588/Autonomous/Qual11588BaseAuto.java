@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.OpenCVPipelines.RI3W11588OpenCV;
 import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.Qual11588Hardware;
 
 public class Qual11588BaseAuto extends LinearOpMode {
@@ -80,6 +81,27 @@ public class Qual11588BaseAuto extends LinearOpMode {
         robot.frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    public void park(){
+        if(robot.pipeLine.coneColor == RI3W11588OpenCV.ConeColor.red){
+            telemetry.addData("Saw red, going to spot 1", "");
+            // Move forward 24 inches
+            moveXY((int) 27, 0);
+            // Move left 27 inches
+            moveXY(0, -30);
+        }else if(robot.pipeLine.coneColor == RI3W11588OpenCV.ConeColor.green) {
+            telemetry.addData("Saw green, going to spot 2", "");
+            // Move forward 36 inches
+            moveXY(36, 0);
+
+        }else if(robot.pipeLine.coneColor == RI3W11588OpenCV.ConeColor.blue){
+            telemetry.addData("Saw blue, going to spot 3", "");
+            // Move forward 24 inches
+            moveXY((int) 27, 0);
+            // Move right 27 inches
+            moveXY(0, 30);
+        }
     }
     public void moveArm(Height height){
         if(height == Height.GROUND){
