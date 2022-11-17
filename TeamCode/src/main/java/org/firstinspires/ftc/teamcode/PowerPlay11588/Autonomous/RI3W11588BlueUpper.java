@@ -14,14 +14,6 @@ public class RI3W11588BlueUpper extends RI3W11588BaseAutonomous{
         waitForStart();
         runTime.reset();
 
-        while(runTime.milliseconds() < 2000){}
-        if (robot.pipeLine.redAmount > (robot.pipeLine.blueAmount - 3) && robot.pipeLine.redAmount > robot.pipeLine.greenAmount) {
-            robot.pipeLine.coneColor = RI3W11588OpenCV.ConeColor.red;
-        } else if ((robot.pipeLine.blueAmount - 3) > robot.pipeLine.redAmount && (robot.pipeLine.blueAmount - 3) > robot.pipeLine.greenAmount) {
-            robot.pipeLine.coneColor = RI3W11588OpenCV.ConeColor.blue;
-        } else if (robot.pipeLine.greenAmount > robot.pipeLine.redAmount && robot.pipeLine.greenAmount > (robot.pipeLine.blueAmount - 3)) {
-            robot.pipeLine.coneColor = RI3W11588OpenCV.ConeColor.green;
-        }
         robot.camera.stopStreaming();
         moveArm(Height.GROUND);
         park();

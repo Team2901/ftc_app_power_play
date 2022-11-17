@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.OpenCVPipelines;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.Qual11588Hardware;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Rect;
@@ -110,6 +111,27 @@ public class RI3W11588OpenCV extends OpenCvPipeline {
         we get a value for coneColor because we don't want it to change in the middle of our run because that
         might change what color it thinks the cone is.
         */
+
+    }
+
+    public void getColor(Qual11588Hardware robot, String color) {
+        if (color == "blue") {
+            if (robot.pipeLine.redAmount > (robot.pipeLine.blueAmount - 3) && robot.pipeLine.redAmount > robot.pipeLine.greenAmount) {
+                robot.pipeLine.coneColor = RI3W11588OpenCV.ConeColor.red;
+            } else if ((robot.pipeLine.blueAmount - 3) > robot.pipeLine.redAmount && (robot.pipeLine.blueAmount - 3) > robot.pipeLine.greenAmount) {
+                robot.pipeLine.coneColor = RI3W11588OpenCV.ConeColor.blue;
+            } else if (robot.pipeLine.greenAmount > robot.pipeLine.redAmount && robot.pipeLine.greenAmount > (robot.pipeLine.blueAmount - 3)) {
+                robot.pipeLine.coneColor = RI3W11588OpenCV.ConeColor.green;
+            }
+        } else if (color == "red") {
+            if (robot.pipeLine.redAmount > (robot.pipeLine.blueAmount) && robot.pipeLine.redAmount > robot.pipeLine.greenAmount) {
+                robot.pipeLine.coneColor = RI3W11588OpenCV.ConeColor.red;
+            } else if ((robot.pipeLine.blueAmount) > robot.pipeLine.redAmount && (robot.pipeLine.blueAmount) > robot.pipeLine.greenAmount) {
+                robot.pipeLine.coneColor = RI3W11588OpenCV.ConeColor.blue;
+            } else if (robot.pipeLine.greenAmount > robot.pipeLine.redAmount && robot.pipeLine.greenAmount > (robot.pipeLine.blueAmount - 3)) {
+                robot.pipeLine.coneColor = RI3W11588OpenCV.ConeColor.green;
+            }
+        }
 
     }
 
