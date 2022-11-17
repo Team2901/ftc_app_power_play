@@ -89,6 +89,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
             // Move forward 24 inches
             moveXY((int) 27, 0);
             // Move left 27 inches
+            //test
             moveXY(0, -30);
         }else if(robot.pipeLine.coneColor == RI3W11588OpenCV.ConeColor.green) {
             telemetry.addData("Saw green, going to spot 2", "");

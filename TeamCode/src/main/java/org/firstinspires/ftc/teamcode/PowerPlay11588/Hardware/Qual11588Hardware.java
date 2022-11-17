@@ -33,7 +33,7 @@ public class Qual11588Hardware implements OpenCvCamera.AsyncCameraOpenListener {
     public RI3W11588OpenCV pipeLine;
     public Telemetry telemetry;
 
-    public void init(HardwareMap hardwareMap){
+    public void init(HardwareMap hardwareMap, Telemetry telemetry){
         frontLeft = hardwareMap.get(DcMotorEx.class, "frontLeft");
         frontRight = hardwareMap.get(DcMotorEx.class, "frontRight");
         backLeft = hardwareMap.get(DcMotorEx.class, "backLeft");
@@ -45,7 +45,7 @@ public class Qual11588Hardware implements OpenCvCamera.AsyncCameraOpenListener {
         int cameraMonitorViewID = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
 
         camera = OpenCvCameraFactory.getInstance().createWebcam(webcam, cameraMonitorViewID);
-
+        this.telemetry = telemetry;
         pipeLine = new RI3W11588OpenCV(telemetry);
         camera.setPipeline(pipeLine);
         camera.openCameraDeviceAsync(this);
