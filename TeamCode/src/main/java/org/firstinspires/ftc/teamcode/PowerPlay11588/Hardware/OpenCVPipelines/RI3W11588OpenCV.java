@@ -114,22 +114,22 @@ public class RI3W11588OpenCV extends OpenCvPipeline {
 
     }
 
-    public void getColor(Qual11588Hardware robot, String color) {
+    public void getColor( String color) {
         if (color == "blue") {
-            if (robot.pipeLine.redAmount > (robot.pipeLine.blueAmount - 3) && robot.pipeLine.redAmount > robot.pipeLine.greenAmount) {
-                robot.pipeLine.coneColor = RI3W11588OpenCV.ConeColor.red;
-            } else if ((robot.pipeLine.blueAmount - 3) > robot.pipeLine.redAmount && (robot.pipeLine.blueAmount - 3) > robot.pipeLine.greenAmount) {
-                robot.pipeLine.coneColor = RI3W11588OpenCV.ConeColor.blue;
-            } else if (robot.pipeLine.greenAmount > robot.pipeLine.redAmount && robot.pipeLine.greenAmount > (robot.pipeLine.blueAmount - 3)) {
-                robot.pipeLine.coneColor = RI3W11588OpenCV.ConeColor.green;
+            if (redAmount > (blueAmount - 3) && redAmount > greenAmount) {
+                coneColor = RI3W11588OpenCV.ConeColor.red;
+            } else if ((blueAmount - 3) > redAmount && (blueAmount - 3) > greenAmount) {
+                coneColor = RI3W11588OpenCV.ConeColor.blue;
+            } else if (greenAmount > redAmount && greenAmount > (blueAmount - 3)) {
+                coneColor = RI3W11588OpenCV.ConeColor.green;
             }
         } else if (color == "red") {
-            if (robot.pipeLine.redAmount > (robot.pipeLine.blueAmount) && robot.pipeLine.redAmount > robot.pipeLine.greenAmount) {
-                robot.pipeLine.coneColor = RI3W11588OpenCV.ConeColor.red;
-            } else if ((robot.pipeLine.blueAmount) > robot.pipeLine.redAmount && (robot.pipeLine.blueAmount) > robot.pipeLine.greenAmount) {
-                robot.pipeLine.coneColor = RI3W11588OpenCV.ConeColor.blue;
-            } else if (robot.pipeLine.greenAmount > robot.pipeLine.redAmount && robot.pipeLine.greenAmount > (robot.pipeLine.blueAmount - 3)) {
-                robot.pipeLine.coneColor = RI3W11588OpenCV.ConeColor.green;
+            if (redAmount > (blueAmount) && redAmount > greenAmount) {
+                coneColor = RI3W11588OpenCV.ConeColor.red;
+            } else if ((blueAmount) > redAmount && (blueAmount) > greenAmount) {
+                coneColor = RI3W11588OpenCV.ConeColor.blue;
+            } else if (greenAmount > redAmount && greenAmount > (blueAmount - 3)) {
+                coneColor = RI3W11588OpenCV.ConeColor.green;
             }
         }
 
