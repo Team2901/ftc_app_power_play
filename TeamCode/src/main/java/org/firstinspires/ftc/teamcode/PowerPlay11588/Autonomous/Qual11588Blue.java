@@ -8,6 +8,7 @@ public class Qual11588Blue extends Qual11588BaseAuto{
     ElapsedTime runTime = new ElapsedTime();
     @Override
     public void runOpMode() throws InterruptedException {
+        this.teamColor = AllianceColor.BLUE;
         robot.init(this.hardwareMap, telemetry);
         waitForStart();
         runTime.reset();
@@ -15,6 +16,7 @@ public class Qual11588Blue extends Qual11588BaseAuto{
         while(runTime.milliseconds() < 2000){
 
         }
+
         park();
     }
 }

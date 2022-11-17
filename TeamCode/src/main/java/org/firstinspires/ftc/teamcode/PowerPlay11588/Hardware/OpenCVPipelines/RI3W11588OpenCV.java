@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.OpenCVPipelines;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.Qual11588Hardware;
+import org.firstinspires.ftc.teamcode.PowerPlay11588.Autonomous.Qual11588BaseAuto;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Rect;
@@ -114,8 +114,8 @@ public class RI3W11588OpenCV extends OpenCvPipeline {
 
     }
 
-    public void getColor( String color) {
-        if (color == "blue") {
+    public ConeColor getColor(Qual11588BaseAuto.AllianceColor allianceColor) {
+        if (allianceColor == Qual11588BaseAuto.AllianceColor.BLUE) {
             if (redAmount > (blueAmount - 3) && redAmount > greenAmount) {
                 coneColor = RI3W11588OpenCV.ConeColor.red;
             } else if ((blueAmount - 3) > redAmount && (blueAmount - 3) > greenAmount) {
@@ -123,7 +123,7 @@ public class RI3W11588OpenCV extends OpenCvPipeline {
             } else if (greenAmount > redAmount && greenAmount > (blueAmount - 3)) {
                 coneColor = RI3W11588OpenCV.ConeColor.green;
             }
-        } else if (color == "red") {
+        } else if (allianceColor == Qual11588BaseAuto.AllianceColor.RED) {
             if (redAmount > (blueAmount) && redAmount > greenAmount) {
                 coneColor = RI3W11588OpenCV.ConeColor.red;
             } else if ((blueAmount) > redAmount && (blueAmount) > greenAmount) {
@@ -132,7 +132,7 @@ public class RI3W11588OpenCV extends OpenCvPipeline {
                 coneColor = RI3W11588OpenCV.ConeColor.green;
             }
         }
-
+        return coneColor;
     }
 
 

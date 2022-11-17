@@ -8,6 +8,7 @@ import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.OpenCVPipelines.RI
 import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.Qual11588Hardware;
 
 public class Qual11588BaseAuto extends LinearOpMode {
+    public AllianceColor teamColor;
     Qual11588Hardware robot = new Qual11588Hardware();
     ElapsedTime PIDTimer = new ElapsedTime();
     //Defining the variables outside the method so they can be used in a telemetry method
@@ -26,6 +27,10 @@ public class Qual11588BaseAuto extends LinearOpMode {
         LOW,
         MEDIUM,
         HIGH
+    }
+    public enum AllianceColor{
+        RED,
+        BLUE
     }
     @Override
     public void runOpMode() throws InterruptedException {
@@ -84,6 +89,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
     }
 
     public void park(){
+        RI3W11588OpenCV.ConeColor color = robot.pipeLine.getColor(teamColor);
         if(robot.pipeLine.coneColor == RI3W11588OpenCV.ConeColor.red){
             telemetry.addData("Saw red, going to spot 1", "");
             // Move forward 24 inches
@@ -103,6 +109,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
             // Move right 27 inches
             moveXY(0, 30);
         }
+
     }
     public void moveArm(Height height){
         if(height == Height.GROUND){
