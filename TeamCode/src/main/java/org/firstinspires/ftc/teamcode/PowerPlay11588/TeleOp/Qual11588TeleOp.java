@@ -93,7 +93,7 @@ public class Qual11588TeleOp extends OpMode {
                     currentClawPosition = ClawPosition.Open;
                 }
         }
-        telemetryHell();
+        telemetryStuff();
     }
 
     public double armPower(int target){
@@ -118,7 +118,7 @@ public class Qual11588TeleOp extends OpMode {
         return total;
     }
 
-    public void telemetryHell(){
+    public void telemetryStuff(){
         telemetry.addData("Front Left Position", robot.frontLeft.getCurrentPosition());
         telemetry.addData("Front Right Position", robot.frontRight.getCurrentPosition());
         telemetry.addData("Back Left Position", robot.backLeft.getCurrentPosition());
