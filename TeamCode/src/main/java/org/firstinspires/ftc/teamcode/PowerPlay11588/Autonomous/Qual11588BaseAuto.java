@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.OpenCVPipelines.RI3W11588OpenCV;
 import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.Qual11588Hardware;
+import org.firstinspires.ftc.teamcode.PowerPlay11588.TeleOp.Qual11588TeleOp;
 
 public class Qual11588BaseAuto extends LinearOpMode {
     public AllianceColor teamColor;
@@ -36,8 +37,21 @@ public class Qual11588BaseAuto extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
 
     }
-
-    public void moveXY(int y, int x){
+    public void setClaw(Qual11588TeleOp.ClawPosition clawPosition){
+        switch (clawPosition){
+            case Open:
+                robot.claw.setPosition(.5);
+                break;
+            case Closed:
+                // get numbers from Nick, position should not be zero because its bad for motor
+                robot.claw.setPosition(0);
+        }
+    }
+    public void pivot(double degrees, boolean clockwise){
+        // To be written
+        //
+    }
+    public void moveXY(double y, double x){
         int ticksY = (int) (y * robot.TICKS_PER_INCH);
         int ticksX = (int) (x * robot.TICKS_PER_INCH);
 
@@ -163,6 +177,61 @@ public class Qual11588BaseAuto extends LinearOpMode {
         moveArm(Height.LOW);
         robot.claw.setPosition(1);
     }
+    public void coneAndPark(){
+        RI3W11588OpenCV.ConeColor color = robot.pipeLine.getColor(teamColor);
+        /*
+        step 1:
+        move forward 37.5 inches
+        */
+        moveXY(37.5, 0);
+        while(!gamepad1.a){
 
+        }
+        /*
+        Step 2:
+        Pivot clockwise 90 degrees
+         */
+        pivot(90, true);
+        while(!gamepad1.a){
+
+        }
+        /*
+        Step 3:
+        raise the arm to the medium junction
+         */
+        moveArm(Height.MEDIUM);
+        while(!gamepad1.a){
+
+        }
+        /*
+        Step 4:
+        Open the claw
+         */
+        setClaw(Qual11588TeleOp.ClawPosition.Open);
+        while(!gamepad1.a){
+
+        }
+        /*
+        Step 5:
+        if you're in location 2, you're done.
+         */
+        if(robot.pipeLine.coneColor == RI3W11588OpenCV.ConeColor.green) {
+            telemetry.addData("Saw green, finished", "");
+            return;
+        } else {
+            //For both location 1 and 3
+            moveXY(0, 12);
+            while(!gamepad1.a){
+
+            }
+            if(robot.pipeLine.coneColor == RI3W11588OpenCV.ConeColor.red){
+                telemetry.addData("Saw red, going to spot 1", "");
+                moveXY(-24, 0);
+            } else {
+                telemetry.addData("Saw blue, going to spot 3", "");
+                moveXY(24, 0);
+            }
+        }
+    }
 
 }
