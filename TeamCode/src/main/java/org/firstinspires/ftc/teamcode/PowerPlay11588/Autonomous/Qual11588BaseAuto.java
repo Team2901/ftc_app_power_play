@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.OpenCVPipelines.RI3W11588OpenCV;
 import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.Qual11588Hardware;
 
@@ -11,7 +12,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
     public AllianceColor teamColor;
     Qual11588Hardware robot = new Qual11588Hardware();
     ElapsedTime PIDTimer = new ElapsedTime();
-    //Defining the variables outside the method so they can be used in a telemetry method
+    //Defining the pidvariables outside the method so they can be used in a telemetry method
     int armTarget = 50;
     int error = 0;
     double total = 0;
@@ -22,6 +23,12 @@ public class Qual11588BaseAuto extends LinearOpMode {
     double iArm = 0;
     double dArm = 0;
     double iArmMax = .25;
+
+    double startAngle = 0;
+    double targetAngle = 0;
+    double turnError = 0;
+    double turnPower = .5;
+
     public enum Height{
         GROUND,
         LOW,
@@ -64,17 +71,6 @@ public class Qual11588BaseAuto extends LinearOpMode {
         while (opModeIsActive() && (robot.frontLeft.isBusy() || robot.frontRight.isBusy() ||
                 robot.backLeft.isBusy() || robot.backRight.isBusy())){
             telemetryStuff();
-            /*
-            telemetry.addData("Front Left Target", robot.frontLeft.getTargetPosition());
-            telemetry.addData("Front Left Position", robot.frontLeft.getCurrentPosition());
-            telemetry.addData("Front Right Target", robot.frontRight.getTargetPosition());
-            telemetry.addData("Front Right Position", robot.frontRight.getCurrentPosition());
-            telemetry.addData("Back Left Target", robot.backLeft.getTargetPosition());
-            telemetry.addData("Back Left Position", robot.backLeft.getCurrentPosition());
-            telemetry.addData("Back Right Target", robot.backRight.getTargetPosition());
-            telemetry.addData("Back Right Position", robot.backRight.getCurrentPosition());
-            telemetry.update();
-            */
         }
 
         robot.frontLeft.setPower(0);
@@ -100,16 +96,13 @@ public class Qual11588BaseAuto extends LinearOpMode {
             telemetry.addData("Saw green, going to spot 2", "");
             // Move forward 26 inches
             moveXY(26, 0);
-
         }else if(robot.pipeLine.coneColor == RI3W11588OpenCV.ConeColor.blue){
             telemetry.addData("Saw blue, going to spot 3", "");
             // Move right 24 inches
             moveXY(0, 24);
             // Move forward 26 inches
             moveXY((int) 26, 0);
-
         }
-
     }
     public void moveArm(Height height){
         if(height == Height.GROUND){
@@ -138,8 +131,36 @@ public class Qual11588BaseAuto extends LinearOpMode {
                 iArm = -iArmMax;
             }
             PIDTimer.reset();
+            telemetryStuff();
         }
     }
+
+    public void turnByAngle(double turnAngle){
+        startAngle = robot.getAngle();
+        targetAngle = AngleUnit.normalizeDegrees(startAngle + turnAngle);
+        turnError = targetAngle - robot.getAngle();
+        while (opModeIsActive() && !(turnError < 5 && turnError > -5)){
+            if(turnError < 0){
+                turnPower = -.5;
+            }else if(turnError > 0){
+                turnPower = .5;
+            }
+            robot.frontLeft.setPower(turnPower);
+            robot.frontRight.setPower(-turnPower);
+            robot.backLeft.setPower(turnPower);
+            robot.backRight.setPower(-turnPower);
+            telemetryStuff();
+        }
+    }
+
+    public void placeCone() {
+        moveArm(Height.MEDIUM);
+        moveXY(0, 12);
+        moveXY(6, 0);
+        moveArm(Height.LOW);
+        robot.claw.setPosition(1);
+    }
+
     public void telemetryStuff(){
         telemetry.addData("Front Left Target", robot.frontLeft.getTargetPosition());
         telemetry.addData("Front Left Position", robot.frontLeft.getCurrentPosition());
@@ -155,14 +176,4 @@ public class Qual11588BaseAuto extends LinearOpMode {
         telemetry.addData("Arm Power", total);
         telemetry.update();
     }
-
-    public void placeCone() {
-        moveArm(Height.MEDIUM);
-        moveXY(0, 12);
-        moveXY(6, 0);
-        moveArm(Height.LOW);
-        robot.claw.setPosition(1);
-    }
-
-
 }

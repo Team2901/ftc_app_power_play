@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -9,6 +11,10 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.OpenCVPipelines.RI3W11588OpenCV;
 import org.firstinspires.ftc.teamcode.Shared.Gamepad.ImprovedGamepad;
 import org.openftc.easyopencv.OpenCvCamera;
@@ -33,6 +39,8 @@ public class Qual11588Hardware implements OpenCvCamera.AsyncCameraOpenListener {
     public RI3W11588OpenCV pipeLine;
     public Telemetry telemetry;
 
+    public BNO055IMU imu;
+
 
     public void init(HardwareMap hardwareMap, Telemetry telemetry) {
         init(hardwareMap, telemetry, true);
@@ -45,23 +53,27 @@ public class Qual11588Hardware implements OpenCvCamera.AsyncCameraOpenListener {
         arm = hardwareMap.get(DcMotorEx.class, "arm");
         claw = hardwareMap.servo.get("claw");
 
-
         this.telemetry = telemetry;
-
 
         if (useCam) {
             WebcamName webcam = hardwareMap.get(WebcamName.class, "Webcam 1");
-
             pipeLine = new RI3W11588OpenCV(telemetry);
             camera.setPipeline(pipeLine);
-
             int cameraMonitorViewID = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-
             camera = OpenCvCameraFactory.getInstance().createWebcam(webcam, cameraMonitorViewID);
-
             camera.openCameraDeviceAsync(this);
         }
 
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.calibrationDataFile = "BNO055IMUCalibration.json";
+        parameters.loggingEnabled = true;
+        parameters.loggingTag = "IMU";
+        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
 
         frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -89,6 +101,11 @@ public class Qual11588Hardware implements OpenCvCamera.AsyncCameraOpenListener {
         backRight.setPower(0);
         arm.setPower(0);
         claw.setPosition(0);
+    }
+
+    public double getAngle(){
+        Orientation orientation = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        return AngleUnit.normalizeDegrees(orientation.firstAngle);
     }
 
     @Override
