@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.exception.RobotCoreException;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.RI3W11588Hardware;
 
 @TeleOp(name = "3 Week 11588", group = "11588")
@@ -123,23 +124,33 @@ public class RI3W11588TeleOp extends OpMode {
             currentClawPosition = ClawPosition.Closed;
         }
 
-        telemetry.addData("Front Left Position", robot.frontLeft.getCurrentPosition());
-        telemetry.addData("Front Right Position", robot.frontRight.getCurrentPosition());
-        telemetry.addData("Back Left Position", robot.backLeft.getCurrentPosition());
-        telemetry.addData("Back Right Position", robot.backRight.getCurrentPosition());
-        telemetry.addData("Arm Position", robot.arm.getCurrentPosition());
-        telemetry.addData("Arm Target", armTarget);
-        telemetry.addData("P Arm", pArm);
-        telemetry.addData("I Arm", iArm);
-        telemetry.addData("D Arm", dArm);
-        telemetry.addData("Proportional Stuff", pArm * kp);
-        telemetry.addData("Integral Stuff", iArm * ki);
-        telemetry.addData("Derivative Stuff", dArm * kd);
-        telemetry.addData("Pid Total", total);
-        telemetry.addData("Claw State", currentClawPosition);
+//        telemetry.addData("Front Left Position", robot.frontLeft.getCurrentPosition());
+//        telemetry.addData("Front Right Position", robot.frontRight.getCurrentPosition());
+//        telemetry.addData("Back Left Position", robot.backLeft.getCurrentPosition());
+//        telemetry.addData("Back Right Position", robot.backRight.getCurrentPosition());
+//        telemetry.addData("Arm Position", robot.arm.getCurrentPosition());
+//        telemetry.addData("Arm Target", armTarget);
+//        telemetry.addData("P Arm", pArm);
+//        telemetry.addData("I Arm", iArm);
+//        telemetry.addData("D Arm", dArm);
+//        telemetry.addData("Proportional Stuff", pArm * kp);
+//        telemetry.addData("Integral Stuff", iArm * ki);
+//        telemetry.addData("Derivative Stuff", dArm * kd);
+//        telemetry.addData("Pid Total", total);
+//        telemetry.addData("Claw State", currentClawPosition);
 //        telemetry.addData("Blue", robot.pipeLine.blueAmountAverage);
 //        telemetry.addData("Green", robot.pipeLine.greenAmountAverage);
 //        telemetry.addData("red", robot.pipeLine.redAmountAverage);
+        Orientation orientation = robot.imu.getAngularOrientation();
+
+        telemetry.addData("Heading", orientation.firstAngle);
+        telemetry.addData("Role", orientation.secondAngle);
+        telemetry.addData("Pitch", orientation.thirdAngle);
+        telemetry.addData("Front left", robot.frontLeft.getCurrentPosition());
+        telemetry.addData("Front Right", robot.frontRight.getCurrentPosition());
+        telemetry.addData("Back Left", robot.backLeft.getCurrentPosition());
+        telemetry.addData("Back Right", robot.backRight.getCurrentPosition());
+        telemetry.addData("Arm", robot.arm.getCurrentPosition());
         telemetry.update();
 
         /*

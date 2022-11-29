@@ -10,6 +10,7 @@ import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.OpenCVPipelines.RI
 import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.RI3W11588Hardware;
 
 public class RI3W11588BaseAutonomous extends LinearOpMode {
+    double ANGLE_RATIO = -90 / 1000;
     RI3W11588Hardware robot = new RI3W11588Hardware();
     enum Height{
         INTAKE,
@@ -160,10 +161,75 @@ public class RI3W11588BaseAutonomous extends LinearOpMode {
             telemetry.addData("Blue", robot.pipeLine.blueAmount);
             telemetry.addData("Green", robot.pipeLine.greenAmount);
             telemetry.addData("Cone Color", robot.pipeLine.coneColor);
+            telemetry.addData("Front left target", robot.frontLeft.getTargetPosition());
+            telemetry.addData("Back left target", robot.backLeft.getTargetPosition());
             telemetry.update();
 
             pidTimer.reset();
         }
         robot.arm.setPower(0.005);
     }
+
+    public void moveAngle(int degrees) {
+
+        //This method takes in a parameter of inches, we must convert these to ticks
+        int left = (int)(degrees * ANGLE_RATIO);
+        int right = (int)(-degrees * ANGLE_RATIO);
+
+
+        robot.frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        robot.frontLeft.setTargetPosition(left);
+        robot.frontRight.setTargetPosition(right);
+        robot.backLeft.setTargetPosition(left);
+        robot.backRight.setTargetPosition(right);
+        telemetry.addData("Front Left Target", robot.frontLeft.getTargetPosition());
+        telemetry.addData("Front Left Position", robot.frontLeft.getCurrentPosition());
+        telemetry.addData("Front Right Target", robot.frontRight.getTargetPosition());
+        telemetry.addData("Front Right Position", robot.frontRight.getCurrentPosition());
+        telemetry.addData("Back Left Target", robot.backLeft.getTargetPosition());
+        telemetry.addData("Back Left Position", robot.backLeft.getCurrentPosition());
+        telemetry.addData("Back Right Target", robot.backRight.getTargetPosition());
+        telemetry.addData("Back Right Position", robot.backRight.getCurrentPosition());
+        telemetry.update();
+        //We will want to be moving forwards, and some of the wheels are actually positioned backwards, so we must set their desitination negative
+
+        robot.frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        robot.frontLeft.setPower(0.5);
+        robot.frontRight.setPower(0.5);
+        robot.backLeft.setPower(0.5);
+        robot.backRight.setPower(0.5);
+
+        while(opModeIsActive() && (robot.frontLeft.isBusy() || robot.frontRight.isBusy() || robot.backLeft.isBusy() ||
+                robot.backRight.isBusy())){
+            telemetry.addData("Front Left Target", robot.frontLeft.getTargetPosition());
+            telemetry.addData("Front Left Position", robot.frontLeft.getCurrentPosition());
+            telemetry.addData("Front Right Target", robot.frontRight.getTargetPosition());
+            telemetry.addData("Front Right Position", robot.frontRight.getCurrentPosition());
+            telemetry.addData("Back Left Target", robot.backLeft.getTargetPosition());
+            telemetry.addData("Back Left Position", robot.backLeft.getCurrentPosition());
+            telemetry.addData("Back Right Target", robot.backRight.getTargetPosition());
+            telemetry.addData("Back Right Position", robot.backRight.getCurrentPosition());
+            telemetry.update();
+        }
+
+
+        robot.frontLeft.setPower(0);
+        robot.frontRight.setPower(0);
+        robot.backLeft.setPower(0);
+        robot.backRight.setPower(0);
+
+        robot.frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
 }

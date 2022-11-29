@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware;
 
+import com.arcrobotics.ftclib.hardware.GyroEx;
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -22,6 +24,7 @@ public class RI3W11588Hardware implements OpenCvCamera.AsyncCameraOpenListener {
     public OpenCvCamera camera;
     public Telemetry telemetry;
     public RI3W11588OpenCV pipeLine;
+    public BNO055IMU imu;
 
 
     public static final double TICKS_PER_MOTOR_REV = 537.7;
@@ -46,8 +49,12 @@ public class RI3W11588Hardware implements OpenCvCamera.AsyncCameraOpenListener {
         backRight = hardwareMap.dcMotor.get("backRight");
         arm = hardwareMap.dcMotor.get("arm");
         claw = hardwareMap.servo.get("claw");
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         this.telemetry = telemetry;
 
+        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        imu.initialize(parameters);
 
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         backRight.setDirection(DcMotorSimple.Direction.REVERSE);
