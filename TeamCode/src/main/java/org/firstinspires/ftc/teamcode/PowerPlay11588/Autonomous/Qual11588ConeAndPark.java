@@ -19,6 +19,6 @@ public class Qual11588ConeAndPark extends Qual11588BaseAuto{
         while(runTime.milliseconds() < 2000){
 
         }
-        coneAndPark();
+        //coneAndPark();
     }
 }
