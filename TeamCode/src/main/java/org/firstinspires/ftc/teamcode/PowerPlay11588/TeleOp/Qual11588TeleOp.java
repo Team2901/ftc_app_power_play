@@ -82,13 +82,13 @@ public class Qual11588TeleOp extends OpMode {
 
         switch (currentClawPosition){
             case Open:
-                robot.claw.setPosition(.5);
+                robot.claw.setPosition(robot.OPEN_POSITION);
                 if(impGamepad1.b.isInitialPress()){
                     currentClawPosition = ClawPosition.Closed;
                 }
                 break;
             case Closed:
-                robot.claw.setPosition(0);
+                robot.claw.setPosition(robot.CLOSED_POSITION);
                 if(impGamepad1.b.isInitialPress()){
                     currentClawPosition = ClawPosition.Open;
                 }

@@ -158,7 +158,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
         moveXY(0, 12);
         moveXY(6, 0);
         moveArm(Height.LOW);
-        robot.claw.setPosition(1);
+        robot.claw.setPosition(robot.OPEN_POSITION);
     }
 
     public void coneAndPark(){
@@ -191,7 +191,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
         Step 4:
         Open the claw
          */
-        //Something like: robot.claw.setPosition(robot.CLAW_POSITION_OPEN);
+        robot.claw.setPosition(robot.OPEN_POSITION);
         while(!gamepad1.a){
 
         }
