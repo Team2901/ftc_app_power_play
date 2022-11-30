@@ -63,8 +63,8 @@ public class IntelRealsense extends OpMode
     double positionX, positionY;
     double targetAngle = 0;
 
-    double cameraXOffset = 5.75; //lies 7 inches in front of middle
-    double cameraYOffset = -4; //lies 3.75 inches up from the middle
+    double cameraXOffset = 6; //lies 7 inches in front of middle
+    double cameraYOffset = 0; //lies 3.75 inches up from the middle
 
     double angleToTarget = 0;
 
@@ -72,6 +72,7 @@ public class IntelRealsense extends OpMode
     double arrowX, arrowY;
 
     boolean isMoving = true;
+    boolean isTurning = false;
 
     public enum AutoState {
         MOVE_FORWARD,
@@ -86,8 +87,6 @@ public class IntelRealsense extends OpMode
         GRIP_CLAW,
         MOVE_FORWARD2,
         TURN_N45
-
-
     }
     AutoState autoState;
 
@@ -100,13 +99,17 @@ public class IntelRealsense extends OpMode
     double leftTurnPower;
     double rightTurnPower;
 
-    boolean isSecond = false;
-
     ImprovedGamepad improvedGamepad;
+    ImprovedGamepad improvedGamepad2;
 
-    double robotCenterX;
-    double robotCenterY;
+    double turnAngle;
 
+    double turnKp = 0.4;
+    double turnKi = 0;
+    double turnKd = 0.1;
+
+    /*public XYhVector START_POS = new XYhVector(0, 0, getAngle());
+    public XYhVector pos = new XYhVector(START_POS);*/
 
     @Override
     public void init() {
@@ -119,6 +122,8 @@ public class IntelRealsense extends OpMode
         previousTime = currentTime;
         previousError = currentError;
         improvedGamepad = new ImprovedGamepad(gamepad1, impTime, "GP");
+        improvedGamepad2 = new ImprovedGamepad(gamepad2, impTime, "GP2");
+
         autoState = AutoState.MOVE_FORWARD;
 
     }
@@ -138,6 +143,7 @@ public class IntelRealsense extends OpMode
         translation = new Translation2d(up.pose.getTranslation().getX() / 0.0254, up.pose.getTranslation().getY() / 0.0254);
         rotation = up.pose.getRotation();
         improvedGamepad.update();
+        improvedGamepad2.update();
         final int robotRadius = 8; // inches
 
         if (up == null) return;
@@ -145,18 +151,18 @@ public class IntelRealsense extends OpMode
         // We divide by 0.0254 to convert meters to inches
 
 
-        arrowX = Math.cos(28.17859 + rotation.getRadians()) * robotRadius;
-        arrowY = Math.sin(28.17859 + rotation.getRadians()) * robotRadius;
+//        arrowX = Math.cos(28.17859 + rotation.getRadians()) * robotRadius;
+//        arrowY = Math.sin(28.17859 + rotation.getRadians()) * robotRadius;
         double x1 = translation.getX(), y1 = translation.getY();
-        double x2 = translation.getX() + arrowX, y2 = translation.getY() + arrowY;
         double fieldTheta = rotation.getDegrees() + angleOffset - initTheta;
-        double adjustX = ((x2*Math.cos(angleOffset)) - (y2*Math.sin(angleOffset)));
-        double adjustY = ((x2*Math.sin(angleOffset)) + (y2*Math.cos(angleOffset)));
+        double offsetX = (x1 - (cameraXOffset*Math.cos(rotation.getRadians())));
+        double offsetY = (y1 - (cameraYOffset*Math.cos(rotation.getRadians())));
+        double adjustX = ((offsetX*Math.cos(angleOffset)) - (offsetY*Math.sin(angleOffset)));
+        double adjustY = ((offsetX*Math.sin(angleOffset)) + (offsetY*Math.cos(angleOffset)));
 
-//        robotCenterX = (((x1-(cameraXOffset * Math.cos(AngleUnit.normalizeRadians(rotation.getRadians()))))*Math.cos(AngleUnit.normalizeRadians(rotation.getRadians()))) + ((x1-(cameraXOffset * Math.sin(AngleUnit.normalizeRadians(rotation.getRadians()))))*Math.sin(AngleUnit.normalizeRadians(rotation.getRadians()))));
-//        robotCenterY = (((y1-(cameraYOffset * Math.cos(AngleUnit.normalizeRadians(rotation.getRadians()))))*Math.cos(AngleUnit.normalizeRadians(rotation.getRadians()))) + ((y1-(cameraYOffset * Math.sin(AngleUnit.normalizeRadians(rotation.getRadians()))))*Math.sin(AngleUnit.normalizeRadians(rotation.getRadians()))));
+        /*double averagedX = (offsetX + pos.x)/2;
+        double averagedY = (offsetY + pos.y)/2;*/
 
-        //Changes target Position
         //Changes target Position
         if(improvedGamepad.dpad_right.isInitialPress()){
             move(48, 0);
@@ -172,13 +178,56 @@ public class IntelRealsense extends OpMode
             move(0, -24);
 //           kd -= 0.01;
         }
-
-
-
         if(improvedGamepad.left_bumper.isInitialPress()){
-            turnByAngle(90);
+            turnToAngle(90);
         } else if(improvedGamepad.right_bumper.isInitialPress()){
-            turnByAngle(-90);
+            turnToAngle(-90);
+        }
+
+
+        switch(autoState){
+            case MOVE_FORWARD:
+                move(36, 0);
+                if(!isTurning && !isMoving) {
+                    autoState = AutoState.TURN_45;
+                }
+                break;
+            case TURN_45:
+                turnToAngle(45);
+                if(!isTurning && !isMoving) {
+                    autoState = AutoState.LIFT_SLIDES;
+                }
+                break;
+            case LIFT_SLIDES:
+
+                break;
+            case RELEASE_CLAW:
+
+                break;
+            case RETRACT_SLIDES:
+
+                break;
+            case TURN_452:
+                turnToAngle(90);
+                if(!isTurning && !isMoving) {
+                    autoState = AutoState.MOVE_BACK;
+                }
+                break;
+            case MOVE_BACK:
+                move(0, -24);
+                if(!isTurning && !isMoving) {
+                    autoState = AutoState.GRIP_CLAW;
+                }
+                break;
+            case GRIP_CLAW:
+
+                break;
+            case MOVE_FORWARD2:
+
+                break;
+            case TURN_N45:
+
+                break;
         }
 
 
@@ -249,6 +298,7 @@ public class IntelRealsense extends OpMode
 //            robot.liftTwo.setPower(0);
 //        }
 
+        /*odometry();*/ //reinstate this
         //Movement PID code
         if(isMoving && (Math.abs(((positionX) - (translation.getX()))) > 0 || Math.abs((positionY) - (translation.getY())) > 0)) {
 
@@ -303,6 +353,7 @@ public class IntelRealsense extends OpMode
 
         } else {
             outputLeft = 0;
+            isMoving = false;
         }
 
         outputLeft *= -1;
@@ -326,6 +377,71 @@ public class IntelRealsense extends OpMode
             rightTurnPower = 0;
         }
 
+        //
+        //
+        //
+        //
+
+        //Angle turn code
+        double startAngle = rotation.getDegrees();
+        double targetAngle = turnAngle;
+        ElapsedTime turnRuntime = new ElapsedTime();
+        double turnP = 0;
+        double turnI = 0;
+        double turnD = 0;
+        double turnError = turnAngle;
+        if(improvedGamepad2.a.isInitialPress()){
+            turnKp -= 0.01;
+        } else if(improvedGamepad2.y.isInitialPress()){
+            turnKp += 0.01;
+        } else if(improvedGamepad2.x.isInitialPress()){
+            turnKd -= 0.01;
+        } else if(improvedGamepad2.b.isInitialPress()){
+            turnKd += 0.01;
+        }
+
+        if(isTurning && !(turnError < 1.5 && turnError > -1.5)){
+            turnError = (targetAngle - robot.getAngle());
+            double turnSecs = turnRuntime.seconds();
+            runtime.reset();
+            telemetry.addData("Target Angle", targetAngle);
+            telemetry.addData("Current Angle", robot.getAngle());
+            telemetry.addData("Loop Time", turnSecs);
+            turnD = (turnError - turnP) / turnSecs;
+            turnI = turnI + (turnError * turnSecs);
+            turnP = turnError;
+            double turnTotal = (turnKp* turnP + turnKi* turnI + turnKd* turnD)/100;
+            if(turnTotal > 1){
+                turnI = 0;
+                turnTotal = 1;
+            }
+            if(turnTotal < -1){
+                turnI = 0;
+                turnTotal = -1;
+            }
+
+            outputLeft = turnTotal;
+            turnPower = 0;
+            outputRight = -outputLeft;
+            leftTurnPower = 0;
+            rightTurnPower = 0;
+
+        } else if(outputLeft < 0.01){
+            positionX = translation.getX();
+            positionY = translation.getY();
+            robot.leftOne.setPower(0);
+            robot.leftTwo.setPower(0);
+            robot.rightOne.setPower(0);
+            robot.rightTwo.setPower(0);
+            isTurning = false;
+        }
+        //
+        //
+        //
+        //
+
+
+
         robot.leftOne.setVelocity((outputLeft/speedMod+leftTurnPower)*2500);
         robot.leftTwo.setVelocity((outputLeft/speedMod-leftTurnPower)*2500);
         robot.rightOne.setVelocity((outputRight/speedMod+rightTurnPower)*2500);
@@ -347,8 +463,6 @@ public class IntelRealsense extends OpMode
         telemetry.addData("output", outputLeft);
         telemetry.addData("x1", String.format("%.2f", x1));
         telemetry.addData("y1", String.format("%.2f", y1));
-//        telemetry.addData("x2", String.format("%.2f", x2));
-//        telemetry.addData("y2", String.format("%.2f", y2));
         telemetry.addData("Adjusted Rotation", String.format("%.2f", fieldTheta) + "°");
         telemetry.addData("Adjusted x", String.format("%.2f", adjustX) + " inches");
         telemetry.addData("Adjusted y", String.format("%.2f", adjustY) + " inches");
@@ -360,8 +474,12 @@ public class IntelRealsense extends OpMode
         telemetry.addData("kp", kp);
         telemetry.addData("kd", kd);
         telemetry.addData("ki", ki);
+        telemetry.addData("turnkp", turnKp);
+        telemetry.addData("turnkd", turnKd);
         telemetry.addData("Angle to Target", angleToTarget + "°");
         telemetry.addData("Raw Rotation", rotation);
+        telemetry.addData("Offsetted X", offsetX);
+        telemetry.addData("Offsetted Y", offsetY);
 //        telemetry.addData("offsetted x", robotCenterX);
 //        telemetry.addData("offsetted y", robotCenterY);
     }
@@ -385,7 +503,6 @@ public class IntelRealsense extends OpMode
     public void moveTo(double x, double y) {
         positionX = x;
         positionY = y;
-        isSecond = true;
         isMoving = true;
     }
 
@@ -461,51 +578,9 @@ public class IntelRealsense extends OpMode
         return total;
     }
 
-    public void turnByAngle(double turnAngle) {
-        double startAngle = rotation.getDegrees();
-        double targetAngle = AngleUnit.normalizeDegrees(startAngle + turnAngle);
-        ElapsedTime runtime = new ElapsedTime();
-        double p = 0;
-        double i = 0;
-        double d = 0;
-        double kp = 0.1;
-        double ki = 0;
-        double kd = 0;
-        double error = turnAngle;
-
-
-        if(!(error < 1.5 && error > -1.5)){
-            error = (targetAngle - robot.getAngle());
-            double secs = runtime.seconds();
-            runtime.reset();
-            telemetry.addData("Target Angle", targetAngle);
-            telemetry.addData("Current Angle", robot.getAngle());
-            telemetry.addData("Loop Time", secs);
-            d = (error - p) / secs;
-            i = i + (error * secs);
-            p = error;
-            double total = (kp* p + ki* i + kd* d)/100;
-            if(total > 1){
-                i = 0;
-                total = 1;
-            }
-            if(total < -1){
-                i = 0;
-                total = -1;
-            }
-
-            robot.leftOne.setPower(total);
-            robot.rightOne.setPower(total);
-            robot.leftTwo.setPower(total);
-            robot.rightTwo.setPower(total);
-            positionX = translation.getX();
-            positionY = translation.getY();
-        }
-
-        robot.leftOne.setPower(0);
-        robot.leftTwo.setPower(0);
-        robot.rightOne.setPower(0);
-        robot.rightTwo.setPower(0);
+    public void turnToAngle(double turnAngle) {
+        isTurning = true;
+        this.turnAngle = turnAngle;
 
 //        if((autoState == AutoState.TURN_45 && robot.leftTwo.getPower() == 0) || (autoState == AutoState.TURN_N45 && robot.leftTwo.getPower() == 0)){
 //            autoState = AutoState.LIFT_SLIDES;
@@ -513,4 +588,27 @@ public class IntelRealsense extends OpMode
 //            autoState = AutoState.MOVE_BACK;
 //        }
     }
+
+    /*public void odometry(){
+        oldRightPosition = currentRightPosition;
+        oldLeftPosition = currentLeftPosition;
+        oldBackPosition = currentBackPosition;
+
+        currentRightPosition = rightOne.getCurrentPosition(); CHANGE NAME :))
+        currentLeftPosition = leftOne.getCurrentPosition();
+        currentBackPosition = rightTwo.getCurrentPosition();
+
+        int dn1 = currentRightPosition - oldRightPosition;
+        int dn2 = currentLeftPosition - oldLeftPosition;
+        int dn3 = currentBackPosition - oldBackPosition;
+
+        double dtheta = ((dn2 - dn1) / leftRightDistance) * inchPerTick;
+        double dx = ((dn1 + dn2) / 2) * inchPerTick;
+        double dy = (dn3 - (dn2 - dn1) * midpointBackDistance / leftRightDistance) * inchPerTick;
+
+        double theta = pos.h + (dtheta / 2.0);
+        pos.x += dx * Math.cos(theta) - dy * Math.sin(theta);
+        pos.y += dx * Math.sin(theta) + dy * Math.cos(theta);
+        pos.h += dtheta;
+    }*/
 }
