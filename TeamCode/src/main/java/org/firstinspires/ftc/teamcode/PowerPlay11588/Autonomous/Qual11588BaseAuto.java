@@ -25,7 +25,8 @@ public class Qual11588BaseAuto extends LinearOpMode {
     double iArmMax = .25;
 
     double startAngle = 0;
-    double targetAngle = 0;
+    //Has targetAngle return -1 if it has not been defined, it is redefined before it is used
+    double targetAngle = -1;
     double turnError = 0;
     double turnPower = .5;
 
@@ -104,6 +105,30 @@ public class Qual11588BaseAuto extends LinearOpMode {
             moveXY((int) 26, 0);
         }
     }
+
+    public void moveArm(int height){
+        armTarget = height;
+        error = armTarget - robot.arm.getCurrentPosition();
+        PIDTimer.reset();
+
+        while(opModeIsActive() && !(error < 5 && error > -5)){
+            error = armTarget - robot.arm.getCurrentPosition();
+            dArm = (error - pArm)/PIDTimer.seconds();
+            iArm = iArm + (error * PIDTimer.seconds());
+            pArm = error;
+            total = ((kp*pArm) + (ki*iArm) + (kd*dArm))/100;
+            robot.arm.setPower(total);
+
+            if(iArm > iArmMax){
+                iArm = iArmMax;
+            } else if(iArm < -iArmMax){
+                iArm = -iArmMax;
+            }
+            PIDTimer.reset();
+            telemetryStuff();
+        }
+    }
+
     public void moveArm(Height height){
         if(height == Height.GROUND){
             armTarget = 50;
@@ -231,6 +256,8 @@ public class Qual11588BaseAuto extends LinearOpMode {
         telemetry.addData("Arm Position", robot.arm.getCurrentPosition());
         telemetry.addData("Arm Error", error);
         telemetry.addData("Arm Power", total);
+        telemetry.addData("Current Angle", robot.getAngle());
+        telemetry.addData("Target Angle", targetAngle);
         telemetry.update();
     }
 }
