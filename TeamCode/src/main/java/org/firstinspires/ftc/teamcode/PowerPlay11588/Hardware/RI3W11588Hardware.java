@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware;
 
+import com.arcrobotics.ftclib.hardware.GyroEx;
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -22,6 +24,7 @@ public class RI3W11588Hardware implements OpenCvCamera.AsyncCameraOpenListener {
     public OpenCvCamera camera;
     public Telemetry telemetry;
     public RI3W11588OpenCV pipeLine;
+    public BNO055IMU imu;
 
 
     public static final double TICKS_PER_MOTOR_REV = 537.7;
@@ -35,26 +38,37 @@ public class RI3W11588Hardware implements OpenCvCamera.AsyncCameraOpenListener {
 
     public static final double ARM_GEAR_RATIO = 16/80;
 
-    public void init(HardwareMap hardwareMap, Telemetry telemetry){
+    public void init(HardwareMap hardwareMap, Telemetry telemetry) {
+        init(hardwareMap, telemetry, true);
+    }
+
+    public void init(HardwareMap hardwareMap, Telemetry telemetry, boolean useCam){
         frontLeft = hardwareMap.dcMotor.get("frontLeft");
         frontRight = hardwareMap.dcMotor.get("frontRight");
         backLeft = hardwareMap.dcMotor.get("backLeft");
         backRight = hardwareMap.dcMotor.get("backRight");
         arm = hardwareMap.dcMotor.get("arm");
         claw = hardwareMap.servo.get("claw");
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         this.telemetry = telemetry;
-        WebcamName webcam = hardwareMap.get(WebcamName.class, "Webcam 1");
+
+        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        imu.initialize(parameters);
 
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         backRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        int cameraMonitorViewID = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        if(useCam) {
+            WebcamName webcam = hardwareMap.get(WebcamName.class, "Webcam 1");
 
-        camera = OpenCvCameraFactory.getInstance().createWebcam(webcam, cameraMonitorViewID);
+            int cameraMonitorViewID = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+            camera = OpenCvCameraFactory.getInstance().createWebcam(webcam, cameraMonitorViewID);
 
-        pipeLine = new RI3W11588OpenCV(telemetry);
-        camera.setPipeline(pipeLine);
-        camera.openCameraDeviceAsync(this);
+            pipeLine = new RI3W11588OpenCV(telemetry);
+            camera.setPipeline(pipeLine);
+            camera.openCameraDeviceAsync(this);
+        }
 
         frontLeft.setPower(0);
         frontRight.setPower(0);

@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.OpenCVPipelines;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.PowerPlay11588.Autonomous.Qual11588BaseAuto;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Rect;
@@ -15,14 +16,14 @@ public class RI3W11588OpenCV extends OpenCvPipeline {
     public enum ConeColor { red, green, blue};
     public ConeColor coneColor = null;
     public double redAmount;
-    public double blueAmount = -1;
+    public double blueAmount;
     public double greenAmount;
-    public double redAmountAllTime;
-    public double greenAmountAllTime;
-    public double blueAmountAllTime;
-    public double redAmountAverage;
-    public double greenAmountAverage;
-    public double blueAmountAverage;
+//    public double redAmountAllTime;
+//    public double greenAmountAllTime;
+//    public double blueAmountAllTime;
+//    public double redAmountAverage;
+//    public double greenAmountAverage;
+//    public double blueAmountAverage;
     public int framesProceeded;
     Rect r = new Rect(100, 100, 100, 100);
     Mat redMask = new Mat();
@@ -49,6 +50,7 @@ public class RI3W11588OpenCV extends OpenCvPipeline {
 //Makes sure doesn't crash when the camera does nothing
         }
 
+        if(coneColor == null) {
             input.copyTo(lastImage);
             //copies the last input to lastImage, actually assigning it
 
@@ -88,21 +90,22 @@ public class RI3W11588OpenCV extends OpenCvPipeline {
             //Core.bitwise_and(subMat, subMat, subMat, redMask);
             //This commented out code is only for visualizing the pipeline
 
-            redAmountAllTime = redAmountAllTime + redAmount;
-            blueAmountAllTime = blueAmountAllTime + blueAmount;
-            greenAmountAllTime = greenAmountAllTime + greenAmount;
+//            redAmountAllTime = redAmountAllTime + redAmount;
+//            blueAmountAllTime = blueAmountAllTime + blueAmount;
+//            greenAmountAllTime = greenAmountAllTime + greenAmount;
+//
+//            redAmountAverage = redAmountAllTime / framesProceeded;
+//            greenAmountAverage = greenAmountAllTime / framesProceeded;
+//            blueAmountAverage = blueAmountAllTime / framesProceeded;
 
-            redAmountAverage = redAmountAllTime / framesProceeded;
-            greenAmountAverage = greenAmountAllTime / framesProceeded;
-            blueAmountAverage = blueAmountAllTime / framesProceeded;
-            //This code is literally only for testing and getting an average
+//            This code is literally only for testing and getting an average
 
 
 
             //All Pipeline code must be written above here
+            //Simple if statement to determine what is the largest amount/percentage of a color
 
-
-
+        }
         return lastImage;
         /*The entire thing is in an if statement because we only want process frame to run one until
         we get a value for coneColor because we don't want it to change in the middle of our run because that
@@ -111,12 +114,39 @@ public class RI3W11588OpenCV extends OpenCvPipeline {
 
     }
 
-
-
-    public void openCVTelemetry() {
-        telemetry.addData("Blue", blueAmount);
-        telemetry.update();
+    public ConeColor getColor(Qual11588BaseAuto.AllianceColor allianceColor) {
+        if (allianceColor == Qual11588BaseAuto.AllianceColor.BLUE) {
+            if (redAmount > (blueAmount - 3) && redAmount > greenAmount) {
+                coneColor = RI3W11588OpenCV.ConeColor.red;
+            } else if ((blueAmount - 3) > redAmount && (blueAmount - 3) > greenAmount) {
+                coneColor = RI3W11588OpenCV.ConeColor.blue;
+            } else if (greenAmount > redAmount && greenAmount > (blueAmount - 3)) {
+                coneColor = RI3W11588OpenCV.ConeColor.green;
+            }
+        } else if (allianceColor == Qual11588BaseAuto.AllianceColor.RED) {
+            if (redAmount > (blueAmount) && redAmount > greenAmount) {
+                coneColor = RI3W11588OpenCV.ConeColor.red;
+            } else if ((blueAmount) > redAmount && (blueAmount) > greenAmount) {
+                coneColor = RI3W11588OpenCV.ConeColor.blue;
+            } else if (greenAmount > redAmount && greenAmount > (blueAmount - 3)) {
+                coneColor = RI3W11588OpenCV.ConeColor.green;
+            }
+        }
+        return coneColor;
     }
+
+
+    }
+
+//    public void openCVTelemetry() {
+//        telemetry.addData("Red Amount", redAmount);
+//        telemetry.addData("Blue Amount", blueAmount);
+//        telemetry.addData("Green Amount", greenAmount);
+//        telemetry.addData("Frames Proceeded", framesProceeded);
+//        telemetry.addData("Red average", redAmountAverage);telemetry.addData("Blue average", blueAmountAverage);
+//        telemetry.addData("Green average", greenAmountAverage);
+//        telemetry.update();
+//    }
     //This is a separate method because you will not always want to see OpenCV Telemetry
 
-}
+
