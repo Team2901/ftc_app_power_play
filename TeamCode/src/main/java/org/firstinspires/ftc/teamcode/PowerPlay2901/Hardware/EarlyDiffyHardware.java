@@ -97,7 +97,7 @@ public class EarlyDiffyHardware {
         oldLeftPosition = currentLeftPosition;
         oldBackPosition = currentBackPosition;
 
-        currentRightPosition = rightOne.getCurrentPosition();
+        currentRightPosition = rightOne.getCurrentPosition(); CHANGE NAME :))
         currentLeftPosition = leftOne.getCurrentPosition();
         currentBackPosition = rightTwo.getCurrentPosition();
 

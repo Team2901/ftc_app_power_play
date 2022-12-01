@@ -15,10 +15,10 @@ public class TeleOp2 extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor frontLeft = null;
     private DcMotor frontRight = null;
-    //private DcMotor backLeft = null;
-    //private DcMotor backRight = null;
-    private DcMotor armVert = null;
-    private DcMotor armHor = null;
+    private DcMotor backLeft = null;
+    private DcMotor backRight = null;
+    //private DcMotor armVert = null;
+    //private DcMotor armHor = null;
 
     private Servo leftHand = null;
     //private Servo rightHand = null;
@@ -33,10 +33,10 @@ public class TeleOp2 extends LinearOpMode {
         // step (using the FTC Robot Controller app on the phone).
         frontLeft  = hardwareMap.get(DcMotor.class, "frontLeft");
         frontRight = hardwareMap.get(DcMotor.class, "frontRight");
-        //backLeft  = hardwareMap.get(DcMotor.class, "backLeft");
-        //backRight = hardwareMap.get(DcMotor.class, "backRight");
-        armVert = hardwareMap.get(DcMotor.class, "armVert");
-        armHor = hardwareMap.get(DcMotor.class, "armHor");
+        backLeft  = hardwareMap.get(DcMotor.class, "backLeft");
+        backRight = hardwareMap.get(DcMotor.class, "backRight");
+        //armVert = hardwareMap.get(DcMotor.class, "armVert");
+        //armHor = hardwareMap.get(DcMotor.class, "armHor");
 
         leftHand = hardwareMap.get(Servo.class, "left_hand");
         //rightHand = hardwareMap.get(Servo.class, "right_hand");
@@ -48,8 +48,8 @@ public class TeleOp2 extends LinearOpMode {
         // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
         frontRight.setDirection(DcMotor.Direction.FORWARD);
-        //backLeft.setDirection(DcMotor.Direction.REVERSE);
-        //backRight.setDirection(DcMotor.Direction.FORWARD);
+        backLeft.setDirection(DcMotor.Direction.REVERSE);
+        backRight.setDirection(DcMotor.Direction.FORWARD);
 
 
         // Wait for the game to start (driver presses PLAY)
@@ -77,14 +77,19 @@ public class TeleOp2 extends LinearOpMode {
             leftPower    = Range.clip(drive + turn, -1.0, 1.0) ;
             rightPower   = Range.clip(drive - turn, -1.0, 1.0) ;
 
-            //set armvertpower
+            /* set armvertpower
             if (gamepad1.a) {
-                armVertPower = 0.4;
-                armHorPower = -0.4;
+                armVertPower = 1;
+                armHorPower = -1;
             }
             else if (gamepad1.b) {
                 armVertPower = -0.25;
                 armHorPower = 0.25;
+            }
+
+            else if (gamepad1.y) {
+                armVertPower = 0.7;
+                armHorPower = -0.7;
             }
             else {
                 armVertPower = 0;
@@ -92,7 +97,7 @@ public class TeleOp2 extends LinearOpMode {
             }
 
 
-            /*/ open the gripper on X button if not already at most open position.
+            // open the gripper on X button if not already at most open position.
             if (gamepad1.x && gripposR < maxposR) gripposR = gripposR + .01;
             if (gamepad1.x && gripposL < maxposL) gripposL = gripposL + .01;
             // close the gripper on Y button if not already at the closed position.
@@ -121,10 +126,10 @@ public class TeleOp2 extends LinearOpMode {
             // Send power to wheels, arms, and servos
             frontLeft.setPower(leftPower);
             frontRight.setPower(rightPower);
-            //backLeft.setPower(leftPower);
-            //backRight.setPower(rightPower);
-            armVert.setPower(armVertPower);
-            armHor.setPower(armHorPower);
+            backLeft.setPower(leftPower);
+            backRight.setPower(rightPower);
+            //armVert.setPower(armVertPower);
+            //armHor.setPower(armHorPower);
 
             leftHand.setPosition(gripposL);
             //rightHand.setPosition(gripposR);
