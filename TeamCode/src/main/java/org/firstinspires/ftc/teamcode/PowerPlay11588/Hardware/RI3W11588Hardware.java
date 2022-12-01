@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware;
 
-//import com.arcrobotics.ftclib.hardware.GyroEx;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -10,6 +9,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.OpenCVPipelines.Qual11588OpenCV;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
@@ -28,7 +28,7 @@ public class RI3W11588Hardware implements OpenCvCamera.AsyncCameraOpenListener {
     public Servo claw;
     public OpenCvCamera camera;
     public Telemetry telemetry;
-    public RI3W11588OpenCV pipeLine;
+    public Qual11588OpenCV pipeLine;
     public BNO055IMU imu;
 
 
@@ -81,7 +81,7 @@ public class RI3W11588Hardware implements OpenCvCamera.AsyncCameraOpenListener {
             int cameraMonitorViewID = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
             camera = OpenCvCameraFactory.getInstance().createWebcam(webcam, cameraMonitorViewID);
 
-            pipeLine = new RI3W11588OpenCV(telemetry);
+            pipeLine = new Qual11588OpenCV(telemetry);
             camera.setPipeline(pipeLine);
             camera.openCameraDeviceAsync(this);
         }

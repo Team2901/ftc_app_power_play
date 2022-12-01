@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.OpenCVPipelines;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.PowerPlay11588.Autonomous.Qual11588BaseAuto;
+import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.Qual11588Hardware;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Rect;
@@ -9,11 +10,11 @@ import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
-public class RI3W11588OpenCV extends OpenCvPipeline {
+public class Qual11588OpenCV extends OpenCvPipeline {
 
     private Mat lastImage = null;
     private Mat subMat = null;
-    public enum ConeColor { red, green, blue};
+    public enum ConeColor { RED, GREEN, BLUE};
     public ConeColor coneColor = null;
     public double redAmount;
     public double blueAmount;
@@ -30,9 +31,11 @@ public class RI3W11588OpenCV extends OpenCvPipeline {
     Mat blueMask = new Mat();
     Mat greenMask = new Mat();
 
+
+
     Telemetry telemetry;
 
-    public RI3W11588OpenCV(Telemetry telemetry) {
+    public Qual11588OpenCV(Telemetry telemetry) {
         this.telemetry = telemetry;
     }
     //Constructor for RI3W11588OpenCV class
@@ -84,7 +87,28 @@ public class RI3W11588OpenCV extends OpenCvPipeline {
             //This creates a percentage of pixels on the screen, this are not scaled to each other
             //TO a degree each value/mask is arbitrary
 
+            if (Qual11588Hardware.teamColor == null) {
+                return lastImage;
+            }
 
+            if (Qual11588Hardware.teamColor == Qual11588Hardware.allianceColor.BLUE) {
+                if (redAmount > (blueAmount - 3) && redAmount > greenAmount) {
+                    coneColor = Qual11588OpenCV.ConeColor.RED;
+                } else if ((blueAmount - 3) > redAmount && (blueAmount - 3) > greenAmount) {
+                    coneColor = Qual11588OpenCV.ConeColor.BLUE;
+                } else if (greenAmount > redAmount && greenAmount > (blueAmount - 3)) {
+                    coneColor = Qual11588OpenCV.ConeColor.GREEN;
+                }
+            } else if (Qual11588Hardware.teamColor == Qual11588Hardware.allianceColor.RED) {
+                if (redAmount > (blueAmount) && redAmount > greenAmount) {
+                    coneColor = Qual11588OpenCV.ConeColor.RED;
+                } else if ((blueAmount) > redAmount && (blueAmount) > greenAmount) {
+                    coneColor = Qual11588OpenCV.ConeColor.BLUE;
+                } else if (greenAmount > redAmount && greenAmount > (blueAmount - 3)) {
+                    coneColor = Qual11588OpenCV.ConeColor.GREEN;
+                }
+
+            }
             //Imgproc.cvtColor(redMask, redMask, Imgproc.COLOR_GRAY2RGB);
             //Core.bitwise_and(subMat, redMask, lastImage);
             //Core.bitwise_and(subMat, subMat, subMat, redMask);
@@ -104,39 +128,16 @@ public class RI3W11588OpenCV extends OpenCvPipeline {
 
             //All Pipeline code must be written above here
             //Simple if statement to determine what is the largest amount/percentage of a color
-
         }
-        return lastImage;
+
         /*The entire thing is in an if statement because we only want process frame to run one until
         we get a value for coneColor because we don't want it to change in the middle of our run because that
         might change what color it thinks the cone is.
         */
-
+        return lastImage;
     }
 
-    public ConeColor getColor(Qual11588BaseAuto.AllianceColor allianceColor) {
-        if (allianceColor == Qual11588BaseAuto.AllianceColor.BLUE) {
-            if (redAmount > (blueAmount - 3) && redAmount > greenAmount) {
-                coneColor = RI3W11588OpenCV.ConeColor.red;
-            } else if ((blueAmount - 3) > redAmount && (blueAmount - 3) > greenAmount) {
-                coneColor = RI3W11588OpenCV.ConeColor.blue;
-            } else if (greenAmount > redAmount && greenAmount > (blueAmount - 3)) {
-                coneColor = RI3W11588OpenCV.ConeColor.green;
-            }
-        } else if (allianceColor == Qual11588BaseAuto.AllianceColor.RED) {
-            if (redAmount > (blueAmount) && redAmount > greenAmount) {
-                coneColor = RI3W11588OpenCV.ConeColor.red;
-            } else if ((blueAmount) > redAmount && (blueAmount) > greenAmount) {
-                coneColor = RI3W11588OpenCV.ConeColor.blue;
-            } else if (greenAmount > redAmount && greenAmount > (blueAmount - 3)) {
-                coneColor = RI3W11588OpenCV.ConeColor.green;
-            }
-        }
-        return coneColor;
-    }
-
-
-    }
+}
 
 //    public void openCVTelemetry() {
 //        telemetry.addData("Red Amount", redAmount);

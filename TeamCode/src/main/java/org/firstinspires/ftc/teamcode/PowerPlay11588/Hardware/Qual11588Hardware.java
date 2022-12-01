@@ -15,8 +15,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.OpenCVPipelines.RI3W11588OpenCV;
-import org.firstinspires.ftc.teamcode.Shared.Gamepad.ImprovedGamepad;
+import org.firstinspires.ftc.teamcode.PowerPlay11588.Autonomous.Qual11588BaseAuto;
+import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.OpenCVPipelines.Qual11588OpenCV;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
@@ -42,28 +42,28 @@ public class Qual11588Hardware implements OpenCvCamera.AsyncCameraOpenListener {
     public DcMotorEx arm;
     public Servo claw;
     public OpenCvCamera camera;
-    public RI3W11588OpenCV pipeLine;
+    public Qual11588OpenCV pipeLine;
     public Telemetry telemetry;
-
     public BNO055IMU imu;
+    public static allianceColor teamColor = null;
 
-
-    public void init(HardwareMap hardwareMap, Telemetry telemetry) {
-        init(hardwareMap, telemetry, true);
+    public void init(HardwareMap hardwareMap, Telemetry telemetry, allianceColor team) {
+        init(hardwareMap, telemetry, team,true);
     }
-    public void init(HardwareMap hardwareMap, Telemetry telemetry, boolean useCam){
+    public void init(HardwareMap hardwareMap, Telemetry telemetry, allianceColor team, boolean useCam){
         frontLeft = hardwareMap.get(DcMotorEx.class, "frontLeft");
         frontRight = hardwareMap.get(DcMotorEx.class, "frontRight");
         backLeft = hardwareMap.get(DcMotorEx.class, "backLeft");
         backRight = hardwareMap.get(DcMotorEx.class, "backRight");
         arm = hardwareMap.get(DcMotorEx.class, "arm");
         claw = hardwareMap.servo.get("claw");
+        teamColor = team;
 
         this.telemetry = telemetry;
 
         if (useCam) {
             WebcamName webcam = hardwareMap.get(WebcamName.class, "Webcam 1");
-            pipeLine = new RI3W11588OpenCV(telemetry);
+            pipeLine = new Qual11588OpenCV(telemetry);
             camera.setPipeline(pipeLine);
             int cameraMonitorViewID = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
             camera = OpenCvCameraFactory.getInstance().createWebcam(webcam, cameraMonitorViewID);
@@ -123,4 +123,7 @@ public class Qual11588Hardware implements OpenCvCamera.AsyncCameraOpenListener {
     public void onError(int errorCode) {
 
     }
+
+    public enum allianceColor { RED, BLUE}
+
 }
