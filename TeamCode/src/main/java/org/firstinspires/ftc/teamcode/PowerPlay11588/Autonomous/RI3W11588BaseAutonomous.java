@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.OpenCVPipelines.RI3W11588OpenCV;
 import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.RI3W11588Hardware;
 
@@ -19,6 +20,11 @@ public class RI3W11588BaseAutonomous extends LinearOpMode {
         MEDIUM,
         HIGH
     }
+
+    double startAngle = 0.0;
+    double targetAngle = 0.0;
+    double turnError = 0.0;
+    double turnPower = .5;
     //These are set positions for the arm
 
     @Override
@@ -168,6 +174,23 @@ public class RI3W11588BaseAutonomous extends LinearOpMode {
             pidTimer.reset();
         }
         robot.arm.setPower(0.005);
+    }
+
+    public void turnByAngle(double turnAngle){
+        startAngle = robot.getAngle();
+        targetAngle = AngleUnit.normalizeDegrees(startAngle + turnAngle);
+        turnError = targetAngle - robot.getAngle();
+        while(opModeIsActive() && !(turnError < 5 && turnError > -5)){
+            if(turnError < 0){
+                turnPower = -0.5;
+            }else if(turnError > 0){
+                turnPower = 0.5;
+            }
+            robot.frontLeft.setPower(turnPower);
+            robot.frontRight.setPower(-turnPower);
+            robot.backLeft.setPower(turnPower);
+            robot.backRight.setPower(-turnPower);
+        }
     }
 
     public void moveAngle(int degrees) {
