@@ -2,12 +2,9 @@ package org.firstinspires.ftc.teamcode.PowerPlay2901.Autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.PowerPlay2901.EarlyDiffy.EarlyDiffyHardware;
-import org.firstinspires.ftc.teamcode.Shared.Gamepad.ImprovedGamepad;
+import org.firstinspires.ftc.teamcode.PowerPlay2901.Hardware.EarlyDiffyHardware;
 import org.firstinspires.ftc.teamcode.Utility.CountDownTimer;
 
 @Autonomous(name = "Swerve Park Auto", group = "Iterative OpMode")

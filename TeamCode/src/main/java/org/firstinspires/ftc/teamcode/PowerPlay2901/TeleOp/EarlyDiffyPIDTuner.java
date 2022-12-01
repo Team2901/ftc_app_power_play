@@ -1,10 +1,11 @@
-package org.firstinspires.ftc.teamcode.PowerPlay2901.EarlyDiffy;
+package org.firstinspires.ftc.teamcode.PowerPlay2901.TeleOp;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.PowerPlay2901.Hardware.EarlyDiffyHardware;
 
 @TeleOp(name = "Early Swerve PID Tuner")
 public class EarlyDiffyPIDTuner extends OpMode {
