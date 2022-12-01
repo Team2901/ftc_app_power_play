@@ -5,11 +5,12 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.PowerPlay2901.Hardware.EarlyDiffyHardware;
+import org.firstinspires.ftc.teamcode.PowerPlay2901.Hardware.RockBotHardware;
 import org.firstinspires.ftc.teamcode.Utility.CountDownTimer;
 
 @Autonomous(name = "Swerve Park Auto", group = "Iterative OpMode")
 public class QuickParkAuto extends LinearOpMode {
-    EarlyDiffyHardware robot = new EarlyDiffyHardware();
+    RockBotHardware robot = new RockBotHardware();
 
     CountDownTimer countDownTimer = new CountDownTimer(ElapsedTime.Resolution.MILLISECONDS);
     @Override
