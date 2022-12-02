@@ -1,13 +1,11 @@
 package org.firstinspires.ftc.teamcode.PowerPlay11588.Autonomous;
 
-import static org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.RI3W11588Hardware.FRONT_GEAR_RATIO;
-
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.OpenCVPipelines.RI3W11588OpenCV;
+import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.OpenCVPipelines.Qual11588OpenCV;
 import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.RI3W11588Hardware;
 
 public class RI3W11588BaseAutonomous extends LinearOpMode {
@@ -86,18 +84,18 @@ public class RI3W11588BaseAutonomous extends LinearOpMode {
     }
 
     public void park(){
-        if(robot.pipeLine.coneColor == RI3W11588OpenCV.ConeColor.red){
+        if(robot.pipeLine.coneColor == Qual11588OpenCV.ConeColor.RED){
             telemetry.addData("Saw red, going to spot 1", "");
             // Move forward 24 inches
             moveXY((int) 27, 0);
             // Move left 27 inches
             moveXY(0, -30);
-        }else if(robot.pipeLine.coneColor == RI3W11588OpenCV.ConeColor.green) {
+        }else if(robot.pipeLine.coneColor == Qual11588OpenCV.ConeColor.GREEN) {
             telemetry.addData("Saw green, going to spot 2", "");
             // Move forward 36 inches
             moveXY(36, 0);
 
-        }else if(robot.pipeLine.coneColor == RI3W11588OpenCV.ConeColor.blue){
+        }else if(robot.pipeLine.coneColor == Qual11588OpenCV.ConeColor.BLUE){
             telemetry.addData("Saw blue, going to spot 3", "");
             // Move forward 24 inches
             moveXY((int) 27, 0);

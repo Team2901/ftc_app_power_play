@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.PowerPlay2901.EarlyDiffy;
+package org.firstinspires.ftc.teamcode.PowerPlay2901.Hardware;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
