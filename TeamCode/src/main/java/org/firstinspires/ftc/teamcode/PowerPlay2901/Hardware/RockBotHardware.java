@@ -31,6 +31,8 @@ public class RockBotHardware {
     public DcMotorEx rightTwo;
     public DcMotor liftOne;
     public DcMotor liftTwo;
+    public DcMotor encoderLeft;
+    public DcMotor encoderRight;
 
     public Servo passthrough;
 
@@ -44,6 +46,8 @@ public class RockBotHardware {
         liftOne = hardwareMap.get(DcMotor.class, "lift 1");
         liftTwo = hardwareMap.get(DcMotor.class, "lift 2");
         passthrough = hardwareMap.get(Servo.class, "passthrough");
+        encoderLeft = hardwareMap.get(DcMotor.class, "left encoder");
+        encoderRight = hardwareMap.get(DcMotor.class, "right encoder");
 
         leftTwo.setDirection(DcMotorSimple.Direction.REVERSE);
         rightTwo.setDirection(DcMotorSimple.Direction.REVERSE);
