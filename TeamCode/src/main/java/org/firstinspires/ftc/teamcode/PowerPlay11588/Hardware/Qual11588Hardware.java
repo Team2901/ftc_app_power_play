@@ -47,9 +47,14 @@ public class Qual11588Hardware implements OpenCvCamera.AsyncCameraOpenListener {
     public BNO055IMU imu;
     public static allianceColor teamColor = null;
 
-    public void init(HardwareMap hardwareMap, Telemetry telemetry, allianceColor team) {
-        init(hardwareMap, telemetry, team,true);
+    public void init(HardwareMap hardwareMap, Telemetry telemetry) {
+        init(hardwareMap, telemetry, null,true);
     }
+
+    public void init(HardwareMap hardwareMap, Telemetry telemetry, allianceColor team) {
+        init(hardwareMap, telemetry, team, true);
+    }
+
     public void init(HardwareMap hardwareMap, Telemetry telemetry, allianceColor team, boolean useCam){
         frontLeft = hardwareMap.get(DcMotorEx.class, "frontLeft");
         frontRight = hardwareMap.get(DcMotorEx.class, "frontRight");

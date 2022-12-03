@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.Qual11588Hardware;
 
-@Autonomous(name = "RI3W 11588 Blue ", group = "11588")
+@Autonomous(name = "Qual 11588 Blue ", group = "11588")
 public class Qual11588BlueConeAndPark extends Qual11588BaseAuto{
     ElapsedTime runTime = new ElapsedTime();
     @Override
