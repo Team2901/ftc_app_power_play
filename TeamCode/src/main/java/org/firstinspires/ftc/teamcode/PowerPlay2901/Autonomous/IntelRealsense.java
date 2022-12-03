@@ -478,8 +478,6 @@ public class IntelRealsense extends OpMode
         telemetry.addData("Raw Rotation", rotation);
         telemetry.addData("Offsetted X", offsetX);
         telemetry.addData("Offsetted Y", offsetY);
-//        telemetry.addData("offsetted x", robotCenterX);
-//        telemetry.addData("offsetted y", robotCenterY);
     }
 
     @Override
