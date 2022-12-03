@@ -3,20 +3,17 @@ package org.firstinspires.ftc.teamcode.PowerPlay11588.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@Autonomous(name = "RI3W 11588 Blue ", group = "11588")
-public class Qual11588BluePark extends Qual11588BaseAuto{
+import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.Qual11588Hardware;
+
+@Autonomous(name = "Qual 11588 Blue ", group = "11588")
+public class Qual11588BlueConeAndPark extends Qual11588BaseAuto{
     ElapsedTime runTime = new ElapsedTime();
     @Override
     public void runOpMode() throws InterruptedException {
-        this.teamColor = AllianceColor.BLUE;
-        robot.init(this.hardwareMap, telemetry);
+        robot.init(this.hardwareMap, telemetry, Qual11588Hardware.allianceColor.BLUE);
         waitForStart();
         runTime.reset();
         moveArm(Height.GROUND);
-        while(runTime.milliseconds() < 2000){
-
-        }
-
         park();
     }
 }

@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.OpenCVPipelines.RI3W11588OpenCV;
+import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.OpenCVPipelines.Qual11588OpenCV;
 import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.Qual11588Hardware;
 
 public class Qual11588BaseAuto extends LinearOpMode {
@@ -86,18 +86,17 @@ public class Qual11588BaseAuto extends LinearOpMode {
     }
 
     public void park(){
-        RI3W11588OpenCV.ConeColor color = robot.pipeLine.getColor(teamColor);
-        if(robot.pipeLine.coneColor == RI3W11588OpenCV.ConeColor.red){
+        if(robot.pipeLine.coneColor == Qual11588OpenCV.ConeColor.RED){
             telemetry.addData("Saw red, going to spot 1", "");
             // Move left 24 inches
             moveXY(0, -24);
             // Move forward 26 inches
             moveXY((int) 26, 0);
-        }else if(robot.pipeLine.coneColor == RI3W11588OpenCV.ConeColor.green) {
+        }else if(robot.pipeLine.coneColor == Qual11588OpenCV.ConeColor.GREEN) {
             telemetry.addData("Saw green, going to spot 2", "");
             // Move forward 26 inches
             moveXY(26, 0);
-        }else if(robot.pipeLine.coneColor == RI3W11588OpenCV.ConeColor.blue){
+        }else if(robot.pipeLine.coneColor == Qual11588OpenCV.ConeColor.BLUE){
             telemetry.addData("Saw blue, going to spot 3", "");
             // Move right 24 inches
             moveXY(0, 24);
@@ -187,7 +186,6 @@ public class Qual11588BaseAuto extends LinearOpMode {
     }
 
     public void coneAndPark(){
-        RI3W11588OpenCV.ConeColor color = robot.pipeLine.getColor(teamColor);
         /*
         step 1:
         move forward 37.5 inches
@@ -224,7 +222,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
         Step 5:
         if you're in location 2, you're done.
          */
-        if(robot.pipeLine.coneColor == RI3W11588OpenCV.ConeColor.green) {
+        if(robot.pipeLine.coneColor == Qual11588OpenCV.ConeColor.GREEN) {
             telemetry.addData("Saw green, finished", "");
             return;
         } else {
@@ -233,7 +231,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
             while(!gamepad1.a){
 
             }
-            if(robot.pipeLine.coneColor == RI3W11588OpenCV.ConeColor.red){
+            if(robot.pipeLine.coneColor == Qual11588OpenCV.ConeColor.RED){
                 telemetry.addData("Saw red, going to spot 1", "");
                 moveXY(-24, 0);
             } else {
@@ -256,6 +254,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
         telemetry.addData("Arm Position", robot.arm.getCurrentPosition());
         telemetry.addData("Arm Error", error);
         telemetry.addData("Arm Power", total);
+        telemetry.addData("Alliance", teamColor);
         telemetry.addData("Current Angle", robot.getAngle());
         telemetry.addData("Target Angle", targetAngle);
         telemetry.update();

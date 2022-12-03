@@ -67,7 +67,6 @@ public class IntelRealsense extends OpMode
     double angleToTarget = 0;
 
     double turnByAngle;
-    double arrowX, arrowY;
 
     boolean isMoving = true;
     boolean isTurning = false;
@@ -478,8 +477,6 @@ public class IntelRealsense extends OpMode
         telemetry.addData("Raw Rotation", rotation);
         telemetry.addData("Offsetted X", offsetX);
         telemetry.addData("Offsetted Y", offsetY);
-//        telemetry.addData("offsetted x", robotCenterX);
-//        telemetry.addData("offsetted y", robotCenterY);
     }
 
     @Override
