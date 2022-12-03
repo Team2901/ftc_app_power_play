@@ -1,11 +1,13 @@
-package org.firstinspires.ftc.teamcode.PowerPlay2901.T265;
+package org.firstinspires.ftc.teamcode.PowerPlay2901.Autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-@Disabled
+import org.firstinspires.ftc.teamcode.PowerPlay2901.Autonomous.XYhVector;
+
+
 @TeleOp(name = "Odometry Tester", group = "T265")
 public class OdometryTester extends OpMode {
     public static final double encoderTicksPerWheelRev = 8192; //REV encoders
@@ -27,8 +29,8 @@ public class OdometryTester extends OpMode {
     private int oldRightPosition = 0;
     private int oldBackPosition = 0;
 
-    /*public XYhVector START_POS = new XYhVector(0, 0, 0);
-    public XYhVector pos = new XYhVector(START_POS);*/
+    public XYhVector START_POS = new XYhVector(0, 0, 0);
+    public XYhVector pos = new XYhVector(START_POS);
     @Override
     public void init() {
         odoLeft = hardwareMap.get(DcMotor.class, "odoLeft");
@@ -43,9 +45,9 @@ public class OdometryTester extends OpMode {
     @Override
     public void loop() {
         odometry();
-        /*telemetry.addData("x", pos.x);
+        telemetry.addData("x", pos.x);
         telemetry.addData("y", pos.y);
-        telemetry.addData("h", pos.h);*/
+        telemetry.addData("h", pos.h);
     }
 
      public void odometry(){
@@ -65,9 +67,9 @@ public class OdometryTester extends OpMode {
         double dx = ((dn1 + dn2) / 2) * inchPerTick;
         double dy = ((backInchPerTick * dn3) - (inchPerTick * (dn2 - dn1) * midpointBackDistance) / leftRightDistance);
 
-        /*double theta = pos.h + (dtheta / 2.0);
+        double theta = pos.h + (dtheta / 2.0);
         pos.x += dx * Math.cos(theta) - dy * Math.sin(theta);
         pos.y += dx * Math.sin(theta) + dy * Math.cos(theta);
-        pos.h += dtheta;*/
+        pos.h += dtheta;
     }
 }
