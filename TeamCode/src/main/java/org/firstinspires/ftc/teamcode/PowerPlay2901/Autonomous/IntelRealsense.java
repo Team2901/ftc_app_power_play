@@ -67,7 +67,6 @@ public class IntelRealsense extends OpMode
     double angleToTarget = 0;
 
     double turnByAngle;
-    double arrowX, arrowY;
 
     boolean isMoving = true;
     boolean isTurning = false;
