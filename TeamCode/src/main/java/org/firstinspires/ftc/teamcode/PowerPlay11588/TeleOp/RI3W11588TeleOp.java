@@ -73,8 +73,8 @@ public class RI3W11588TeleOp extends OpMode {
         }else{
             turningPower = gamepad1.right_stick_x;
         }
-        double y = -.5 * gamepad1.left_stick_y;
-        double x = .5 * gamepad1.left_stick_x;
+        double y = -.75 * gamepad1.left_stick_y;
+        double x = .75 * gamepad1.left_stick_x;
         //double rx = gamepad1.right_stick_x;
         double rx = turningPower;
 
