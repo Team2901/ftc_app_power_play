@@ -35,8 +35,10 @@ public class EarlyDiffyHardware {
     public DcMotorEx leftTwo;
     public DcMotorEx rightOne;
     public DcMotorEx rightTwo;
+    public DcMotor odoLeft;
+    public DcMotor odoRight;
 //    public DcMotor liftOne;
-//    public DcMotor liftTwo;
+    public DcMotor liftTwo;
 //    public Servo clawOne;
 //    public Servo clawTwo;
     //public Rev2mDistanceSensor clawSensor;
@@ -60,8 +62,11 @@ public class EarlyDiffyHardware {
         leftTwo = hardwareMap.get(DcMotorEx.class, "left 2");
         rightOne = hardwareMap.get(DcMotorEx.class, "right 1");
         rightTwo = hardwareMap.get(DcMotorEx.class, "right 2");
+        odoLeft = hardwareMap.get(DcMotor.class, "odoLeft");
+        odoRight = hardwareMap.get(DcMotor.class, "odoRight");
+
 //        liftOne = hardwareMap.get(DcMotor.class, "lift 1");
-//        liftTwo = hardwareMap.get(DcMotor.class, "lift 2");
+        liftTwo = hardwareMap.get(DcMotor.class, "lift 2");
 //        clawOne = hardwareMap.get(Servo.class, "claw 1");
 //        clawTwo = hardwareMap.get(Servo.class, "claw 2");
 //        //clawSensor = hardwareMap.get(Rev2mDistanceSensor.class, "claw sensor");
@@ -78,7 +83,9 @@ public class EarlyDiffyHardware {
         rightOne.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightTwo.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 //        liftOne.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        liftTwo.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        liftTwo.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        odoLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        odoRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;

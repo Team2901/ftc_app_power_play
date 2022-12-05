@@ -63,13 +63,20 @@ public class OdometryTester extends OpMode {
         int dn2 = currentLeftPosition - oldLeftPosition;
         int dn3 = currentBackPosition - oldBackPosition;
 
+        dn2 = -dn2;
+
         double dtheta = ((dn2 - dn1) / leftRightDistance) * inchPerTick;
         double dx = ((dn1 + dn2) / 2) * inchPerTick;
         double dy = ((backInchPerTick * dn3) - (inchPerTick * (dn2 - dn1) * midpointBackDistance) / leftRightDistance);
 
         double theta = pos.h + (dtheta / 2.0);
-        pos.x += dx * Math.cos(theta) - dy * Math.sin(theta);
-        pos.y += dx * Math.sin(theta) + dy * Math.cos(theta);
+        pos.y += dx * Math.cos(theta) - dy * Math.sin(theta);
+        pos.x -= dx * Math.sin(theta) + dy * Math.cos(theta);
         pos.h += dtheta;
-    }
+
+
+        telemetry.addData("right position", currentRightPosition);
+         telemetry.addData("left position", currentLeftPosition);
+
+         telemetry.addData("back position", currentBackPosition);}
 }
