@@ -9,6 +9,11 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+
 public class RockBotHardware {
     private ElapsedTime runtime = new ElapsedTime();
 
@@ -52,6 +57,7 @@ public class RockBotHardware {
         leftTwo.setDirection(DcMotorSimple.Direction.REVERSE);
         rightTwo.setDirection(DcMotorSimple.Direction.REVERSE);
         liftTwo.setDirection(DcMotorSimple.Direction.REVERSE);
+        encoderRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
         leftOne.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftTwo.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -68,5 +74,10 @@ public class RockBotHardware {
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
+    }
+
+    public double getAngle() {
+        Orientation orientation = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        return AngleUnit.normalizeDegrees(orientation.firstAngle);
     }
 }
