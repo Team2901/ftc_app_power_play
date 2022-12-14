@@ -90,13 +90,20 @@ public class IntelRealsense extends OpMode {
 
         //loop next part
         LIFT_SLIDES,
-        RELEASE_CLAW,
+        INCH_FORWARD,
+        EXTEND_CLAW,
         RETRACT_SLIDES,
+        EXTEND_SLIDES,
+        INCH_BACK,
         TURN_452,
         MOVE_BACK,
-        GRIP_CLAW,
+        RETRACT_CLAW,
+        RETRACT_SLIDES_2,
         MOVE_FORWARD2,
-        TURN_N45
+        TURN_N45,
+
+        //Final State
+        PARK
     }
     AutoState autoState;
 
@@ -117,13 +124,19 @@ public class IntelRealsense extends OpMode {
     double turnKi = 0;
     double turnKd = 0;
 
+    //Adjusted position for camera's offset from robot's center
     double offsetX;
     double offsetY;
+    //Position based on the average readings of the T265 and the odometry wheels
     double averagedX;
     double averagedY;
 
+    //XYhVector stores the odometry's x, y, and angle values (accessed with pos.x, pos.y, or pos.h)
     public XYhVector START_POS = new XYhVector(-cameraXOffset, -cameraYOffset, 0);
     public XYhVector pos = new XYhVector(START_POS);
+
+    //Ignore for now, use later for parking locations using camera
+    int parking = 2;
 
     @Override
     public void init() {
@@ -140,6 +153,7 @@ public class IntelRealsense extends OpMode {
 
         //autoState = AutoState.MOVE_FORWARD;
 
+        //Sets the target position to offsets to prevent initial movement upon starting
         positionX = -cameraXOffset;
         positionY = -cameraYOffset;
     }
@@ -178,9 +192,9 @@ public class IntelRealsense extends OpMode {
 
         //Changes target Position
         if (improvedGamepad.dpad_right.isInitialPress()) {
-            move(48 - cameraXOffset, 0);
+            move(24 - cameraXOffset, 0);
         } else if (improvedGamepad.dpad_left.isInitialPress()) {
-            move(-48 - cameraXOffset, 0);
+            move(-24 - cameraXOffset, 0);
         } else if (improvedGamepad.dpad_up.isInitialPress()) {
             move(0, 24 - cameraYOffset);
         } else if (improvedGamepad.dpad_down.isInitialPress()) {
@@ -196,7 +210,7 @@ public class IntelRealsense extends OpMode {
         //Auto States cycle
         /*switch(autoState){
             case MOVE_FORWARD:
-                move(36, 0);
+                move(x, y);
                 if(!isTurning && !isMoving) {
                     autoState = AutoState.TURN_45;
                 }
@@ -210,14 +224,23 @@ public class IntelRealsense extends OpMode {
             case LIFT_SLIDES:
 
                 break;
-            case RELEASE_CLAW:
+            case INCH_FORWARD:
+
+                break;
+            case EXTEND_CLAW:
 
                 break;
             case RETRACT_SLIDES:
 
                 break;
+            case EXTEND_SLIDES:
+
+                break;
+            case INCH_BACK:
+
+                break;
             case TURN_452:
-                turnToAngle(90);
+                turnByAngle(45);
                 if(!isTurning && !isMoving) {
                     autoState = AutoState.MOVE_BACK;
                 }
@@ -235,55 +258,69 @@ public class IntelRealsense extends OpMode {
 
                 break;
             case TURN_N45:
-
+                turnByAngle(-45);
+                if(!isTurning && !isMoving //&& autonomous time is greater than cycle time) {
+                    autoState = AutoState.LIFT_SLIDES;
+                } else if(!isTurning && !isMoving){
+                    autoState = AutoState.PARK;
+                }
                 break;
+            case PARK:
+                if(parking == 0){
+                    moveTo(24, -48);
+                } else if(parking == 1){
+                    moveTo(0, -48);
+                } else if (parking == 2){
+                    moveTo(-24, -48);
+                }
         }*/
 
 
-//        if(autoState == AutoState.MOVE_FORWARD){
-//            moveTo(-50, 0);
-//        } else if(autoState == AutoState.TURN_45){
-//            moveTo(-50, 20);
-//        }
-//        if(autoState == AutoState.MOVE_FORWARD){
-//            moveTo(-48, 0);
-//        } else if(autoState == AutoState.TURN_45){
-//            turnByAngle(45);
-//        } else if(autoState == AutoState.LIFT_SLIDES){
-//            robot.liftOne.setTargetPosition(850);
-//            robot.liftOne.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//            robot.liftOne.setPower(0.9);
-//            countDownTimer.setTargetTime(10);
-//            if(countDownTimer.hasRemainingTime()) {
-//            } else {
-//                autoState = AutoState.RELEASE_CLAW;
-//            }
-//        } else if(autoState == AutoState.RELEASE_CLAW){
-//            robot.clawOne.setPosition(0);
-//            robot.clawTwo.setPosition(0.25);
-//            autoState = AutoState.RETRACT_SLIDES;
-//        } else if(autoState == AutoState.RETRACT_SLIDES){
-//            robot.liftOne.setTargetPosition(10);
-//            robot.liftOne.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//            robot.liftOne.setPower(-0.9);
-//            countDownTimer.setTargetTime(10);
-//            if(!countDownTimer.hasRemainingTime()) {
-//            } else {
-//                autoState = AutoState.TURN_452;
-//            }
-//        } else if(autoState == AutoState.TURN_452){
-//            turnByAngle(45);
-//        } else if(autoState == AutoState.MOVE_BACK){
-//            moveTo(-48, 24);
-//        } else if(autoState == AutoState.GRIP_CLAW){
-//            robot.clawOne.setPosition(.12);
-//            robot.clawTwo.setPosition(.18);
-//            autoState = AutoState.MOVE_FORWARD2;
-//        } else if(autoState == AutoState.MOVE_FORWARD2){
-//            moveTo(48, 0);
-//        } else if(autoState == AutoState.TURN_N45){
-//            turnByAngle(-45);
-//        }
+        //IGNORE
+        /*if(autoState == AutoState.MOVE_FORWARD){
+            moveTo(-50, 0);
+        } else if(autoState == AutoState.TURN_45){
+            moveTo(-50, 20);
+        }
+        if(autoState == AutoState.MOVE_FORWARD){
+            moveTo(-48, 0);
+        } else if(autoState == AutoState.TURN_45){
+            turnByAngle(45);
+        } else if(autoState == AutoState.LIFT_SLIDES){
+            robot.liftOne.setTargetPosition(850);
+            robot.liftOne.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.liftOne.setPower(0.9);
+            countDownTimer.setTargetTime(10);
+            if(countDownTimer.hasRemainingTime()) {
+            } else {
+                autoState = AutoState.RELEASE_CLAW;
+            }
+        } else if(autoState == AutoState.RELEASE_CLAW){
+            robot.clawOne.setPosition(0);
+            robot.clawTwo.setPosition(0.25);
+            autoState = AutoState.RETRACT_SLIDES;
+        } else if(autoState == AutoState.RETRACT_SLIDES){
+            robot.liftOne.setTargetPosition(10);
+            robot.liftOne.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.liftOne.setPower(-0.9);
+            countDownTimer.setTargetTime(10);
+            if(!countDownTimer.hasRemainingTime()) {
+            } else {
+                autoState = AutoState.TURN_452;
+            }
+        } else if(autoState == AutoState.TURN_452){
+            turnByAngle(45);
+        } else if(autoState == AutoState.MOVE_BACK){
+            moveTo(-48, 24);
+        } else if(autoState == AutoState.GRIP_CLAW){
+            robot.clawOne.setPosition(.12);
+            robot.clawTwo.setPosition(.18);
+            autoState = AutoState.MOVE_FORWARD2;
+        } else if(autoState == AutoState.MOVE_FORWARD2){
+            moveTo(48, 0);
+        } else if(autoState == AutoState.TURN_N45){
+            turnByAngle(-45);
+        }*/
 
         //Set lift heights
 //        if(improvedGamepad.x.isInitialPress()){
@@ -309,6 +346,7 @@ public class IntelRealsense extends OpMode {
 
         //odometry called
         odometry();
+
         //Movement PID code
         if (isMoving && (Math.abs(((positionX) - (offsetX))) > 0 || Math.abs((positionY) - (offsetY)) > 0)) {
 
@@ -394,6 +432,8 @@ public class IntelRealsense extends OpMode {
         double turnI = 0;
         double turnD = 0;
         double turnError = turnAngle;
+
+        //Adjusts PID constants while running
         if (improvedGamepad2.a.isInitialPress()) {
             turnKp -= 0.01;
         } else if (improvedGamepad2.y.isInitialPress()) {
@@ -597,6 +637,7 @@ public class IntelRealsense extends OpMode {
         return total;
     }
 
+    //Enter angle for robot to turn to, field oriented
     public void turnToAngle(double turnAngle) {
         isTurning = true;
         this.turnAngle = turnAngle;
@@ -609,8 +650,14 @@ public class IntelRealsense extends OpMode {
 //        }
     }
 
-    //Gets coordinates of robot using 3 dead wheels with encoders
+    //Enter angle for robot to turn by, robot oriented
+    public void turnByAngle(double turnAngle){
+        isTurning = true;
+        this.turnAngle = turnAngle + Math.toDegrees(robot.getAngle());
+        isMoving = false;
+    }
 
+    //Gets coordinates of robot using 3 dead wheels with encoders
     public void odometry() {
         oldRightPosition = currentRightPosition;
         oldLeftPosition = currentLeftPosition;
@@ -634,11 +681,5 @@ public class IntelRealsense extends OpMode {
         pos.y += dx * Math.cos(theta) - dy * Math.sin(theta);
         pos.x -= dx * Math.sin(theta) + dy * Math.cos(theta);
         pos.h += dtheta;
-
-
-//        telemetry.addData("right position", currentRightPosition);
-//        telemetry.addData("left position", currentLeftPosition);
-//
-//        telemetry.addData("back position", currentBackPosition);}
     }
 }
