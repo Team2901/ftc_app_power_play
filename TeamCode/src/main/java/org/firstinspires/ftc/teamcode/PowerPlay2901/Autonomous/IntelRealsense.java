@@ -22,11 +22,14 @@ public class IntelRealsense extends OpMode {
     private static T265Camera slamra = null;
     public double initTheta;
 
+    //Don't need to use this unless camera is not facing a cardinal direction in relation to robot
     final double angleOffset = 0;
 
     T265Camera.CameraUpdate up;
 
     CountDownTimer countDownTimer = new CountDownTimer(ElapsedTime.Resolution.SECONDS);
+
+    //Grants access to the T265 coordinates and current rotational angle
     Translation2d translation;
     Rotation2d rotation;
 
@@ -39,6 +42,7 @@ public class IntelRealsense extends OpMode {
 
     EarlyDiffyHardware robot = new EarlyDiffyHardware();
 
+    //Constants for odometry
     public static final double encoderTicksPerWheelRev = 8192; //REV encoders
     public static final double wheelCircumference = (2.83465 * Math.PI); //72mm diameter wheels
     public static final double leftRightDistance = 9; //Distance between left and right odometry wheels
@@ -47,6 +51,7 @@ public class IntelRealsense extends OpMode {
     public static final double wheelCircumferenceBack = (2 * Math.PI);
     public static final double backInchPerTick = wheelCircumferenceBack / encoderTicksPerWheelRev;
 
+    //Variables for odometry
     public int currentLeftPosition = 0;
     public int currentRightPosition = 0;
     public int currentBackPosition = 0;
@@ -63,6 +68,7 @@ public class IntelRealsense extends OpMode {
     double i;
     double d;
 
+    //PID constants for moving
     double kp = 0.07;
     double ki = 0;
     double kd = 0;
@@ -71,6 +77,7 @@ public class IntelRealsense extends OpMode {
     double addX = 0;
     double addY = 0;
 
+    //positionX and positionY are the target coordinates. (set them to make the robot move)
     double positionX, positionY;
     double targetAngle = 0;
 
@@ -81,6 +88,7 @@ public class IntelRealsense extends OpMode {
 
     double turnByAngle;
 
+    //Keeps track of current actions of robot for purposes of switching AutoState
     boolean isMoving = true;
     boolean isTurning = false;
 
@@ -120,6 +128,7 @@ public class IntelRealsense extends OpMode {
 
     double turnAngle;
 
+    //Turning PID constants
     double turnKp = 0.42;
     double turnKi = 0;
     double turnKd = 0;
@@ -170,13 +179,13 @@ public class IntelRealsense extends OpMode {
     @Override
     public void loop() {
         up = slamra.getLastReceivedCameraUpdate();
+        // We divide by 0.0254 to convert meters to inches
         translation = new Translation2d(up.pose.getTranslation().getX() / 0.0254, up.pose.getTranslation().getY() / 0.0254);
         rotation = up.pose.getRotation();
         improvedGamepad.update();
         improvedGamepad2.update();
         if (up == null) return;
 
-        // We divide by 0.0254 to convert meters to inches
 
 //        arrowX = Math.cos(28.17859 + rotation.getRadians()) * robotRadius;
 //        arrowY = Math.sin(28.17859 + rotation.getRadians()) * robotRadius;
@@ -344,7 +353,7 @@ public class IntelRealsense extends OpMode {
 //            robot.liftTwo.setPower(0);
 //        }
 
-        //odometry called
+        //updates odometry
         odometry();
 
         //Movement PID code
@@ -371,6 +380,9 @@ public class IntelRealsense extends OpMode {
             if (angleToTarget > 180) {
                 angleToTarget -= 360;
             }
+
+            //If pods are moving perpendicular change this value by +90 or -90
+            //If pods are moving opposite direction change this value by +180/-180
             angleToTarget -= 90;
 
             currentTime = time.time(TimeUnit.MILLISECONDS);
@@ -458,7 +470,7 @@ public class IntelRealsense extends OpMode {
             if (Math.abs(AngleUnit.normalizeDegrees(0 - leftPodAngle)) > 1){ //this is added to reset pod angle
                 leftTurnPower = leftPodTurn(0);//Test these two lines for reset pod angle before turning
                 rightTurnPower = rightPodTurn(0);//
-                move(0, 0, 0);
+                //move(0, 0, 0);// try this next if previous two lines don't work
             } else {
                 turnError = (targetAngle - Math.toDegrees(robot.getAngle()));
                 double turnSecs = turnRuntime.seconds();
