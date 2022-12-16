@@ -22,28 +22,33 @@ public class TankDriveSwerveBaseAuto extends LinearOpMode {
 
     public void moveInches(double inches){
         int target = (int)(inches * 8192 / 8.9);
-        int distance = 0;
-        int distanceToTarget = target;
-        double startAngle = robot.getAngle();
+        int distance;
+        int distanceToTarget;
+        double startDiff = robot.encoderLeft.getCurrentPosition() - robot.encoderRight.getCurrentPosition();
 
         while(robot.encoderLeft.getCurrentPosition() < target-100 && robot.encoderRight.getCurrentPosition() < target-100 && robot.encoderLeft.getCurrentPosition() > target+100 && robot.encoderRight.getCurrentPosition() > target+100) {
-            distance = robot.encoderLeft.getCurrentPosition();
-            distanceToTarget = target - distance;
+            distance = Math.abs(robot.encoderLeft.getCurrentPosition());
+            distanceToTarget = Math.abs(target) - distance;
 
             double forwardPower;
 
             if(distance > distanceToTarget) {
-                forwardPower = (double)distance/10000 + .2;
+                forwardPower = (double)distance/10000 + .1;
             } else {
-                forwardPower = (double)distanceToTarget/10000 + .2;
+                forwardPower = (double)distanceToTarget/10000 + .1;
             }
+
+            if(target < 0){
+                forwardPower *= -1;
+            }
+
             if(forwardPower > 1){
                 forwardPower = 1;
             } else if(forwardPower < -1){
                 forwardPower = -1;
             }
 
-            double turnPower = (robot.encoderLeft.getCurrentPosition() - robot.encoderRight.getCurrentPosition()) * forwardPower / 10000;
+            double turnPower = (robot.encoderLeft.getCurrentPosition() - robot.encoderRight.getCurrentPosition()) - (startDiff) * (forwardPower+.3) / 10000;
 
             leftPodPower = forwardPower - turnPower;
             rightPodPower = forwardPower + turnPower;
@@ -179,6 +184,22 @@ public class TankDriveSwerveBaseAuto extends LinearOpMode {
         robot.leftTwo.setPower(0);
         robot.rightOne.setPower(0);
         robot.rightTwo.setPower(0);
+    }
+
+    double lp = 0;
+    double li = 0;
+    double ld = 0;
+
+    double liftP = 0;
+    double liftI = 0;
+    double liftD = 0;
+
+    public double liftTarget = 0;
+
+    public void liftPower() {
+        double total = 0;
+        robot.liftOne.setPower(total + .05);
+        robot.liftTwo.setPower(total + .05);
     }
 
     double kp = 1.2;

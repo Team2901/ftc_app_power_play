@@ -54,8 +54,8 @@ public class RockBotTeleop extends OpMode {
             //passthrough retracts
         }
 
-        robot.liftOne.setPower(gamepad2.right_stick_y/4+.05);
-        robot.liftTwo.setPower(gamepad2.right_stick_y/4+.05);
+        robot.liftOne.setPower(gamepad2.right_stick_y/5);
+        robot.liftTwo.setPower(gamepad2.right_stick_y/5);
 
         robot.leftOne.setVelocity((leftPodPower/speedMod+leftTurnPower)*2500);
         robot.leftTwo.setVelocity((leftPodPower/speedMod-leftTurnPower)*2500);

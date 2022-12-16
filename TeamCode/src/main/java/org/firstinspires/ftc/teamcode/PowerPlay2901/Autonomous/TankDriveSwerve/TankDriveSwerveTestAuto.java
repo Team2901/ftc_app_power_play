@@ -4,7 +4,6 @@ public class TankDriveSwerveTestAuto extends TankDriveSwerveBaseAuto{
 
     @Override
     public void runOpMode() throws InterruptedException {
-        getOffWall();
         moveInches(10);
         moveInches(-2);
         turnByAngle(90);
