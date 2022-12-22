@@ -41,6 +41,8 @@ public class Qual11588TeleOp extends OpMode {
 
     @Override
     public void loop() {
+        impGamepad1.update();
+        impGamepad2.update();
         if(impGamepad1.dpad_left.isInitialPress()){
             //Sets the armTarget to ground/intake
             armTarget = 50;
@@ -72,7 +74,7 @@ public class Qual11588TeleOp extends OpMode {
         }else{
             turningPower = impGamepad1.right_stick_x.getValue();
         }
-        double y = -.5 * impGamepad1.left_stick_y.getValue();
+        double y = .5 * impGamepad1.left_stick_y.getValue();
         double x = .5 * impGamepad1.left_stick_x.getValue();
         double rx = turningPower;
 

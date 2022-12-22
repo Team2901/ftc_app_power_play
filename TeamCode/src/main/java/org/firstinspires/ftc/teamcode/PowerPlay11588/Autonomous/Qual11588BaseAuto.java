@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.PowerPlay11588.Autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -191,15 +192,15 @@ public class Qual11588BaseAuto extends LinearOpMode {
         move forward 37.5 inches
         */
         moveXY(37.5, 0);
-        while(!gamepad1.a){
+        while(opModeIsActive() && !gamepad1.a){
 
         }
         /*
         Step 2:
         Pivot clockwise 90 degrees
          */
-        turnByAngle(90); // + = counter-clockwise, - = clockwise ???
-        while(!gamepad1.a){
+        turnByAngle(90); // + = counter-clockwise, - = clockwise ??? yes right hand rule
+        while(opModeIsActive()  && !gamepad1.a){
 
         }
         /*
@@ -207,7 +208,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
         raise the arm to the medium junction
          */
         moveArm(Height.MEDIUM);
-        while(!gamepad1.a){
+        while(opModeIsActive() && !gamepad1.a){
 
         }
         /*
@@ -215,20 +216,21 @@ public class Qual11588BaseAuto extends LinearOpMode {
         Open the claw
          */
         robot.claw.setPosition(robot.OPEN_POSITION);
-        while(!gamepad1.a){
+        while(opModeIsActive() && !gamepad1.a){
 
         }
         /*
         Step 5:
         if you're in location 2, you're done.
          */
+        robot.pipeLine.coneColor = Qual11588OpenCV.ConeColor.GREEN;
         if(robot.pipeLine.coneColor == Qual11588OpenCV.ConeColor.GREEN) {
             telemetry.addData("Saw green, finished", "");
             return;
         } else {
             //For both location 1 and 3
             moveXY(0, 12);
-            while(!gamepad1.a){
+            while(opModeIsActive() && !gamepad1.a){
 
             }
             if(robot.pipeLine.coneColor == Qual11588OpenCV.ConeColor.RED){

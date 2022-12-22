@@ -13,7 +13,7 @@ public class Qual11588BlueConeAndPark extends Qual11588BaseAuto{
         robot.init(this.hardwareMap, telemetry, Qual11588Hardware.allianceColor.BLUE);
         waitForStart();
         runTime.reset();
-        moveArm(Height.GROUND);
+        //moveArm(Height.GROUND);
         park();
     }
 }
