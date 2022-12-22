@@ -69,9 +69,9 @@ public class Qual11588Hardware implements OpenCvCamera.AsyncCameraOpenListener {
         if (useCam) {
             WebcamName webcam = hardwareMap.get(WebcamName.class, "Webcam 1");
             pipeLine = new Qual11588OpenCV(telemetry);
-            camera.setPipeline(pipeLine);
             int cameraMonitorViewID = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
             camera = OpenCvCameraFactory.getInstance().createWebcam(webcam, cameraMonitorViewID);
+            camera.setPipeline(pipeLine);
             camera.openCameraDeviceAsync(this);
         }
 
