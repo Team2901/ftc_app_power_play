@@ -49,13 +49,16 @@ public class RockBotTeleop extends OpMode {
         }
 
         if(gamepad2.dpad_up){
-            //passthrough extends
+            robot.passthrough.setPosition(.025);
         } else if(gamepad2.dpad_down){
-            //passthrough retracts
+            robot.passthrough.setPosition(.69);
         }
 
-        robot.liftOne.setPower(gamepad2.right_stick_y/5);
-        robot.liftTwo.setPower(gamepad2.right_stick_y/5);
+        int target = 0;
+
+        double liftPower = liftPower(target);
+        robot.liftOne.setPower(liftPower);
+        robot.liftTwo.setPower(liftPower);
 
         robot.leftOne.setVelocity((leftPodPower/speedMod+leftTurnPower)*2500);
         robot.leftTwo.setVelocity((leftPodPower/speedMod-leftTurnPower)*2500);
@@ -128,6 +131,36 @@ public class RockBotTeleop extends OpMode {
         }
         if(total < -1){
             iAngleRight = 0;
+            total = -1;
+        }
+        return total;
+    }
+
+    double klp = 0;
+    double kli = 0;
+    double kld = 0;
+
+    public ElapsedTime runtimeLift = new ElapsedTime();
+    double liftPosition = 0;
+    double liftP = 0;
+    double liftI = 0;
+    double liftD = 0;
+
+    public double liftPower(int target){
+        int error = robot.liftOne.getCurrentPosition() - target;
+        telemetry.addData("error", error);
+        double secs = runtimeLift.seconds();
+        runtime.reset();
+        liftD = (error - liftP) / secs;
+        liftI = liftI + (error * secs);
+        liftP = error;
+        double total = (klp* liftP + kli* liftI + kld* liftD)/100;
+        if(total > 1){
+            liftI = 0;
+            total = 1;
+        }
+        if(total < -1){
+            liftI = 0;
             total = -1;
         }
         return total;
