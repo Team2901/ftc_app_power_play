@@ -20,7 +20,7 @@ public class TankDriveSwerveBaseAuto extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {}
 
-    public void moveInches(double inches){
+    /*public void moveInches(double inches){
         int target = (int)(inches * 8192 / 8.9);
         int distance;
         int distanceToTarget;
@@ -61,7 +61,7 @@ public class TankDriveSwerveBaseAuto extends LinearOpMode {
             robot.rightOne.setVelocity((rightPodPower / 2 + rightTurnPower) * 2500);
             robot.rightTwo.setVelocity((rightPodPower / 2 - rightTurnPower) * 2500);
         }
-    }
+    }*/
 
     public void turnByAngle(double turnAngle){
         double startAngle = robot.getAngle();
@@ -196,11 +196,11 @@ public class TankDriveSwerveBaseAuto extends LinearOpMode {
 
     public double liftTarget = 0;
 
-    public void liftPower() {
+    /*public void liftPower() {
         double total = 0;
         robot.liftOne.setPower(total + .05);
         robot.liftTwo.setPower(total + .05);
-    }
+    }*/
 
     double kp = 1.2;
     double ki = 0;
