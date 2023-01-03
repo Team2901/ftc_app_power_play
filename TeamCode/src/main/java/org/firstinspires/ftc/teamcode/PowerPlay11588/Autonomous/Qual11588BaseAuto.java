@@ -149,13 +149,12 @@ public class Qual11588BaseAuto extends LinearOpMode {
             pArm = error;
             total = ((kp*pArm) + (ki*iArm) + (kd*dArm))/100;
             robot.arm.setPower(total);
-
+            PIDTimer.reset();
             if(iArm > iArmMax){
                 iArm = iArmMax;
             } else if(iArm < -iArmMax){
                 iArm = -iArmMax;
             }
-            PIDTimer.reset();
             telemetryStuff();
         }
     }
@@ -193,7 +192,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
         */
         moveXY(37.5, 0);
         while(opModeIsActive() && !gamepad1.a){
-
+            telemetryStuff();
         }
         /*
         Step 2:
@@ -201,7 +200,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
          */
         turnByAngle(90); // + = counter-clockwise, - = clockwise ??? yes right hand rule
         while(opModeIsActive()  && !gamepad1.a){
-
+            telemetryStuff();
         }
         /*
         Step 3:
@@ -209,7 +208,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
          */
         moveArm(Height.MEDIUM);
         while(opModeIsActive() && !gamepad1.a){
-
+            telemetryStuff();
         }
         /*
         Step 4:
@@ -217,7 +216,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
          */
         robot.claw.setPosition(robot.OPEN_POSITION);
         while(opModeIsActive() && !gamepad1.a){
-
+            telemetryStuff();
         }
         /*
         Step 5:
