@@ -40,6 +40,7 @@ public class RockBotHardware {
     public DcMotor encoderRight;
 
     public Servo passthrough;
+    public Servo claw;
 
     public BNO055IMU imu;
 
@@ -51,6 +52,7 @@ public class RockBotHardware {
         liftOne = hardwareMap.get(DcMotor.class, "lift 1");
         liftTwo = hardwareMap.get(DcMotor.class, "lift 2");
         passthrough = hardwareMap.get(Servo.class, "passthrough");
+        claw = hardwareMap.get(Servo.class, "claw");
         encoderLeft = hardwareMap.get(DcMotor.class, "left encoder");
         encoderRight = hardwareMap.get(DcMotor.class, "right encoder");
 

@@ -467,9 +467,9 @@ public class IntelRealsense extends OpMode {
             isMoving = true;
         }
         else if (isTurning && !(turnError < 1.5 && turnError > -1.5)) {
-            if (Math.abs(AngleUnit.normalizeDegrees(0 - leftPodAngle)) > 1){ //this is added to reset pod angle
-                leftTurnPower = leftPodTurn(0);//Test these two lines for reset pod angle before turning
-                rightTurnPower = rightPodTurn(0);//
+            if (Math.abs(AngleUnit.normalizeDegrees(180 - leftPodAngle)) > 1){ //this is added to reset pod angle
+                leftTurnPower = leftPodTurn(180);//Test these two lines for reset pod angle before turning
+                rightTurnPower = rightPodTurn(180);//
                 //move(0, 0, 0);// try this next if previous two lines don't work
             } else {
                 turnError = (targetAngle - Math.toDegrees(robot.getAngle()));
@@ -492,14 +492,14 @@ public class IntelRealsense extends OpMode {
                 }
 
                 if (!isMoving) {
-                    outputLeft = turnTotal;
+                    outputLeft = -turnTotal;
                     turnPower = 0;
                     outputRight = -outputLeft;
                     leftTurnPower = 0;
                     rightTurnPower = 0;
                 }
             }
-        } else {
+        } else if(isTurning){
             positionX = offsetX;
             positionY = offsetY;
             robot.leftOne.setPower(0);
@@ -690,8 +690,9 @@ public class IntelRealsense extends OpMode {
         double dy = ((backInchPerTick * dn3) - (inchPerTick * (dn2 - dn1) * midpointBackDistance) / leftRightDistance);
 
         double theta = pos.h + (dtheta / 2.0);
-        pos.y += dx * Math.cos(theta) - dy * Math.sin(theta);
+        pos.y -= dx * Math.cos(theta) - dy * Math.sin(theta);
         pos.x -= dx * Math.sin(theta) + dy * Math.cos(theta);
+        pos.x = -pos.x;
         pos.h += dtheta;
     }
 }

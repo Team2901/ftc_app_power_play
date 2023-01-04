@@ -52,27 +52,35 @@ public class RockBotTeleop extends OpMode {
         }
 
         if(gamepad2.dpad_up){
-            robot.passthrough.setPosition(.025);
+            robot.passthrough.setPosition(.075);
         } else if(gamepad2.dpad_down){
-            robot.passthrough.setPosition(.69);
+            robot.passthrough.setPosition(.67);
+        }
+
+        if(gamepad2.dpad_left){
+            robot.claw.setPosition(.25);
+        }
+        if(gamepad2.dpad_right){
+            robot.claw.setPosition(.75);
         }
 
         if(gamepad2.y){
-            target = 770;
+            target = 815;
         }
         if(gamepad2.x) {
-            target = 530;
+            target = 575;
         }
         if(gamepad2.b) {
-            target = 270;
+            target = 325;
         }
-        if(gamepad2.start){
+        if(gamepad2.right_bumper){
             target = 65;
         }
 
         if(gamepad2.a){
             liftPower = liftPower(target - 65);
             feedForward = 0;
+            liftI = 0;
         } else {
             liftPower = liftPower(target);
             feedForward = -.3;
