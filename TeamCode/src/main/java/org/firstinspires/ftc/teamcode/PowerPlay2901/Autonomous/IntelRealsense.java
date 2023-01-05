@@ -201,13 +201,13 @@ public class IntelRealsense extends OpMode {
 
         //Changes target Position
         if (improvedGamepad.dpad_right.isInitialPress()) {
-            move(24 - cameraXOffset, 0);
+            move(12, 0);
         } else if (improvedGamepad.dpad_left.isInitialPress()) {
-            move(-24 - cameraXOffset, 0);
+            move(-12, 0);
         } else if (improvedGamepad.dpad_up.isInitialPress()) {
-            move(0, 24 - cameraYOffset);
+            move(0, 12);
         } else if (improvedGamepad.dpad_down.isInitialPress()) {
-            move(0, -24 - cameraYOffset);
+            move(0, -12);
         }
         //Changes target angle
         if (improvedGamepad.left_bumper.isInitialPress()) {
@@ -451,9 +451,9 @@ public class IntelRealsense extends OpMode {
         } else if (improvedGamepad2.y.isInitialPress()) {
             turnKp += 0.01;
         } else if (improvedGamepad2.x.isInitialPress()) {
-            turnKd -= 0.01;
+            turnKi -= 0.01;
         } else if (improvedGamepad2.b.isInitialPress()) {
-            turnKd += 0.01;
+            turnKi += 0.01;
         }
 
         if(isTurning && (Math.abs(turnAngle-Math.toDegrees(robot.getAngle())) < 1.5)){
@@ -467,7 +467,7 @@ public class IntelRealsense extends OpMode {
             isMoving = true;
         }
         else if (isTurning && !(turnError < 1.5 && turnError > -1.5)) {
-            if (Math.abs(AngleUnit.normalizeDegrees(180 - leftPodAngle)) > 1){ //this is added to reset pod angle
+            if (Math.abs(AngleUnit.normalizeDegrees(180 - leftPodAngle)) < -1){ //this is added to reset pod angle
                 leftTurnPower = leftPodTurn(180);//Test these two lines for reset pod angle before turning
                 rightTurnPower = rightPodTurn(180);//
                 //move(0, 0, 0);// try this next if previous two lines don't work
@@ -492,7 +492,7 @@ public class IntelRealsense extends OpMode {
                 }
 
                 if (!isMoving) {
-                    outputLeft = -turnTotal;
+                    outputLeft = turnTotal;
                     turnPower = 0;
                     outputRight = -outputLeft;
                     leftTurnPower = 0;
@@ -546,6 +546,7 @@ public class IntelRealsense extends OpMode {
         telemetry.addData("ki", ki);
         telemetry.addData("turnkp", turnKp);
         telemetry.addData("turnkd", turnKd);
+        telemetry.addData("turnki", turnKi);
         telemetry.addData("Angle to Target", angleToTarget + "°");
         telemetry.addData("Raw Rotation", rotation);
         telemetry.addData("Offsetted X", offsetX);
@@ -690,9 +691,8 @@ public class IntelRealsense extends OpMode {
         double dy = ((backInchPerTick * dn3) - (inchPerTick * (dn2 - dn1) * midpointBackDistance) / leftRightDistance);
 
         double theta = pos.h + (dtheta / 2.0);
-        pos.y -= dx * Math.cos(theta) - dy * Math.sin(theta);
-        pos.x -= dx * Math.sin(theta) + dy * Math.cos(theta);
-        pos.x = -pos.x;
+        pos.y += dx * Math.cos(theta) - dy * Math.sin(theta);
+        pos.x += dx * Math.sin(theta) + dy * Math.cos(theta);
         pos.h += dtheta;
     }
 }
