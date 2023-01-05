@@ -106,14 +106,14 @@ public class Qual11588Hardware implements OpenCvCamera.AsyncCameraOpenListener {
 
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        arm.setDirection(DcMotorSimple.Direction.REVERSE);
+        //arm.setDirection(DcMotorSimple.Direction.REVERSE);
 
         frontLeft.setPower(0);
         frontRight.setPower(0);
         backLeft.setPower(0);
         backRight.setPower(0);
         arm.setPower(0);
-        claw.setPosition(CLOSED_POSITION);
+        //claw.setPosition(CLOSED_POSITION);
     }
 
     public double getAngle(){
