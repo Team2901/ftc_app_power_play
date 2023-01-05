@@ -18,19 +18,22 @@ public class Qual11588TeleOp extends OpMode {
 
     //All the variables that are needed for pid
     ElapsedTime PIDTimer = new ElapsedTime();
-    int armTarget = -100;
+    int armTarget = 100;
     int realArmTarget = armTarget;
     int lastTarget = armTarget;
     int modifier = 0;
     double error = 0.0;
     double total = 0.0;
-    double kp = 0.5;
-    double ki = 0.5;
-    double kd = 0.1;
+    double kp = 0.9;
+    double ki = 0.0;
+    double kd = 0.0;
+    double kCos = 0.3;
     double pArm = 0.0;
     double iArm = 0.0;
     double dArm = 0.0;
+    double cosArm = 0;
     double iArmMax = .25;
+    double armAngle = 0;
 
 
     @Override
@@ -102,11 +105,14 @@ public class Qual11588TeleOp extends OpMode {
     }
 
     public double armPower(int target){
+
         error = target - robot.arm.getCurrentPosition();
         dArm = (error - pArm) / PIDTimer.seconds();
         iArm = iArm + (error * PIDTimer.seconds());
         pArm = error;
-        total = ((pArm * kp) + (iArm * ki) + (dArm * kd))/100;
+        armAngle = 0.102856 * robot.arm.getCurrentPosition() - 43.6276;
+        cosArm = Math.cos(Math.toRadians(armAngle));
+        total = ((pArm * kp) + (iArm * ki) + (dArm * kd))/100 + (cosArm * kCos)/100;
         PIDTimer.reset();
 
         if(armTarget != lastTarget){

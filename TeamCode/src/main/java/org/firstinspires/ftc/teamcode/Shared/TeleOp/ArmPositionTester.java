@@ -15,7 +15,7 @@ public class ArmPositionTester extends OpMode {
         tuneMotor = hardwareMap.get(DcMotorEx.class, "tune motor");
         tuneMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         tuneMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        tuneMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        //tuneMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         tuneMotor.setPower(0);
         telemetry.addData("Motor Position", tuneMotor.getCurrentPosition());
         telemetry.update();
