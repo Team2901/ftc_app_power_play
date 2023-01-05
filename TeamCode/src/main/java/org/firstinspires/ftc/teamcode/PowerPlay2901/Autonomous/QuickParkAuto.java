@@ -15,6 +15,8 @@ public class QuickParkAuto extends LinearOpMode {
     CountDownTimer countDownTimer = new CountDownTimer(ElapsedTime.Resolution.MILLISECONDS);
     @Override
     public void runOpMode() throws InterruptedException {
+        robot.init(hardwareMap);
+        waitForStart();
         countDownTimer.setTargetTime(1500);
         while (countDownTimer.hasRemainingTime()) {
             robot.leftOne.setVelocity(0.3 * 2500);
@@ -31,7 +33,7 @@ public class QuickParkAuto extends LinearOpMode {
 
 //        countDownTimer.setTargetTime(500);
 //        while (countDownTimer.hasRemainingTime()) {
-//            robot.leftOne.setVelocity(-0.3 * 2500);
+//            robot.leftOne.setVelocity(-0.3 * 2500); 
 //            robot.leftTwo.setVelocity(-0.3 * 2500);
 //            robot.rightOne.setVelocity(0.3 * 2500);
 //            robot.rightTwo.setVelocity(0.3 * 2500);

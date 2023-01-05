@@ -12,6 +12,9 @@ public class RockBotTeleop extends OpMode {
     RockBotHardware robot = new RockBotHardware();
     private ElapsedTime runtime = new ElapsedTime();
 
+    double liftPower = 0;
+    double feedForward = -.3;
+    int target = 10;
     double leftPodPower = 0;
     double rightPodPower = 0;
     public double leftTurnPower = 0;
@@ -49,16 +52,42 @@ public class RockBotTeleop extends OpMode {
         }
 
         if(gamepad2.dpad_up){
-            robot.passthrough.setPosition(.025);
+            robot.passthrough.setPosition(.075);
         } else if(gamepad2.dpad_down){
-            robot.passthrough.setPosition(.69);
+            robot.passthrough.setPosition(.67);
         }
 
-        int target = 0;
+        if(gamepad2.dpad_left){
+            robot.claw.setPosition(.25);
+        }
+        if(gamepad2.dpad_right){
+            robot.claw.setPosition(.75);
+        }
 
-        double liftPower = liftPower(target);
-        robot.liftOne.setPower(liftPower);
-        robot.liftTwo.setPower(liftPower);
+        if(gamepad2.y){
+            target = 815;
+        }
+        if(gamepad2.x) {
+            target = 575;
+        }
+        if(gamepad2.b) {
+            target = 325;
+        }
+        if(gamepad2.right_bumper){
+            target = 65;
+        }
+
+        if(gamepad2.a){
+            liftPower = liftPower(target - 65);
+            feedForward = 0;
+            liftI = 0;
+        } else {
+            liftPower = liftPower(target);
+            feedForward = -.3;
+        }
+
+        robot.liftOne.setPower(liftPower + feedForward);
+        robot.liftTwo.setPower(liftPower + feedForward);
 
         robot.leftOne.setVelocity((leftPodPower/speedMod+leftTurnPower)*2500);
         robot.leftTwo.setVelocity((leftPodPower/speedMod-leftTurnPower)*2500);
@@ -136,9 +165,9 @@ public class RockBotTeleop extends OpMode {
         return total;
     }
 
-    double klp = 0;
-    double kli = 0;
-    double kld = 0;
+    double klp = 0.7;
+    double kli = 0.0015;
+    double kld = 0.015;
 
     public ElapsedTime runtimeLift = new ElapsedTime();
     double liftPosition = 0;
@@ -155,9 +184,9 @@ public class RockBotTeleop extends OpMode {
         liftI = liftI + (error * secs);
         liftP = error;
         double total = (klp* liftP + kli* liftI + kld* liftD)/100;
-        if(total > 1){
+        if(total > .65){
             liftI = 0;
-            total = 1;
+            total = .65;
         }
         if(total < -1){
             liftI = 0;

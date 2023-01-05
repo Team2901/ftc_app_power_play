@@ -129,7 +129,7 @@ public class IntelRealsense extends OpMode {
     double turnAngle;
 
     //Turning PID constants
-    double turnKp = 0.42;
+    double turnKp = 0.82;
     double turnKi = 0;
     double turnKd = 0;
 
@@ -201,18 +201,20 @@ public class IntelRealsense extends OpMode {
 
         //Changes target Position
         if (improvedGamepad.dpad_right.isInitialPress()) {
-            move(24 - cameraXOffset, 0);
+            move(24, 0);
         } else if (improvedGamepad.dpad_left.isInitialPress()) {
-            move(-24 - cameraXOffset, 0);
+            move(-24, 0);
         } else if (improvedGamepad.dpad_up.isInitialPress()) {
-            move(0, 24 - cameraYOffset);
+            move(0, 48);
         } else if (improvedGamepad.dpad_down.isInitialPress()) {
-            move(0, -24 - cameraYOffset);
+            move(0, -48);
         }
         //Changes target angle
         if (improvedGamepad.left_bumper.isInitialPress()) {
+            move(0, 0, 180);
             turnToAngle(90);
         } else if (improvedGamepad.right_bumper.isInitialPress()) {
+            move(0, 0, 180);
             turnToAngle(-90);
         }
 
@@ -357,10 +359,10 @@ public class IntelRealsense extends OpMode {
         odometry();
 
         //Movement PID code
-        if (isMoving && (Math.abs(((positionX) - (offsetX))) > 0 || Math.abs((positionY) - (offsetY)) > 0)) {
+        if (!isTurning && isMoving && (Math.abs(((positionX) - (pos.x))) > 0 || Math.abs((positionY) - (pos.y)) > 0)) {
 
-            double dx = ((positionX) - (offsetX));
-            double dy = ((positionY) - (offsetY));
+            double dx = ((positionX) - (pos.x));
+            double dy = ((positionY) - (pos.y));
             double angle = Math.atan(dy / dx);
             currentError = Math.sqrt((Math.pow(dx, 2) + Math.pow(dy, 2)));
             angleToTarget = -Math.toDegrees(angle);
@@ -416,12 +418,14 @@ public class IntelRealsense extends OpMode {
         }
 
         outputLeft *= -1;
-        angleToTarget += rotation.getDegrees();
+        //pos.h change (from rotation.toDegrees)
+        angleToTarget += Math.toDegrees(robot.getAngle());
         outputLeft *= 100.0;
         outputLeft = (int) outputLeft;
         outputLeft /= 100.0;
 
-        turnPower = AngleUnit.normalizeDegrees(targetAngle - rotation.getDegrees()) / 500;
+        //pos.h change
+        turnPower = AngleUnit.normalizeDegrees(targetAngle - Math.toDegrees(robot.getAngle())) / 500;
         outputRight = outputLeft;
         leftTurnPower = leftPodTurn(angleToTarget);
         rightTurnPower = rightPodTurn(angleToTarget);
@@ -429,7 +433,7 @@ public class IntelRealsense extends OpMode {
 
         telemetry.addData("position x", positionX);
         //Creates dead zone radius larger than target
-        if (isMoving && (Math.abs(((positionX) - (offsetX))) < 0.5 && Math.abs((positionY) - (offsetY)) < 0.5)) {
+        if (isMoving && (Math.abs(((positionX) - (pos.x))) < 0.5 && Math.abs((positionY) - (pos.y)) < 0.5)) {
             outputLeft = 0;
             outputRight = 0;
             leftTurnPower = 0;
@@ -451,14 +455,14 @@ public class IntelRealsense extends OpMode {
         } else if (improvedGamepad2.y.isInitialPress()) {
             turnKp += 0.01;
         } else if (improvedGamepad2.x.isInitialPress()) {
-            turnKd -= 0.01;
+            turnKi -= 0.01;
         } else if (improvedGamepad2.b.isInitialPress()) {
-            turnKd += 0.01;
+            turnKi += 0.01;
         }
 
         if(isTurning && (Math.abs(turnAngle-Math.toDegrees(robot.getAngle())) < 1.5)){
-            positionX = offsetX;
-            positionY = offsetY;
+            positionX = pos.x;
+            positionY = pos.y;
             robot.leftOne.setPower(0);
             robot.leftTwo.setPower(0);
             robot.rightOne.setPower(0);
@@ -467,11 +471,6 @@ public class IntelRealsense extends OpMode {
             isMoving = true;
         }
         else if (isTurning && !(turnError < 1.5 && turnError > -1.5)) {
-            if (Math.abs(AngleUnit.normalizeDegrees(0 - leftPodAngle)) > 1){ //this is added to reset pod angle
-                leftTurnPower = leftPodTurn(0);//Test these two lines for reset pod angle before turning
-                rightTurnPower = rightPodTurn(0);//
-                //move(0, 0, 0);// try this next if previous two lines don't work
-            } else {
                 turnError = (targetAngle - Math.toDegrees(robot.getAngle()));
                 double turnSecs = turnRuntime.seconds();
                 runtime.reset();
@@ -498,18 +497,8 @@ public class IntelRealsense extends OpMode {
                     leftTurnPower = 0;
                     rightTurnPower = 0;
                 }
-            }
-        } else {
-            positionX = offsetX;
-            positionY = offsetY;
-            robot.leftOne.setPower(0);
-            robot.leftTwo.setPower(0);
-            robot.rightOne.setPower(0);
-            robot.rightTwo.setPower(0);
-            isTurning = false;
-            isMoving = true;
-        }
 
+        }
         robot.leftOne.setVelocity((outputLeft/speedMod+leftTurnPower)*2500);
         robot.leftTwo.setVelocity((outputLeft/speedMod-leftTurnPower)*2500);
         robot.rightOne.setVelocity((outputRight/speedMod+rightTurnPower)*2500);
@@ -546,6 +535,7 @@ public class IntelRealsense extends OpMode {
         telemetry.addData("ki", ki);
         telemetry.addData("turnkp", turnKp);
         telemetry.addData("turnkd", turnKd);
+        telemetry.addData("turnki", turnKi);
         telemetry.addData("Angle to Target", angleToTarget + "°");
         telemetry.addData("Raw Rotation", rotation);
         telemetry.addData("Offsetted X", offsetX);
@@ -562,8 +552,8 @@ public class IntelRealsense extends OpMode {
 
     //enter (x, y) coordinates to move robot by
     public void move(double x, double y) {
-        positionX = x + ((offsetX + pos.x)/2);
-        positionY = y + ((offsetY + pos.y)/2);
+        positionX = x + (pos.x);
+        positionY = y + (pos.y);
         isMoving = true;
     }
 
@@ -691,7 +681,7 @@ public class IntelRealsense extends OpMode {
 
         double theta = pos.h + (dtheta / 2.0);
         pos.y += dx * Math.cos(theta) - dy * Math.sin(theta);
-        pos.x -= dx * Math.sin(theta) + dy * Math.cos(theta);
+        pos.x += dx * Math.sin(theta) + dy * Math.cos(theta);
         pos.h += dtheta;
     }
 }

@@ -62,8 +62,8 @@ public class EarlyDiffyHardware {
         leftTwo = hardwareMap.get(DcMotorEx.class, "left 2");
         rightOne = hardwareMap.get(DcMotorEx.class, "right 1");
         rightTwo = hardwareMap.get(DcMotorEx.class, "right 2");
-        odoLeft = hardwareMap.get(DcMotor.class, "odoLeft");
-        odoRight = hardwareMap.get(DcMotor.class, "odoRight");
+        odoLeft = hardwareMap.get(DcMotor.class, "left encoder");
+        odoRight = hardwareMap.get(DcMotor.class, "right encoder");
 
 //        liftOne = hardwareMap.get(DcMotor.class, "lift 1");
         liftTwo = hardwareMap.get(DcMotor.class, "lift 2");
