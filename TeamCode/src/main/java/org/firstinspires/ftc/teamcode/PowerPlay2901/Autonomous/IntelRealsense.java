@@ -210,12 +210,14 @@ public class IntelRealsense extends OpMode {
             move(0, -48);
         }
         //Changes target angle
-        if (improvedGamepad.left_bumper.isInitialPress()) {
-            move(0, 0, 180);
-            turnToAngle(90);
-        } else if (improvedGamepad.right_bumper.isInitialPress()) {
-            move(0, 0, 180);
-            turnToAngle(-90);
+        if(improvedGamepad.a.getValue()) {
+            targetAngle = 0;
+        } else if(improvedGamepad.b.getValue()){
+            targetAngle = 90;
+        } else if(improvedGamepad.y.getValue()){
+            targetAngle = 180;
+        } else if(improvedGamepad.x.getValue()){
+            targetAngle = -90;
         }
 
         //Auto States cycle
@@ -419,19 +421,11 @@ public class IntelRealsense extends OpMode {
 
         outputLeft *= -1;
         //pos.h change (from rotation.toDegrees)
-        angleToTarget += Math.toDegrees(robot.getAngle());
-        outputLeft *= 100.0;
-        outputLeft = (int) outputLeft;
-        outputLeft /= 100.0;
 
-        //pos.h change
-        turnPower = AngleUnit.normalizeDegrees(targetAngle - Math.toDegrees(robot.getAngle())) / 500;
-        outputRight = outputLeft;
-        leftTurnPower = leftPodTurn(angleToTarget);
-        rightTurnPower = rightPodTurn(angleToTarget);
 
 
         telemetry.addData("position x", positionX);
+
         //Creates dead zone radius larger than target
         if (isMoving && (Math.abs(((positionX) - (pos.x))) < 0.5 && Math.abs((positionY) - (pos.y)) < 0.5)) {
             outputLeft = 0;
@@ -439,66 +433,20 @@ public class IntelRealsense extends OpMode {
             leftTurnPower = 0;
             rightTurnPower = 0;
         }
+        turnPower = -AngleUnit.normalizeDegrees(targetAngle - Math.toDegrees(robot.getAngle())) / 50;
+        angleToTarget += Math.toDegrees(robot.getAngle());
+
+        //pos.h change
+        outputRight = outputLeft;
+        outputRight -= (turnPower*Math.cos(Math.toRadians(angleToTarget)));
+        outputLeft += (turnPower*Math.cos(Math.toRadians(angleToTarget)));
+        leftTurnPower = leftPodTurn(angleToTarget);
+        rightTurnPower = rightPodTurn(angleToTarget);
 
         //Angle turn code
-        double startAngle = rotation.getDegrees();
-        double targetAngle = turnAngle;
-        ElapsedTime turnRuntime = new ElapsedTime();
-        double turnP = 0;
-        double turnI = 0;
-        double turnD = 0;
-        double turnError = turnAngle;
+        double targetAngle = robot.getAngle();
 
-        //Adjusts PID constants while running
-        if (improvedGamepad2.a.isInitialPress()) {
-            turnKp -= 0.01;
-        } else if (improvedGamepad2.y.isInitialPress()) {
-            turnKp += 0.01;
-        } else if (improvedGamepad2.x.isInitialPress()) {
-            turnKi -= 0.01;
-        } else if (improvedGamepad2.b.isInitialPress()) {
-            turnKi += 0.01;
-        }
 
-        if(isTurning && (Math.abs(turnAngle-Math.toDegrees(robot.getAngle())) < 1.5)){
-            positionX = pos.x;
-            positionY = pos.y;
-            robot.leftOne.setPower(0);
-            robot.leftTwo.setPower(0);
-            robot.rightOne.setPower(0);
-            robot.rightTwo.setPower(0);
-            isTurning = false;
-            isMoving = true;
-        }
-        else if (isTurning && !(turnError < 1.5 && turnError > -1.5)) {
-                turnError = (targetAngle - Math.toDegrees(robot.getAngle()));
-                double turnSecs = turnRuntime.seconds();
-                runtime.reset();
-                telemetry.addData("Target Angle", targetAngle);
-                telemetry.addData("Current Angle", Math.toDegrees(robot.getAngle()));
-                telemetry.addData("Loop Time", turnSecs);
-                turnD = (turnError - turnP) / turnSecs;
-                turnI = turnI + (turnError * turnSecs);
-                turnP = turnError;
-                double turnTotal = (turnKp * turnP + turnKi * turnI + turnKd * turnD) / 100;
-                if (turnTotal > 1) {
-                    turnI = 0;
-                    turnTotal = 1;
-                }
-                if (turnTotal < -1) {
-                    turnI = 0;
-                    turnTotal = -1;
-                }
-
-                if (!isMoving) {
-                    outputLeft = turnTotal;
-                    turnPower = 0;
-                    outputRight = -outputLeft;
-                    leftTurnPower = 0;
-                    rightTurnPower = 0;
-                }
-
-        }
         robot.leftOne.setVelocity((outputLeft/speedMod+leftTurnPower)*2500);
         robot.leftTwo.setVelocity((outputLeft/speedMod-leftTurnPower)*2500);
         robot.rightOne.setVelocity((outputRight/speedMod+rightTurnPower)*2500);
@@ -568,7 +516,7 @@ public class IntelRealsense extends OpMode {
     public void move(double x, double y, double angle) {
         positionX = x + translation.getX();
         positionY = y + translation.getY();
-        targetAngle = angle;
+        //targetAngle = angle;
         isMoving = true;
     }
 
@@ -587,7 +535,7 @@ public class IntelRealsense extends OpMode {
     public double leftPodTurn(double angle) {
         leftPodAngle = (robot.leftOne.getCurrentPosition() - robot.leftTwo.getCurrentPosition()) / 8.95;
         double error = AngleUnit.normalizeDegrees(angle - leftPodAngle);
-        if (!gamepad1.start && (error >= 90 || error <= -90)) {
+        if (!improvedGamepad.start.getValue() && (error >= 90 || error <= -90)) {
             error = AngleUnit.normalizeDegrees(error - 180);
             outputLeft = -outputLeft;
         }
@@ -618,7 +566,7 @@ public class IntelRealsense extends OpMode {
     public double rightPodTurn(double angle) {
         rightPodAngle = (robot.rightOne.getCurrentPosition() - robot.rightTwo.getCurrentPosition()) / 8.95;
         double error = AngleUnit.normalizeDegrees(angle - rightPodAngle);
-        if (!gamepad1.start && (error >= 90 || error <= -90)) {
+        if (!improvedGamepad.start.getValue() && (error >= 90 || error <= -90)) {
             error = AngleUnit.normalizeDegrees(error - 180);
             outputRight = -outputRight;
         }
