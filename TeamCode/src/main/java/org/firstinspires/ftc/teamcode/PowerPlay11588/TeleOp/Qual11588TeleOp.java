@@ -18,19 +18,22 @@ public class Qual11588TeleOp extends OpMode {
 
     //All the variables that are needed for pid
     ElapsedTime PIDTimer = new ElapsedTime();
-    int armTarget = -100;
+    int armTarget = 150;
     int realArmTarget = armTarget;
     int lastTarget = armTarget;
     int modifier = 0;
     double error = 0.0;
     double total = 0.0;
-    double kp = 0.5;
-    double ki = 0.5;
-    double kd = 0.1;
-    double pArm = 0.0;
+    double kp = 0.9;
+    double ki = 0.0;
+    double kd = 0.0;
+    double kCos = 0.3;
+    double pArm = 0.5;
     double iArm = 0.0;
     double dArm = 0.0;
+    double cosArm = 0;
     double iArmMax = .25;
+    double armAngle = 0;
 
 
     @Override
@@ -46,16 +49,16 @@ public class Qual11588TeleOp extends OpMode {
         impGamepad2.update();
         if(impGamepad1.dpad_left.isInitialPress()){
             //Sets the armTarget to ground/intake
-            armTarget = 125;
+            armTarget = 200;
         }else if(impGamepad1.dpad_down.isInitialPress()){
             //Sets the armTarget to the low pole
-            armTarget = 350;
+            armTarget = 475;
         }else if(impGamepad1.dpad_right.isInitialPress()){
             //Sets the armTarget to the mid pole
-            armTarget = 500;
+            armTarget = 775;
         }else if(impGamepad1.dpad_up.isInitialPress()){
             //Sets the armTarget to the high pole
-            armTarget = 725;
+            armTarget = 1200;
         }
         /*Allows for the armTarget to be changed for the duration of the TeleOp rather than resetting
         when you change height*/
@@ -87,13 +90,13 @@ public class Qual11588TeleOp extends OpMode {
 
         switch (currentClawPosition){
             case Open:
-                robot.claw.setPosition(robot.OPEN_POSITION);
+                //robot.claw.setPosition(robot.OPEN_POSITION);
                 if(impGamepad1.b.isInitialPress()){
                     currentClawPosition = ClawPosition.Closed;
                 }
                 break;
             case Closed:
-                robot.claw.setPosition(robot.CLOSED_POSITION);
+                //robot.claw.setPosition(robot.CLOSED_POSITION);
                 if(impGamepad1.b.isInitialPress()){
                     currentClawPosition = ClawPosition.Open;
                 }
@@ -102,11 +105,14 @@ public class Qual11588TeleOp extends OpMode {
     }
 
     public double armPower(int target){
+
         error = target - robot.arm.getCurrentPosition();
         dArm = (error - pArm) / PIDTimer.seconds();
         iArm = iArm + (error * PIDTimer.seconds());
         pArm = error;
-        total = ((pArm * kp) + (iArm * ki) + (dArm * kd))/100;
+        armAngle = 0.102856 * robot.arm.getCurrentPosition() - 43.6276;
+        cosArm = Math.cos(Math.toRadians(armAngle));
+        total = ((pArm * kp) + (iArm * ki) + (dArm * kd))/100 + (cosArm * kCos);
         PIDTimer.reset();
 
         if(armTarget != lastTarget){
@@ -118,6 +124,13 @@ public class Qual11588TeleOp extends OpMode {
         }else if(iArm < -iArmMax){
             iArm = -iArmMax;
         }
+
+        if(total > .75){
+            total = .75;
+        }
+        if(total < (cosArm * kCos) / 2){
+            total = (cosArm * kCos) / 2;
+        }
         lastTarget = armTarget;
 
         return total;
@@ -128,6 +141,7 @@ public class Qual11588TeleOp extends OpMode {
         telemetry.addData("Front Right Position", robot.frontRight.getCurrentPosition());
         telemetry.addData("Back Left Position", robot.backLeft.getCurrentPosition());
         telemetry.addData("Back Right Position", robot.backRight.getCurrentPosition());
+        telemetry.addData("Claw Position", robot.claw.getPosition());
         telemetry.addData("Claw State", currentClawPosition);
         telemetry.addData("Arm Target", armTarget);
         telemetry.addData("Arm Position", robot.arm.getCurrentPosition());
@@ -135,9 +149,11 @@ public class Qual11588TeleOp extends OpMode {
         telemetry.addData("P Arm", pArm);
         telemetry.addData("I Arm", iArm);
         telemetry.addData("D Arm", dArm);
+        telemetry.addData("Cos Arm", cosArm);
         telemetry.addData("Proportional Stuff", pArm * kp);
         telemetry.addData("Integral Stuff", iArm * ki);
         telemetry.addData("Derivative Stuff", dArm * kd);
+        telemetry.addData("Cos Stuff", cosArm * kCos);
         telemetry.update();
     }
 }

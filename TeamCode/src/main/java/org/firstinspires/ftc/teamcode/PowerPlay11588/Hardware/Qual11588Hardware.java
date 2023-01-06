@@ -34,6 +34,7 @@ public class Qual11588Hardware implements OpenCvCamera.AsyncCameraOpenListener {
     public static final double LOW_POLE_ENCODER_VALUE = 100;
     public static final double MID_POLE_ENCODER_VALUE = 150;
     public static final double HIGH_POLE_ENCODER_VALUE = 200;
+    public static final double ARM_GEAR_RATIO = 40/16;
 
     public DcMotorEx frontLeft;
     public DcMotorEx frontRight;
@@ -96,7 +97,7 @@ public class Qual11588Hardware implements OpenCvCamera.AsyncCameraOpenListener {
         frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        arm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -105,14 +106,14 @@ public class Qual11588Hardware implements OpenCvCamera.AsyncCameraOpenListener {
 
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        arm.setDirection(DcMotorSimple.Direction.REVERSE);
+        //arm.setDirection(DcMotorSimple.Direction.REVERSE);
 
         frontLeft.setPower(0);
         frontRight.setPower(0);
         backLeft.setPower(0);
         backRight.setPower(0);
         arm.setPower(0);
-        claw.setPosition(CLOSED_POSITION);
+        //claw.setPosition(CLOSED_POSITION);
     }
 
     public double getAngle(){
