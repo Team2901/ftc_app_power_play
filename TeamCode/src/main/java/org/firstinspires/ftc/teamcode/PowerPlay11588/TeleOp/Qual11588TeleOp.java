@@ -28,10 +28,10 @@ public class Qual11588TeleOp extends OpMode {
     double ki = 0.0;
     double kd = 0.0;
     double kCos = 0.3;
-    double pArm = 0.5;
+    double pArm = 0.0;
     double iArm = 0.0;
     double dArm = 0.0;
-    double cosArm = 0;
+    double cosArm = 0.0;
     double iArmMax = .25;
     double armAngle = 0;
 
