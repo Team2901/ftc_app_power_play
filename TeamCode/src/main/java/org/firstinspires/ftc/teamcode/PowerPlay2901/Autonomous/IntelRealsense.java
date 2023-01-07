@@ -147,6 +147,8 @@ public class IntelRealsense extends OpMode {
     //Ignore for now, use later for parking locations using camera
     int parking = 2;
 
+    boolean firstRound = true;
+
     @Override
     public void init() {
         robot.init(hardwareMap);
@@ -160,7 +162,7 @@ public class IntelRealsense extends OpMode {
         improvedGamepad = new ImprovedGamepad(gamepad1, impTime, "GP");
         improvedGamepad2 = new ImprovedGamepad(gamepad2, impTime, "GP2");
 
-        //autoState = AutoState.MOVE_FORWARD;
+        autoState = AutoState.MOVE_FORWARD;
 
         //Sets the target position to offsets to prevent initial movement upon starting
         positionX = -cameraXOffset;
@@ -178,6 +180,7 @@ public class IntelRealsense extends OpMode {
 
     @Override
     public void loop() {
+
         up = slamra.getLastReceivedCameraUpdate();
         // We divide by 0.0254 to convert meters to inches
         translation = new Translation2d(up.pose.getTranslation().getX() / 0.0254, up.pose.getTranslation().getY() / 0.0254);
@@ -220,19 +223,21 @@ public class IntelRealsense extends OpMode {
             targetAngle = -90;
         }
 
+        /*if(firstRound){
+            moveTo(0, -48);
+            targetAngle = 45;
+            firstRound = false;
+        }
         //Auto States cycle
-        /*switch(autoState){
+        switch(autoState){
             case MOVE_FORWARD:
-                move(x, y);
                 if(!isTurning && !isMoving) {
                     autoState = AutoState.TURN_45;
+                    moveTo(24, 0);
+                    targetAngle = 90;
                 }
                 break;
             case TURN_45:
-                turnToAngle(45);
-                if(!isTurning && !isMoving) {
-                    autoState = AutoState.LIFT_SLIDES;
-                }
                 break;
             case LIFT_SLIDES:
 
@@ -261,18 +266,15 @@ public class IntelRealsense extends OpMode {
             case MOVE_BACK:
                 move(0, -24);
                 if(!isTurning && !isMoving) {
-                    autoState = AutoState.GRIP_CLAW;
+                    autoState = AutoState.MOVE_FORWARD2;
                 }
-                break;
-            case GRIP_CLAW:
-
                 break;
             case MOVE_FORWARD2:
 
                 break;
             case TURN_N45:
                 turnByAngle(-45);
-                if(!isTurning && !isMoving //&& autonomous time is greater than cycle time) {
+                if(!isTurning && !isMoving){
                     autoState = AutoState.LIFT_SLIDES;
                 } else if(!isTurning && !isMoving){
                     autoState = AutoState.PARK;
@@ -286,8 +288,9 @@ public class IntelRealsense extends OpMode {
                 } else if (parking == 2){
                     moveTo(-24, -48);
                 }
-        }*/
-
+                break;
+        }
+*/
 
         //IGNORE
         /*if(autoState == AutoState.MOVE_FORWARD){
@@ -361,10 +364,10 @@ public class IntelRealsense extends OpMode {
         odometry();
 
         //Movement PID code
-        if (!isTurning && isMoving && (Math.abs(((positionX) - (pos.x))) > 0 || Math.abs((positionY) - (pos.y)) > 0)) {
+        if (!isTurning && isMoving && (Math.abs(((positionX) - (offsetX))) > 0 || Math.abs((positionY) - (offsetY)) > 0)) {
 
-            double dx = ((positionX) - (pos.x));
-            double dy = ((positionY) - (pos.y));
+            double dx = ((positionX) - (offsetX));
+            double dy = ((positionY) - (offsetY));
             double angle = Math.atan(dy / dx);
             currentError = Math.sqrt((Math.pow(dx, 2) + Math.pow(dy, 2)));
             angleToTarget = -Math.toDegrees(angle);
@@ -427,13 +430,14 @@ public class IntelRealsense extends OpMode {
         telemetry.addData("position x", positionX);
 
         //Creates dead zone radius larger than target
-        if (isMoving && (Math.abs(((positionX) - (pos.x))) < 0.5 && Math.abs((positionY) - (pos.y)) < 0.5)) {
+        if (isMoving && (Math.abs(((positionX) - (offsetX))) < 0.5 && Math.abs((positionY) - (offsetY)) < 0.5)) {
             outputLeft = 0;
             outputRight = 0;
             leftTurnPower = 0;
             rightTurnPower = 0;
+            //isMoving = false;
         }
-        turnPower = -AngleUnit.normalizeDegrees(targetAngle - Math.toDegrees(robot.getAngle())) / 50;
+        turnPower = -AngleUnit.normalizeDegrees(targetAngle - Math.toDegrees(robot.getAngle())) / 65;
         angleToTarget += Math.toDegrees(robot.getAngle());
 
         //pos.h change
@@ -500,8 +504,8 @@ public class IntelRealsense extends OpMode {
 
     //enter (x, y) coordinates to move robot by
     public void move(double x, double y) {
-        positionX = x + (pos.x);
-        positionY = y + (pos.y);
+        positionX = x + (offsetX);
+        positionY = y + (offsetY);
         isMoving = true;
     }
 
