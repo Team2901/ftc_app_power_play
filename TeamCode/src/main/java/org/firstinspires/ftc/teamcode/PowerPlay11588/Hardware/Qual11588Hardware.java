@@ -28,13 +28,13 @@ public class Qual11588Hardware implements OpenCvCamera.AsyncCameraOpenListener {
     public static final double TICKS_PER_DRIVE_REV = TICKS_PER_MOTOR_REV * DRIVE_GEAR_RATIO;
     public static final double WHEEL_CIRCUMFERENCE = Math.PI * 3.78;
     public static final double TICKS_PER_INCH = TICKS_PER_DRIVE_REV / WHEEL_CIRCUMFERENCE;
-    public static final double OPEN_POSITION = 0.5;
+    public static final double OPEN_POSITION = 0.25;
     public static final double CLOSED_POSITION = 0.0;
-    public static final double GROUND_ENCODER_VALUE = 50;
-    public static final double LOW_POLE_ENCODER_VALUE = 100;
-    public static final double MID_POLE_ENCODER_VALUE = 150;
-    public static final double HIGH_POLE_ENCODER_VALUE = 200;
-    public static final double ARM_GEAR_RATIO = 40/16;
+    public static final double GROUND_ENCODER_VALUE = 200;
+    public static final double LOW_POLE_ENCODER_VALUE = 475;
+    public static final double MID_POLE_ENCODER_VALUE = 775;
+    public static final double HIGH_POLE_ENCODER_VALUE = 1000;
+    public static final double ARM_GEAR_RATIO = 40.0/16.0;
 
     public DcMotorEx frontLeft;
     public DcMotorEx frontRight;
@@ -113,7 +113,7 @@ public class Qual11588Hardware implements OpenCvCamera.AsyncCameraOpenListener {
         backLeft.setPower(0);
         backRight.setPower(0);
         arm.setPower(0);
-        //claw.setPosition(CLOSED_POSITION);
+        claw.setPosition(CLOSED_POSITION);
     }
 
     public double getAngle(){

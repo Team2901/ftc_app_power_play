@@ -20,13 +20,18 @@ public class TankDriveSwerveBaseAuto extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {}
 
-    /*public void moveInches(double inches){
+    public void moveInches(double inches){
+        moveInches(inches, 65, false);
+    }
+
+    public void moveInches(double inches, int lift, boolean extended){
         int target = (int)(inches * 8192 / 8.9);
         int distance;
         int distanceToTarget;
         double startDiff = robot.encoderLeft.getCurrentPosition() - robot.encoderRight.getCurrentPosition();
 
         while(robot.encoderLeft.getCurrentPosition() < target-100 && robot.encoderRight.getCurrentPosition() < target-100 && robot.encoderLeft.getCurrentPosition() > target+100 && robot.encoderRight.getCurrentPosition() > target+100) {
+            runLift(lift, extended, false);
             distance = Math.abs(robot.encoderLeft.getCurrentPosition());
             distanceToTarget = Math.abs(target) - distance;
 
@@ -61,9 +66,17 @@ public class TankDriveSwerveBaseAuto extends LinearOpMode {
             robot.rightOne.setVelocity((rightPodPower / 2 + rightTurnPower) * 2500);
             robot.rightTwo.setVelocity((rightPodPower / 2 - rightTurnPower) * 2500);
         }
-    }*/
+        robot.leftOne.setVelocity(0);
+        robot.leftTwo.setVelocity(0);
+        robot.rightOne.setVelocity(0);
+        robot.rightTwo.setVelocity(0);
+    }
 
     public void turnByAngle(double turnAngle){
+        turnByAngle(turnAngle, 65, false);
+    }
+
+    public void turnByAngle(double turnAngle, int lift, boolean extended){
         double startAngle = robot.getAngle();
         double targetAngle = AngleUnit.normalizeDegrees(startAngle + turnAngle);
         ElapsedTime runtime = new ElapsedTime();
@@ -81,6 +94,7 @@ public class TankDriveSwerveBaseAuto extends LinearOpMode {
         robot.rightTwo.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         while(opModeIsActive() && !(error < 1.5 && error > -1.5)){
+            runLift(lift, extended, false);
             error = (targetAngle - robot.getAngle());
             double secs = runtime.seconds();
             runtime.reset();
@@ -186,21 +200,57 @@ public class TankDriveSwerveBaseAuto extends LinearOpMode {
         robot.rightTwo.setPower(0);
     }
 
-    double lp = 0;
-    double li = 0;
-    double ld = 0;
+    double liftPower = 0;
+    double feedForward = .3;
 
+    public void runLift(int target, boolean extended, boolean plunge){
+        if(extended){
+            robot.passthrough.setPosition(.025);
+        } else {
+            robot.passthrough.setPosition(.69);
+        }
+
+        if(plunge){
+            liftPower = liftPower(target - 65);
+            feedForward = 0;
+        } else {
+            liftPower = liftPower(target);
+            feedForward = .3;
+        }
+
+        robot.liftOne.setPower(liftPower - feedForward);
+        robot.liftTwo.setPower(liftPower - feedForward);
+    }
+
+    double klp = 0.7;
+    double kli = 0.0015;
+    double kld = 0.015;
+
+    public ElapsedTime runtimeLift = new ElapsedTime();
+    double liftPosition = 0;
     double liftP = 0;
     double liftI = 0;
     double liftD = 0;
 
-    public double liftTarget = 0;
-
-    /*public void liftPower() {
-        double total = 0;
-        robot.liftOne.setPower(total + .05);
-        robot.liftTwo.setPower(total + .05);
-    }*/
+    public double liftPower(int target){
+        int error = robot.liftOne.getCurrentPosition() - target;
+        telemetry.addData("error", error);
+        double secs = runtimeLift.seconds();
+        runtime.reset();
+        liftD = (error - liftP) / secs;
+        liftI = liftI + (error * secs);
+        liftP = error;
+        double total = (klp* liftP + kli* liftI + kld* liftD)/100;
+        if(total > .65){
+            liftI = 0;
+            total = .65;
+        }
+        if(total < -1){
+            liftI = 0;
+            total = -1;
+        }
+        return total;
+    }
 
     double kp = 1.2;
     double ki = 0;

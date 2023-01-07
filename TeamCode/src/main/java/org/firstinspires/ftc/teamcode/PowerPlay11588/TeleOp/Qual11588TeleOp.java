@@ -18,7 +18,7 @@ public class Qual11588TeleOp extends OpMode {
 
     //All the variables that are needed for pid
     ElapsedTime PIDTimer = new ElapsedTime();
-    int armTarget = 150;
+    int armTarget = 200;
     int realArmTarget = armTarget;
     int lastTarget = armTarget;
     int modifier = 0;
@@ -28,10 +28,10 @@ public class Qual11588TeleOp extends OpMode {
     double ki = 0.0;
     double kd = 0.0;
     double kCos = 0.3;
-    double pArm = 0.5;
+    double pArm = 0.0;
     double iArm = 0.0;
     double dArm = 0.0;
-    double cosArm = 0;
+    double cosArm = 0.0;
     double iArmMax = .25;
     double armAngle = 0;
 
@@ -58,7 +58,7 @@ public class Qual11588TeleOp extends OpMode {
             armTarget = 775;
         }else if(impGamepad1.dpad_up.isInitialPress()){
             //Sets the armTarget to the high pole
-            armTarget = 1200;
+            armTarget = 1000;
         }
         /*Allows for the armTarget to be changed for the duration of the TeleOp rather than resetting
         when you change height*/
@@ -79,8 +79,8 @@ public class Qual11588TeleOp extends OpMode {
         }else{
             turningPower = impGamepad1.right_stick_x.getValue();
         }
-        double y = .5 * impGamepad1.left_stick_y.getValue();
-        double x = .5 * impGamepad1.left_stick_x.getValue();
+        double y = .75 * impGamepad1.left_stick_y.getValue();
+        double x = .75 * impGamepad1.left_stick_x.getValue();
         double rx = turningPower;
 
         robot.frontLeft.setPower(y + x + rx);
@@ -90,13 +90,13 @@ public class Qual11588TeleOp extends OpMode {
 
         switch (currentClawPosition){
             case Open:
-                //robot.claw.setPosition(robot.OPEN_POSITION);
+                robot.claw.setPosition(robot.OPEN_POSITION);
                 if(impGamepad1.b.isInitialPress()){
                     currentClawPosition = ClawPosition.Closed;
                 }
                 break;
             case Closed:
-                //robot.claw.setPosition(robot.CLOSED_POSITION);
+                robot.claw.setPosition(robot.CLOSED_POSITION);
                 if(impGamepad1.b.isInitialPress()){
                     currentClawPosition = ClawPosition.Open;
                 }
@@ -128,8 +128,8 @@ public class Qual11588TeleOp extends OpMode {
         if(total > .75){
             total = .75;
         }
-        if(total < (cosArm * kCos) / 2){
-            total = (cosArm * kCos) / 2;
+        if(total < .01){
+            total = .01;
         }
         lastTarget = armTarget;
 
