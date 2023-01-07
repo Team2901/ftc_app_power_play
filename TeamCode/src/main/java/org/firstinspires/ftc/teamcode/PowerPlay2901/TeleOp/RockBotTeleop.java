@@ -13,7 +13,7 @@ public class RockBotTeleop extends OpMode {
     private ElapsedTime runtime = new ElapsedTime();
 
     double liftPower = 0;
-    double feedForward = -.3;
+    double feedForward = .3;
     int target = 10;
     double leftPodPower = 0;
     double rightPodPower = 0;
@@ -83,11 +83,11 @@ public class RockBotTeleop extends OpMode {
             liftI = 0;
         } else {
             liftPower = liftPower(target);
-            feedForward = -.3;
+            feedForward = .3;
         }
 
-        robot.liftOne.setPower(liftPower + feedForward);
-        robot.liftTwo.setPower(liftPower + feedForward);
+        robot.liftOne.setPower(liftPower - feedForward);
+        robot.liftTwo.setPower(liftPower - feedForward);
 
         robot.leftOne.setVelocity((leftPodPower/speedMod+leftTurnPower)*2500);
         robot.leftTwo.setVelocity((leftPodPower/speedMod-leftTurnPower)*2500);
