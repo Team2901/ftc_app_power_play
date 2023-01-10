@@ -213,7 +213,7 @@ public class IntelRealsense extends OpMode {
             move(0, -24);
         }
         //Changes target angle
-        if(gamepad2.y){
+        /*if(gamepad2.y){
             runLift(815, false);
         }
         if(gamepad2.x) {
@@ -225,7 +225,7 @@ public class IntelRealsense extends OpMode {
         if(gamepad2.right_bumper){
             runLift(65, false);
             robot.passthrough.setPosition(.67);
-        }
+        }*/
 
         if(improvedGamepad.back.getValue()){
             moveTo(0, 0);
@@ -447,6 +447,7 @@ public class IntelRealsense extends OpMode {
         turnPower = turnPower(angleToTarget);
 
         //pos.h change
+        outputRight = outputRight / (Math.abs(angleToTarget)/180);
         outputRight = outputLeft;
         outputRight -= turnPower;
         outputLeft += turnPower;
@@ -460,7 +461,7 @@ public class IntelRealsense extends OpMode {
         robot.leftTwo.setVelocity((outputLeft/speedMod-leftTurnPower)*2500);
         robot.rightOne.setVelocity((outputRight/speedMod+rightTurnPower)*2500);
         robot.rightTwo.setVelocity((outputRight/speedMod-rightTurnPower)*2500);
-        runLift();
+        //runLift();
 
 //        if(Math.abs(((positionX) - (translation.getX()))) < 1 || Math.abs((positionY) - (translation.getY())) < 1){
 //            isMoving = false;
