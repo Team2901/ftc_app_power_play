@@ -28,8 +28,8 @@ public class Qual11588Hardware implements OpenCvCamera.AsyncCameraOpenListener {
     public static final double TICKS_PER_DRIVE_REV = TICKS_PER_MOTOR_REV * DRIVE_GEAR_RATIO;
     public static final double WHEEL_CIRCUMFERENCE = Math.PI * 3.78;
     public static final double TICKS_PER_INCH = TICKS_PER_DRIVE_REV / WHEEL_CIRCUMFERENCE;
-    public static final double OPEN_POSITION = 0.25;
-    public static final double CLOSED_POSITION = 0.0;
+    public static final double OPEN_POSITION = 0.5;
+    public static final double CLOSED_POSITION = 0.25;
     public static final double GROUND_ENCODER_VALUE = 200;
     public static final double LOW_POLE_ENCODER_VALUE = 475;
     public static final double MID_POLE_ENCODER_VALUE = 775;
