@@ -11,6 +11,7 @@ import com.spartronics4915.lib.T265Camera;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.PowerPlay2901.Hardware.EarlyDiffyHardware;
+import org.firstinspires.ftc.teamcode.PowerPlay2901.Hardware.RockBotHardware;
 import org.firstinspires.ftc.teamcode.Shared.Gamepad.ImprovedGamepad;
 import org.firstinspires.ftc.teamcode.Utility.CountDownTimer;
 
@@ -40,7 +41,7 @@ public class IntelRealsense extends OpMode {
 
     private ElapsedTime matchTimer = new ElapsedTime();
 
-    EarlyDiffyHardware robot = new EarlyDiffyHardware();
+    RockBotHardware robot = new RockBotHardware();
 
     //Constants for odometry
     public static final double encoderTicksPerWheelRev = 8192; //REV encoders
@@ -79,7 +80,6 @@ public class IntelRealsense extends OpMode {
 
     //positionX and positionY are the target coordinates. (set them to make the robot move)
     double positionX, positionY;
-    double targetAngle = 0;
 
     double cameraXOffset = 6; //lies 6 inches in front of middle
     double cameraYOffset = -3.5; //lies 3.5 inches up from the middle
@@ -117,7 +117,7 @@ public class IntelRealsense extends OpMode {
 
     double outputLeft;
     double outputRight;
-    double speedMod = 3;
+    double speedMod = 1.8;
 
     double turnPower;
     double leftTurnPower;
@@ -147,6 +147,8 @@ public class IntelRealsense extends OpMode {
     //Ignore for now, use later for parking locations using camera
     int parking = 2;
 
+    boolean firstRound = true;
+
     @Override
     public void init() {
         robot.init(hardwareMap);
@@ -160,7 +162,7 @@ public class IntelRealsense extends OpMode {
         improvedGamepad = new ImprovedGamepad(gamepad1, impTime, "GP");
         improvedGamepad2 = new ImprovedGamepad(gamepad2, impTime, "GP2");
 
-        //autoState = AutoState.MOVE_FORWARD;
+        autoState = AutoState.MOVE_FORWARD;
 
         //Sets the target position to offsets to prevent initial movement upon starting
         positionX = -cameraXOffset;
@@ -178,6 +180,7 @@ public class IntelRealsense extends OpMode {
 
     @Override
     public void loop() {
+
         up = slamra.getLastReceivedCameraUpdate();
         // We divide by 0.0254 to convert meters to inches
         translation = new Translation2d(up.pose.getTranslation().getX() / 0.0254, up.pose.getTranslation().getY() / 0.0254);
@@ -205,34 +208,44 @@ public class IntelRealsense extends OpMode {
         } else if (improvedGamepad.dpad_left.isInitialPress()) {
             move(-24, 0);
         } else if (improvedGamepad.dpad_up.isInitialPress()) {
-            move(0, 48);
+            move(0, 24);
         } else if (improvedGamepad.dpad_down.isInitialPress()) {
-            move(0, -48);
+            move(0, -24);
         }
         //Changes target angle
-        if(improvedGamepad.a.getValue()) {
-            targetAngle = 0;
-        } else if(improvedGamepad.b.getValue()){
-            targetAngle = 90;
-        } else if(improvedGamepad.y.getValue()){
-            targetAngle = 180;
-        } else if(improvedGamepad.x.getValue()){
-            targetAngle = -90;
+        if(gamepad2.y){
+            runLift(815, false);
+        }
+        if(gamepad2.x) {
+            runLift(575, false);
+        }
+        if(gamepad2.b) {
+            runLift(325, false);
+        }
+        if(gamepad2.right_bumper){
+            runLift(65, false);
+            robot.passthrough.setPosition(.67);
         }
 
+        if(improvedGamepad.back.getValue()){
+            moveTo(0, 0);
+        }
+
+        /*if(firstRound){
+            moveTo(0, -48);
+            targetAngle = 45;
+            firstRound = false;
+        }
         //Auto States cycle
-        /*switch(autoState){
+        switch(autoState){
             case MOVE_FORWARD:
-                move(x, y);
                 if(!isTurning && !isMoving) {
                     autoState = AutoState.TURN_45;
+                    moveTo(24, 0);
+                    targetAngle = 90;
                 }
                 break;
             case TURN_45:
-                turnToAngle(45);
-                if(!isTurning && !isMoving) {
-                    autoState = AutoState.LIFT_SLIDES;
-                }
                 break;
             case LIFT_SLIDES:
 
@@ -261,18 +274,15 @@ public class IntelRealsense extends OpMode {
             case MOVE_BACK:
                 move(0, -24);
                 if(!isTurning && !isMoving) {
-                    autoState = AutoState.GRIP_CLAW;
+                    autoState = AutoState.MOVE_FORWARD2;
                 }
-                break;
-            case GRIP_CLAW:
-
                 break;
             case MOVE_FORWARD2:
 
                 break;
             case TURN_N45:
                 turnByAngle(-45);
-                if(!isTurning && !isMoving //&& autonomous time is greater than cycle time) {
+                if(!isTurning && !isMoving){
                     autoState = AutoState.LIFT_SLIDES;
                 } else if(!isTurning && !isMoving){
                     autoState = AutoState.PARK;
@@ -286,8 +296,9 @@ public class IntelRealsense extends OpMode {
                 } else if (parking == 2){
                     moveTo(-24, -48);
                 }
-        }*/
-
+                break;
+        }
+*/
 
         //IGNORE
         /*if(autoState == AutoState.MOVE_FORWARD){
@@ -361,10 +372,10 @@ public class IntelRealsense extends OpMode {
         odometry();
 
         //Movement PID code
-        if (!isTurning && isMoving && (Math.abs(((positionX) - (pos.x))) > 0 || Math.abs((positionY) - (pos.y)) > 0)) {
+        if (!isTurning && isMoving && (Math.abs(((positionX) - (offsetX))) > 0 || Math.abs((positionY) - (offsetY)) > 0)) {
 
-            double dx = ((positionX) - (pos.x));
-            double dy = ((positionY) - (pos.y));
+            double dx = ((positionX) - (offsetX));
+            double dy = ((positionY) - (offsetY));
             double angle = Math.atan(dy / dx);
             currentError = Math.sqrt((Math.pow(dx, 2) + Math.pow(dy, 2)));
             angleToTarget = -Math.toDegrees(angle);
@@ -427,30 +438,29 @@ public class IntelRealsense extends OpMode {
         telemetry.addData("position x", positionX);
 
         //Creates dead zone radius larger than target
-        if (isMoving && (Math.abs(((positionX) - (pos.x))) < 0.5 && Math.abs((positionY) - (pos.y)) < 0.5)) {
+        if (isMoving && (Math.abs(((positionX) - (offsetX))) < 0.5 && Math.abs((positionY) - (offsetY)) < 0.5)) {
             outputLeft = 0;
             outputRight = 0;
             leftTurnPower = 0;
             rightTurnPower = 0;
         }
-        turnPower = -AngleUnit.normalizeDegrees(targetAngle - Math.toDegrees(robot.getAngle())) / 50;
-        angleToTarget += Math.toDegrees(robot.getAngle());
+        turnPower = turnPower(angleToTarget);
 
         //pos.h change
         outputRight = outputLeft;
-        outputRight -= (turnPower*Math.cos(Math.toRadians(angleToTarget)));
-        outputLeft += (turnPower*Math.cos(Math.toRadians(angleToTarget)));
-        leftTurnPower = leftPodTurn(angleToTarget);
-        rightTurnPower = rightPodTurn(angleToTarget);
+        outputRight -= turnPower;
+        outputLeft += turnPower;
+        leftTurnPower = leftPodTurn(0);
+        rightTurnPower = rightPodTurn(0);
 
         //Angle turn code
-        double targetAngle = robot.getAngle();
 
 
         robot.leftOne.setVelocity((outputLeft/speedMod+leftTurnPower)*2500);
         robot.leftTwo.setVelocity((outputLeft/speedMod-leftTurnPower)*2500);
         robot.rightOne.setVelocity((outputRight/speedMod+rightTurnPower)*2500);
         robot.rightTwo.setVelocity((outputRight/speedMod-rightTurnPower)*2500);
+        runLift();
 
 //        if(Math.abs(((positionX) - (translation.getX()))) < 1 || Math.abs((positionY) - (translation.getY())) < 1){
 //            isMoving = false;
@@ -500,8 +510,8 @@ public class IntelRealsense extends OpMode {
 
     //enter (x, y) coordinates to move robot by
     public void move(double x, double y) {
-        positionX = x + (pos.x);
-        positionY = y + (pos.y);
+        positionX = x + (offsetX);
+        positionY = y + (offsetY);
         isMoving = true;
     }
 
@@ -587,6 +597,32 @@ public class IntelRealsense extends OpMode {
         return total;
     }
 
+    double pTurn = 0;
+    double iTurn = 0;
+    double dTurn = 0;
+    double ktp = 1.5;
+    double kti = 0;
+    double ktd = 0.3;
+
+    public double turnPower(double targetPosition){
+        double error = AngleUnit.normalizeDegrees(targetPosition-robot.getAngle());
+        double secs = runtime.seconds();
+        runtime.reset();
+        dTurn = (error - pTurn) / secs;
+        iTurn = iTurn + (error * secs);
+        pTurn = error;
+        double total = (ktp* pTurn + kti* iTurn + ktd*dTurn)/100;
+        if(total > 1){
+            iTurn = 0;
+            total = 1;
+        }
+        if(total < -1){
+            iTurn = 0;
+            total = -1;
+        }
+        return total;
+    }
+
     //Enter angle for robot to turn to, field oriented
     public void turnToAngle(double turnAngle) {
         isTurning = true;
@@ -613,8 +649,8 @@ public class IntelRealsense extends OpMode {
         oldLeftPosition = currentLeftPosition;
         oldBackPosition = currentBackPosition;
 
-        currentRightPosition = robot.odoRight.getCurrentPosition();
-        currentLeftPosition = robot.odoLeft.getCurrentPosition();
+        currentRightPosition = robot.encoderRight.getCurrentPosition();
+        currentLeftPosition = robot.encoderLeft.getCurrentPosition();
         currentBackPosition = robot.liftTwo.getCurrentPosition();
 
         int dn1 = currentRightPosition - oldRightPosition;
@@ -631,5 +667,55 @@ public class IntelRealsense extends OpMode {
         pos.y += dx * Math.cos(theta) - dy * Math.sin(theta);
         pos.x += dx * Math.sin(theta) + dy * Math.cos(theta);
         pos.h += dtheta;
+    }
+
+    int liftTarget = 15;
+    double liftPower = 0;
+    double feedForward = .3;
+
+    public void runLift(){runLift(liftTarget, false);}
+
+    public void runLift(int target, boolean drop){
+        if(drop){
+            liftPower = liftPower(target - 65);
+            feedForward = 0;
+            liftI = 0;
+        } else {
+            liftPower = liftPower(target);
+            feedForward = .3;
+        }
+
+        robot.liftOne.setPower(liftPower - feedForward);
+        robot.liftTwo.setPower(liftPower - feedForward);
+    }
+
+    double klp = 0.7;
+    double kli = 0.0015;
+    double kld = 0.015;
+
+    public ElapsedTime runtimeLift = new ElapsedTime();
+    double liftPosition = 0;
+    double liftP = 0;
+    double liftI = 0;
+    double liftD = 0;
+
+    public double liftPower(int target){
+        int error = robot.liftOne.getCurrentPosition() - target;
+        telemetry.addData("error", error);
+        double secs = runtimeLift.seconds();
+        runtime.reset();
+        liftD = (error - liftP) / secs;
+        liftI = liftI + (error * secs);
+        liftP = error;
+        double total = (klp* liftP + kli* liftI + kld* liftD)/100;
+        if(total > .65){
+            liftI = 0;
+            total = .65;
+        }
+        if(total < -1){
+            liftI = 0;
+            total = -1;
+        }
+        return total;
     }
 }
