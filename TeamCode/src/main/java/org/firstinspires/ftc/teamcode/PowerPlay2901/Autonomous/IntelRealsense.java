@@ -11,6 +11,7 @@ import com.spartronics4915.lib.T265Camera;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.PowerPlay2901.Hardware.EarlyDiffyHardware;
+import org.firstinspires.ftc.teamcode.PowerPlay2901.Hardware.RockBotHardware;
 import org.firstinspires.ftc.teamcode.Shared.Gamepad.ImprovedGamepad;
 import org.firstinspires.ftc.teamcode.Utility.CountDownTimer;
 
@@ -40,7 +41,7 @@ public class IntelRealsense extends OpMode {
 
     private ElapsedTime matchTimer = new ElapsedTime();
 
-    EarlyDiffyHardware robot = new EarlyDiffyHardware();
+    RockBotHardware robot = new RockBotHardware();
 
     //Constants for odometry
     public static final double encoderTicksPerWheelRev = 8192; //REV encoders
@@ -79,7 +80,6 @@ public class IntelRealsense extends OpMode {
 
     //positionX and positionY are the target coordinates. (set them to make the robot move)
     double positionX, positionY;
-    double targetAngle = 0;
 
     double cameraXOffset = 6; //lies 6 inches in front of middle
     double cameraYOffset = -3.5; //lies 3.5 inches up from the middle
@@ -208,19 +208,23 @@ public class IntelRealsense extends OpMode {
         } else if (improvedGamepad.dpad_left.isInitialPress()) {
             move(-24, 0);
         } else if (improvedGamepad.dpad_up.isInitialPress()) {
-            move(0, 48);
+            move(0, 24);
         } else if (improvedGamepad.dpad_down.isInitialPress()) {
-            move(0, -48);
+            move(0, -24);
         }
         //Changes target angle
-        if(improvedGamepad.a.getValue()) {
-            targetAngle = 0;
-        } else if(improvedGamepad.b.getValue()){
-            targetAngle = 90;
-        } else if(improvedGamepad.y.getValue()){
-            targetAngle = 180;
-        } else if(improvedGamepad.x.getValue()){
-            targetAngle = -90;
+        if(gamepad2.y){
+            runLift(815, false);
+        }
+        if(gamepad2.x) {
+            runLift(575, false);
+        }
+        if(gamepad2.b) {
+            runLift(325, false);
+        }
+        if(gamepad2.right_bumper){
+            runLift(65, false);
+            robot.passthrough.setPosition(.67);
         }
 
         if(improvedGamepad.back.getValue()){
@@ -456,6 +460,7 @@ public class IntelRealsense extends OpMode {
         robot.leftTwo.setVelocity((outputLeft/speedMod-leftTurnPower)*2500);
         robot.rightOne.setVelocity((outputRight/speedMod+rightTurnPower)*2500);
         robot.rightTwo.setVelocity((outputRight/speedMod-rightTurnPower)*2500);
+        runLift();
 
 //        if(Math.abs(((positionX) - (translation.getX()))) < 1 || Math.abs((positionY) - (translation.getY())) < 1){
 //            isMoving = false;
@@ -644,8 +649,8 @@ public class IntelRealsense extends OpMode {
         oldLeftPosition = currentLeftPosition;
         oldBackPosition = currentBackPosition;
 
-        currentRightPosition = robot.odoRight.getCurrentPosition();
-        currentLeftPosition = robot.odoLeft.getCurrentPosition();
+        currentRightPosition = robot.encoderRight.getCurrentPosition();
+        currentLeftPosition = robot.encoderLeft.getCurrentPosition();
         currentBackPosition = robot.liftTwo.getCurrentPosition();
 
         int dn1 = currentRightPosition - oldRightPosition;
@@ -662,5 +667,55 @@ public class IntelRealsense extends OpMode {
         pos.y += dx * Math.cos(theta) - dy * Math.sin(theta);
         pos.x += dx * Math.sin(theta) + dy * Math.cos(theta);
         pos.h += dtheta;
+    }
+
+    int liftTarget = 15;
+    double liftPower = 0;
+    double feedForward = .3;
+
+    public void runLift(){runLift(liftTarget, false);}
+
+    public void runLift(int target, boolean drop){
+        if(drop){
+            liftPower = liftPower(target - 65);
+            feedForward = 0;
+            liftI = 0;
+        } else {
+            liftPower = liftPower(target);
+            feedForward = .3;
+        }
+
+        robot.liftOne.setPower(liftPower - feedForward);
+        robot.liftTwo.setPower(liftPower - feedForward);
+    }
+
+    double klp = 0.7;
+    double kli = 0.0015;
+    double kld = 0.015;
+
+    public ElapsedTime runtimeLift = new ElapsedTime();
+    double liftPosition = 0;
+    double liftP = 0;
+    double liftI = 0;
+    double liftD = 0;
+
+    public double liftPower(int target){
+        int error = robot.liftOne.getCurrentPosition() - target;
+        telemetry.addData("error", error);
+        double secs = runtimeLift.seconds();
+        runtime.reset();
+        liftD = (error - liftP) / secs;
+        liftI = liftI + (error * secs);
+        liftP = error;
+        double total = (klp* liftP + kli* liftI + kld* liftD)/100;
+        if(total > .65){
+            liftI = 0;
+            total = .65;
+        }
+        if(total < -1){
+            liftI = 0;
+            total = -1;
+        }
+        return total;
     }
 }
