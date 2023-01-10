@@ -25,12 +25,12 @@ public class TankDriveSwerveBaseAuto extends LinearOpMode {
     }
 
     public void moveInches(double inches, int lift, boolean extended){
-        int target = (int)(inches * 8192 / 8.9);
-        int distance;
-        int distanceToTarget;
+        double target = (inches * 8192 / 8.9);
+        double distance;
+        double distanceToTarget;
         double startDiff = robot.encoderLeft.getCurrentPosition() - robot.encoderRight.getCurrentPosition();
 
-        while(robot.encoderLeft.getCurrentPosition() < target-100 && robot.encoderRight.getCurrentPosition() < target-100 && robot.encoderLeft.getCurrentPosition() > target+100 && robot.encoderRight.getCurrentPosition() > target+100) {
+        while(gamepad1.a && robot.encoderLeft.getCurrentPosition() > target-100 && robot.encoderRight.getCurrentPosition() > target-100 && robot.encoderLeft.getCurrentPosition() < target+100 && robot.encoderRight.getCurrentPosition() < target+100) {
             runLift(lift, extended, false);
             distance = Math.abs(robot.encoderLeft.getCurrentPosition());
             distanceToTarget = Math.abs(target) - distance;

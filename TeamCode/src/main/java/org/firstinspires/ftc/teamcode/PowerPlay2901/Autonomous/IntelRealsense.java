@@ -117,7 +117,7 @@ public class IntelRealsense extends OpMode {
 
     double outputLeft;
     double outputRight;
-    double speedMod = 3;
+    double speedMod = 1.8;
 
     double turnPower;
     double leftTurnPower;
@@ -221,6 +221,10 @@ public class IntelRealsense extends OpMode {
             targetAngle = 180;
         } else if(improvedGamepad.x.getValue()){
             targetAngle = -90;
+        }
+
+        if(improvedGamepad.back.getValue()){
+            moveTo(0, 0);
         }
 
         /*if(firstRound){
@@ -435,20 +439,17 @@ public class IntelRealsense extends OpMode {
             outputRight = 0;
             leftTurnPower = 0;
             rightTurnPower = 0;
-            //isMoving = false;
         }
-        turnPower = -AngleUnit.normalizeDegrees(targetAngle - Math.toDegrees(robot.getAngle())) / 65;
-        angleToTarget += Math.toDegrees(robot.getAngle());
+        turnPower = turnPower(angleToTarget);
 
         //pos.h change
         outputRight = outputLeft;
-        outputRight -= (turnPower*Math.cos(Math.toRadians(angleToTarget)));
-        outputLeft += (turnPower*Math.cos(Math.toRadians(angleToTarget)));
-        leftTurnPower = leftPodTurn(angleToTarget);
-        rightTurnPower = rightPodTurn(angleToTarget);
+        outputRight -= turnPower;
+        outputLeft += turnPower;
+        leftTurnPower = leftPodTurn(0);
+        rightTurnPower = rightPodTurn(0);
 
         //Angle turn code
-        double targetAngle = robot.getAngle();
 
 
         robot.leftOne.setVelocity((outputLeft/speedMod+leftTurnPower)*2500);
@@ -586,6 +587,32 @@ public class IntelRealsense extends OpMode {
         }
         if (total < -1) {
             iAngleRight = 0;
+            total = -1;
+        }
+        return total;
+    }
+
+    double pTurn = 0;
+    double iTurn = 0;
+    double dTurn = 0;
+    double ktp = 1.5;
+    double kti = 0;
+    double ktd = 0.3;
+
+    public double turnPower(double targetPosition){
+        double error = AngleUnit.normalizeDegrees(targetPosition-robot.getAngle());
+        double secs = runtime.seconds();
+        runtime.reset();
+        dTurn = (error - pTurn) / secs;
+        iTurn = iTurn + (error * secs);
+        pTurn = error;
+        double total = (ktp* pTurn + kti* iTurn + ktd*dTurn)/100;
+        if(total > 1){
+            iTurn = 0;
+            total = 1;
+        }
+        if(total < -1){
+            iTurn = 0;
             total = -1;
         }
         return total;

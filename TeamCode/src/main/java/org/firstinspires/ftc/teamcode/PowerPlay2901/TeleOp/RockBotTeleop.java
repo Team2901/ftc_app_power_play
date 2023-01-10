@@ -46,7 +46,7 @@ public class RockBotTeleop extends OpMode {
             rightTurnPower = rightPodTurn(moveAngle+(45*turnPower*Math.sin(Math.toRadians(moveAngle))));
         }
 
-        int speedMod = 3;
+        double speedMod = 1.8;
         if(gamepad1.left_bumper){
             speedMod = 1;
         }
@@ -57,11 +57,10 @@ public class RockBotTeleop extends OpMode {
             robot.passthrough.setPosition(.67);
         }
 
-        if(gamepad2.dpad_left){
-            robot.claw.setPosition(.25);
-        }
-        if(gamepad2.dpad_right){
-            robot.claw.setPosition(.75);
+        if(gamepad2.left_bumper){
+            robot.claw.setPosition(.288);
+        } else {
+            robot.claw.setPosition(.35);
         }
 
         if(gamepad2.y){
@@ -75,6 +74,7 @@ public class RockBotTeleop extends OpMode {
         }
         if(gamepad2.right_bumper){
             target = 65;
+            robot.passthrough.setPosition(.67);
         }
 
         if(gamepad2.a){
