@@ -26,8 +26,8 @@ public class EarlyDiffyHardware {
     public static final double encoderTicksPerWheelRev = 8192;
     public static final double wheelCircumference = (3 * Math.PI);
     public static final double wheelRadius = 1.5;
-    public static final double leftRightDistance = 12;
-    public static final double midpointBackDistance = 12;
+//    public static final double leftRightDistance = 12;
+//    public static final double midpointBackDistance = 12;
     public static final double encoderTicksPerInch = encoderTicksPerWheelRev/wheelCircumference;
     public static final double inchPerTick = wheelCircumference/encoderTicksPerWheelRev;
 

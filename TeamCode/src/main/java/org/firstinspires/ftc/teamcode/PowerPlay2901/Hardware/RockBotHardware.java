@@ -65,6 +65,8 @@ public class RockBotHardware {
         leftTwo.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightOne.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightTwo.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        encoderLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        encoderRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;

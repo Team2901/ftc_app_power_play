@@ -40,8 +40,8 @@ public class RockBotTeleop extends OpMode {
         } else {
             moveAngle = Math.toDegrees(Math.atan2(sidePower, -forwardPower+.001));
             //moveAngle = AngleUnit.normalizeDegrees(moveAngle+robot.getAngle()); //uncomment this for field oriented
-            leftPodPower = Math.sqrt(forwardPower*forwardPower+sidePower*sidePower)+(turnPower*Math.cos(Math.toRadians(moveAngle)));
-            rightPodPower = Math.sqrt(forwardPower*forwardPower+sidePower*sidePower)-(turnPower*Math.cos(Math.toRadians(moveAngle)));
+            leftPodPower = Math.sqrt(forwardPower*forwardPower+sidePower*sidePower)+(.7*turnPower*Math.cos(Math.toRadians(moveAngle)));
+            rightPodPower = Math.sqrt(forwardPower*forwardPower+sidePower*sidePower)-(.7*turnPower*Math.cos(Math.toRadians(moveAngle)));
             leftTurnPower = leftPodTurn(moveAngle-(45*turnPower*Math.sin(Math.toRadians(moveAngle))));
             rightTurnPower = rightPodTurn(moveAngle+(45*turnPower*Math.sin(Math.toRadians(moveAngle))));
         }
@@ -52,15 +52,15 @@ public class RockBotTeleop extends OpMode {
         }
 
         if(gamepad2.dpad_up){
-            robot.passthrough.setPosition(.075);
+            robot.passthrough.setPosition(.02);
         } else if(gamepad2.dpad_down){
             robot.passthrough.setPosition(.67);
         }
 
-        if(gamepad2.left_bumper){
-            robot.claw.setPosition(.288);
-        } else {
+        if(gamepad2.left_trigger > 0.5){
             robot.claw.setPosition(.35);
+        } else {
+            robot.claw.setPosition(.288);
         }
 
         if(gamepad2.y){
@@ -74,7 +74,6 @@ public class RockBotTeleop extends OpMode {
         }
         if(gamepad2.right_bumper){
             target = 65;
-            robot.passthrough.setPosition(.67);
         }
 
         if(gamepad2.a){
