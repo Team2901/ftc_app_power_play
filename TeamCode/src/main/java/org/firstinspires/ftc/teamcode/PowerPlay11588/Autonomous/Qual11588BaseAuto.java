@@ -231,6 +231,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
             robot.backLeft.setPower(turnPower);
             robot.backRight.setPower(-turnPower);
             telemetryStuff();
+            turnError = targetAngle - robot.getAngle();
         }
     }
 
