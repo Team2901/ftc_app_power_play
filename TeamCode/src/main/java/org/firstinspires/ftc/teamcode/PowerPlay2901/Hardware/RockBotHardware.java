@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.PowerPlay2901.Hardware;
 
+import android.graphics.Camera;
+
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -9,12 +11,19 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.teamcode.NewProgrammers.Y2023.Mecanum.ObjectDetectionPipeline;
+import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.OpenCVPipelines.Qual11588OpenCV;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvCameraRotation;
 
-public class RockBotHardware {
+public class RockBotHardware implements OpenCvCamera.AsyncCameraOpenListener {
     private ElapsedTime runtime = new ElapsedTime();
 
     public static final double ticksPerMotorRev = 134.4;
@@ -43,7 +52,12 @@ public class RockBotHardware {
 
     public BNO055IMU imu;
 
+    public OpenCvCamera camera;
+    public ObjectDetectionPipeline pipeLine;
     public void init(HardwareMap hardwareMap) {
+        init(hardwareMap,null,false);
+    }
+    public void init(HardwareMap hardwareMap, Telemetry telemetry, boolean useCam) {
         leftOne = hardwareMap.get(DcMotorEx.class, "left 1");
         leftTwo = hardwareMap.get(DcMotorEx.class, "left 2");
         rightOne = hardwareMap.get(DcMotorEx.class, "right 1");
@@ -64,6 +78,15 @@ public class RockBotHardware {
         rightOne.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightTwo.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+        if (useCam) {
+            WebcamName webcam = hardwareMap.get(WebcamName.class, "Webcam 1");
+            pipeLine = new ObjectDetectionPipeline(telemetry);
+            int cameraMonitorViewID = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+            camera = OpenCvCameraFactory.getInstance().createWebcam(webcam, cameraMonitorViewID);
+            camera.setPipeline(pipeLine);
+            camera.openCameraDeviceAsync(this);
+        }
+
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
@@ -79,5 +102,15 @@ public class RockBotHardware {
     public double getAngle() {
         Orientation orientation = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         return AngleUnit.normalizeDegrees(orientation.firstAngle);
+    }
+
+    @Override
+    public void onOpened() {
+        camera.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+    }
+
+    @Override
+    public void onError(int errorCode) {
+
     }
 }
