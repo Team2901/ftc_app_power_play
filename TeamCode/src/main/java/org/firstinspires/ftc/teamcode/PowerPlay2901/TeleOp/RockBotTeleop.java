@@ -28,8 +28,8 @@ public class RockBotTeleop extends OpMode {
 
     @Override
     public void loop() {
-        double forwardPower = gamepad1.left_stick_y;
-        double sidePower = gamepad1.left_stick_x;
+        double forwardPower = -gamepad1.left_stick_y;
+        double sidePower = -gamepad1.left_stick_x;
         double turnPower = gamepad1.right_stick_x;
 
         if(gamepad1.right_bumper){
@@ -65,15 +65,19 @@ public class RockBotTeleop extends OpMode {
 
         if(gamepad2.y){
             target = 815;
+            liftI = 0;
         }
         if(gamepad2.x) {
             target = 575;
+            liftI = 0;
         }
         if(gamepad2.b) {
             target = 325;
+            liftI = 0;
         }
         if(gamepad2.right_bumper){
             target = 65;
+            liftI = 0;
         }
 
         if(gamepad2.a){
