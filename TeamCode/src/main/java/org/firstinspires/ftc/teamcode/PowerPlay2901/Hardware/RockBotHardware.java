@@ -49,6 +49,7 @@ public class RockBotHardware implements OpenCvCamera.AsyncCameraOpenListener {
     public DcMotor encoderRight;
 
     public Servo passthrough;
+    public Servo claw;
 
     public BNO055IMU imu;
 
@@ -65,6 +66,7 @@ public class RockBotHardware implements OpenCvCamera.AsyncCameraOpenListener {
         liftOne = hardwareMap.get(DcMotor.class, "lift 1");
         liftTwo = hardwareMap.get(DcMotor.class, "lift 2");
         passthrough = hardwareMap.get(Servo.class, "passthrough");
+        claw = hardwareMap.get(Servo.class, "claw");
         encoderLeft = hardwareMap.get(DcMotor.class, "left encoder");
         encoderRight = hardwareMap.get(DcMotor.class, "right encoder");
 
@@ -77,6 +79,8 @@ public class RockBotHardware implements OpenCvCamera.AsyncCameraOpenListener {
         leftTwo.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightOne.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightTwo.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        encoderLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        encoderRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         if (useCam) {
             WebcamName webcam = hardwareMap.get(WebcamName.class, "Webcam 1");

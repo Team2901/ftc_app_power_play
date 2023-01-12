@@ -18,23 +18,27 @@ public class Qual11588TeleOp extends OpMode {
 
     //All the variables that are needed for pid
     ElapsedTime PIDTimer = new ElapsedTime();
-    int armTarget = 50;
+    int armTarget = 200;
+    int realArmTarget = armTarget;
     int lastTarget = armTarget;
     int modifier = 0;
-    double error = 0;
-    double total = 0;
-    double kp = 0;
-    double ki = 0;
-    double kd = 0;
-    double pArm = 0;
-    double iArm = 0;
-    double dArm = 0;
+    double error = 0.0;
+    double total = 0.0;
+    double kp = 0.9;
+    double ki = 0.0;
+    double kd = 0.0;
+    double kCos = 0.3;
+    double pArm = 0.0;
+    double iArm = 0.0;
+    double dArm = 0.0;
+    double cosArm = 0.0;
     double iArmMax = .25;
+    double armAngle = 0;
 
 
     @Override
     public void init() {
-        robot.init(hardwareMap, telemetry);
+        robot.init(hardwareMap, telemetry, false);
         impGamepad1 = new ImprovedGamepad(gamepad1, gamepadTimer, "g1");
         impGamepad2 = new ImprovedGamepad(gamepad2, gamepadTimer, "g2");
     }
@@ -45,16 +49,16 @@ public class Qual11588TeleOp extends OpMode {
         impGamepad2.update();
         if(impGamepad1.dpad_left.isInitialPress()){
             //Sets the armTarget to ground/intake
-            armTarget = 50;
+            armTarget = 200;
         }else if(impGamepad1.dpad_down.isInitialPress()){
             //Sets the armTarget to the low pole
-            armTarget = 100;
+            armTarget = 475;
         }else if(impGamepad1.dpad_right.isInitialPress()){
             //Sets the armTarget to the mid pole
-            armTarget = 150;
+            armTarget = 775;
         }else if(impGamepad1.dpad_up.isInitialPress()){
             //Sets the armTarget to the high pole
-            armTarget = 200;
+            armTarget = 1000;
         }
         /*Allows for the armTarget to be changed for the duration of the TeleOp rather than resetting
         when you change height*/
@@ -64,8 +68,9 @@ public class Qual11588TeleOp extends OpMode {
         if(impGamepad1.a.isInitialPress()){
             modifier -= 5;
         }
-        armTarget += modifier;
-        robot.arm.setPower(armPower(armTarget));
+
+        realArmTarget = armTarget + modifier;
+        robot.arm.setPower(armPower(realArmTarget));
 
         if(impGamepad1.right_trigger.getValue() > 0){
             turningPower = .3 * impGamepad1.right_trigger.getValue();
@@ -74,8 +79,8 @@ public class Qual11588TeleOp extends OpMode {
         }else{
             turningPower = impGamepad1.right_stick_x.getValue();
         }
-        double y = .5 * impGamepad1.left_stick_y.getValue();
-        double x = .5 * impGamepad1.left_stick_x.getValue();
+        double y = .75 * impGamepad1.left_stick_y.getValue();
+        double x = .75 * impGamepad1.left_stick_x.getValue();
         double rx = turningPower;
 
         robot.frontLeft.setPower(y + x + rx);
@@ -85,7 +90,7 @@ public class Qual11588TeleOp extends OpMode {
 
         switch (currentClawPosition){
             case Open:
-                robot.claw.setPosition(robot.OPEN_POSITION);
+                robot.claw.setPosition(Qual11588Hardware.OPEN_POSITION);
                 if(impGamepad1.b.isInitialPress()){
                     currentClawPosition = ClawPosition.Closed;
                 }
@@ -100,11 +105,14 @@ public class Qual11588TeleOp extends OpMode {
     }
 
     public double armPower(int target){
+
         error = target - robot.arm.getCurrentPosition();
         dArm = (error - pArm) / PIDTimer.seconds();
         iArm = iArm + (error * PIDTimer.seconds());
         pArm = error;
-        total = ((pArm * kp) + (iArm * ki) + (dArm * kd))/100;
+        armAngle = 0.102856 * robot.arm.getCurrentPosition() - 43.6276;
+        cosArm = Math.cos(Math.toRadians(armAngle));
+        total = ((pArm * kp) + (iArm * ki) + (dArm * kd))/100 + (cosArm * kCos);
         PIDTimer.reset();
 
         if(armTarget != lastTarget){
@@ -116,6 +124,13 @@ public class Qual11588TeleOp extends OpMode {
         }else if(iArm < -iArmMax){
             iArm = -iArmMax;
         }
+
+        if(total > .6){
+            total = .6;
+        }
+        if(total < .01){
+            total = .01;
+        }
         lastTarget = armTarget;
 
         return total;
@@ -126,6 +141,7 @@ public class Qual11588TeleOp extends OpMode {
         telemetry.addData("Front Right Position", robot.frontRight.getCurrentPosition());
         telemetry.addData("Back Left Position", robot.backLeft.getCurrentPosition());
         telemetry.addData("Back Right Position", robot.backRight.getCurrentPosition());
+        telemetry.addData("Claw Position", robot.claw.getPosition());
         telemetry.addData("Claw State", currentClawPosition);
         telemetry.addData("Arm Target", armTarget);
         telemetry.addData("Arm Position", robot.arm.getCurrentPosition());
@@ -133,9 +149,11 @@ public class Qual11588TeleOp extends OpMode {
         telemetry.addData("P Arm", pArm);
         telemetry.addData("I Arm", iArm);
         telemetry.addData("D Arm", dArm);
+        telemetry.addData("Cos Arm", cosArm);
         telemetry.addData("Proportional Stuff", pArm * kp);
         telemetry.addData("Integral Stuff", iArm * ki);
         telemetry.addData("Derivative Stuff", dArm * kd);
+        telemetry.addData("Cos Stuff", cosArm * kCos);
         telemetry.update();
     }
 }

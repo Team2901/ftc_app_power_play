@@ -53,21 +53,12 @@ public class RockBotTeleop extends OpMode {
         } else if(gamepad2.dpad_down){
             robot.passthrough.setPosition(.69);
         }
-        if(gamepad2.a){
-            int target = 200;
-            double liftPower = liftPower(target);
-            robot.liftOne.setPower(liftPower);
-            robot.liftTwo.setPower(liftPower);
-            telemetry.addData("Power", liftPower);
-        }
-        if(gamepad2.b){
-            int target = 50;
-            double liftPower = liftPower(target);
-            robot.liftOne.setPower(liftPower-0.07);
-            robot.liftTwo.setPower(liftPower-0.07);
-            telemetry.addData("Power", liftPower+0.07);
-        }
 
+        int target = 0;
+
+        double liftPower = liftPower(target);
+        robot.liftOne.setPower(liftPower);
+        robot.liftTwo.setPower(liftPower);
 
         robot.leftOne.setVelocity((leftPodPower/speedMod+leftTurnPower)*2500);
         robot.leftTwo.setVelocity((leftPodPower/speedMod-leftTurnPower)*2500);
@@ -81,9 +72,9 @@ public class RockBotTeleop extends OpMode {
         telemetry.update();
     }
 
-    double kp = 1.4;
+    double kp = 1.2;
     double ki = 0;
-    double kd = 0.2;
+    double kd = 0;
 
     private ElapsedTime runtimePodLeft = new ElapsedTime();
     double leftPodAngle = 0;
@@ -145,7 +136,7 @@ public class RockBotTeleop extends OpMode {
         return total;
     }
 
-    double klp = 0.27;
+    double klp = 0;
     double kli = 0;
     double kld = 0;
 
