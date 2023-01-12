@@ -159,19 +159,19 @@ public class Qual11588BaseAuto extends LinearOpMode {
         if(robot.pipeLine.coneColor == Qual11588OpenCV.ConeColor.RED){
             telemetry.addData("Saw red, going to spot 1", "");
             // Move left 24 inches
-            moveXY(0, -24);
+            moveXYPID(0, -24);
             // Move forward 26 inches
-            moveXY((int) 45, 0);
+            moveXYPID((int) 45, 0);
         }else if(robot.pipeLine.coneColor == Qual11588OpenCV.ConeColor.GREEN) {
             telemetry.addData("Saw green, going to spot 2", "");
             // Move forward 26 inches
-            moveXY(45, 0);
+            moveXYPID(45, 0);
         }else if(robot.pipeLine.coneColor == Qual11588OpenCV.ConeColor.BLUE){
             telemetry.addData("Saw blue, going to spot 3", "");
             // Move right 24 inches
-            moveXY(0, 24);
+            moveXYPID(0, 24);
             // Move forward 26 inches
-            moveXY((int) 45, 0);
+            moveXYPID((int) 45, 0);
         }
     }
 
@@ -211,7 +211,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
         error = armTarget - robot.arm.getCurrentPosition();
         PIDTimer.reset();
 
-        while(opModeIsActive() && !(error < 5 && error > -5)){
+        while(opModeIsActive() && !(error < 10 && error > -10)){
             error = armTarget - robot.arm.getCurrentPosition();
             dArm = (error - pArm)/PIDTimer.seconds();
             iArm = iArm + (error * PIDTimer.seconds());
@@ -234,6 +234,10 @@ public class Qual11588BaseAuto extends LinearOpMode {
             }
             telemetryStuff();
         }
+        armAngle = 0.102856 * robot.arm.getCurrentPosition() - 43.6276;
+        cosArm = Math.cos(Math.toRadians(armAngle));
+        double ffTotal = cosArm * kCos;
+        robot.arm.setPower(ffTotal);
     }
 
     public void turnByAngle(double turnAngle){
