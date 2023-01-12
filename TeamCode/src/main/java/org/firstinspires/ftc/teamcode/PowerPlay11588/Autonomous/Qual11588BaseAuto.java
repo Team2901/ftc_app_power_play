@@ -155,6 +155,26 @@ public class Qual11588BaseAuto extends LinearOpMode {
         }
     }
 
+    public void reconParkAuto() {
+        if(robot.pipeLine.coneColor == Qual11588OpenCV.ConeColor.RED){
+            telemetry.addData("Saw red, going to spot 1", "");
+            // Move left 24 inches
+            moveXY(0, -24);
+            // Move forward 26 inches
+            moveXY((int) 45, 0);
+        }else if(robot.pipeLine.coneColor == Qual11588OpenCV.ConeColor.GREEN) {
+            telemetry.addData("Saw green, going to spot 2", "");
+            // Move forward 26 inches
+            moveXY(45, 0);
+        }else if(robot.pipeLine.coneColor == Qual11588OpenCV.ConeColor.BLUE){
+            telemetry.addData("Saw blue, going to spot 3", "");
+            // Move right 24 inches
+            moveXY(0, 24);
+            // Move forward 26 inches
+            moveXY((int) 45, 0);
+        }
+    }
+
     public void moveArm(int height){
         armTarget = height;
         error = armTarget - robot.arm.getCurrentPosition();
@@ -220,7 +240,8 @@ public class Qual11588BaseAuto extends LinearOpMode {
         startAngle = robot.getAngle();
         targetAngle = AngleUnit.normalizeDegrees(startAngle + turnAngle);
         turnError = targetAngle - robot.getAngle();
-        while (opModeIsActive() && !(turnError < 5 && turnError > -5)){
+        while (opModeIsActive() && (turnError > 5 || turnError < -5)){
+            turnError = targetAngle - robot.getAngle();
             if(turnError < 0){
                 turnPower = -.5;
             }else if(turnError > 0){

@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.PowerPlay2901.TeleOp;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -14,12 +15,13 @@ public class RockBotTeleop extends OpMode {
 
     double liftPower = 0;
     double feedForward = .3;
-    int target = 10;
+    int target = 65;
     double leftPodPower = 0;
     double rightPodPower = 0;
     public double leftTurnPower = 0;
     public double rightTurnPower = 0;
     double moveAngle;
+    double speedMod = 1.8;
 
     @Override
     public void init() {
@@ -46,19 +48,14 @@ public class RockBotTeleop extends OpMode {
             rightTurnPower = rightPodTurn(moveAngle+(45*turnPower*Math.sin(Math.toRadians(moveAngle))));
         }
 
-        double speedMod = 1.8;
-        if(gamepad1.left_bumper){
-            speedMod = 1;
-        }
-
-        if(gamepad2.dpad_up){
+        if(gamepad2.dpad_down){
             robot.passthrough.setPosition(.02);
-        } else if(gamepad2.dpad_down){
+        } else if(gamepad2.dpad_up){
             robot.passthrough.setPosition(.67);
         }
 
         if(gamepad2.left_trigger > 0.5){
-            robot.claw.setPosition(.35);
+            robot.claw.setPosition(.38);
         } else {
             robot.claw.setPosition(.288);
         }
@@ -66,18 +63,22 @@ public class RockBotTeleop extends OpMode {
         if(gamepad2.y){
             target = 815;
             liftI = 0;
+            speedMod = 2.5;
         }
         if(gamepad2.x) {
             target = 575;
             liftI = 0;
+            speedMod = 2;
         }
         if(gamepad2.b) {
             target = 325;
             liftI = 0;
+            speedMod = 1.8;
         }
         if(gamepad2.right_bumper){
             target = 65;
             liftI = 0;
+            speedMod = 1.8;
         }
 
         if(gamepad2.a){
@@ -89,8 +90,17 @@ public class RockBotTeleop extends OpMode {
             feedForward = .3;
         }
 
-        robot.liftOne.setPower(liftPower - feedForward);
-        robot.liftTwo.setPower(liftPower - feedForward);
+        double result = Double.POSITIVE_INFINITY;
+        for (VoltageSensor sensor : hardwareMap.voltageSensor) {
+            double voltage = sensor.getVoltage();
+            if (voltage > 0) {
+                result = Math.min(result, voltage);
+            }
+        }
+        double scaleFactor = 12/result;
+
+        robot.liftOne.setPower((liftPower - feedForward) * scaleFactor);
+        robot.liftTwo.setPower((liftPower - feedForward) * scaleFactor);
 
         robot.leftOne.setVelocity((leftPodPower/speedMod+leftTurnPower)*2500);
         robot.leftTwo.setVelocity((leftPodPower/speedMod-leftTurnPower)*2500);
@@ -169,7 +179,7 @@ public class RockBotTeleop extends OpMode {
     }
 
     double klp = 0.7;
-    double kli = 0.0015;
+    double kli = 0.0005;
     double kld = 0.015;
 
     public ElapsedTime runtimeLift = new ElapsedTime();

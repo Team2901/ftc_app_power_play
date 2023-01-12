@@ -29,7 +29,7 @@ public class Qual11588Hardware implements OpenCvCamera.AsyncCameraOpenListener {
     public static final double WHEEL_CIRCUMFERENCE = Math.PI * 3.78;
     public static final double TICKS_PER_INCH = TICKS_PER_DRIVE_REV / WHEEL_CIRCUMFERENCE;
     public static final double OPEN_POSITION = 0.5;
-    public static final double CLOSED_POSITION = 0.25;
+    public static final double CLOSED_POSITION = 0.15;
     public static final double GROUND_ENCODER_VALUE = 200;
     public static final double LOW_POLE_ENCODER_VALUE = 475;
     public static final double MID_POLE_ENCODER_VALUE = 775;
@@ -49,14 +49,14 @@ public class Qual11588Hardware implements OpenCvCamera.AsyncCameraOpenListener {
     public static allianceColor teamColor = null;
 
     public void init(HardwareMap hardwareMap, Telemetry telemetry) {
-        init(hardwareMap, telemetry, null,true);
+        init(hardwareMap, telemetry, true,allianceColor.RED);
     }
 
-    public void init(HardwareMap hardwareMap, Telemetry telemetry, allianceColor team) {
-        init(hardwareMap, telemetry, team, true);
+    public void init(HardwareMap hardwareMap, Telemetry telemetry, Boolean useCam) {
+        init(hardwareMap, telemetry, useCam, null);
     }
 
-    public void init(HardwareMap hardwareMap, Telemetry telemetry, allianceColor team, boolean useCam){
+    public void init(HardwareMap hardwareMap, Telemetry telemetry, boolean useCam, allianceColor team){
         frontLeft = hardwareMap.get(DcMotorEx.class, "frontLeft");
         frontRight = hardwareMap.get(DcMotorEx.class, "frontRight");
         backLeft = hardwareMap.get(DcMotorEx.class, "backLeft");
@@ -69,7 +69,7 @@ public class Qual11588Hardware implements OpenCvCamera.AsyncCameraOpenListener {
 
         if (useCam) {
             WebcamName webcam = hardwareMap.get(WebcamName.class, "Webcam 1");
-            pipeLine = new Qual11588OpenCV(telemetry);
+            pipeLine = new Qual11588OpenCV(telemetry, this);
             int cameraMonitorViewID = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
             camera = OpenCvCameraFactory.getInstance().createWebcam(webcam, cameraMonitorViewID);
             camera.setPipeline(pipeLine);
