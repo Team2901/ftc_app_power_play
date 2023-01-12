@@ -174,7 +174,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
             moveXYPID((int) 45, 0);
         }
     }
-
+/*
     public void moveArm(int height){
         armTarget = height;
         error = armTarget - robot.arm.getCurrentPosition();
@@ -197,6 +197,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
             telemetryStuff();
         }
     }
+    */
 
     public void moveArm(Height height){
         if(height == Height.GROUND){

@@ -6,12 +6,12 @@ import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.Qual11588Hardware;
 
 @Autonomous(name = "Qual 11588 Red Recon-Park ", group = "11588")
 public class Qual11588RedReconPark extends Qual11588BaseAuto {
-    ElapsedTime runTime = new ElapsedTime();
     @Override
     public void runOpMode() throws InterruptedException {
         robot.init(this.hardwareMap, telemetry, true, Qual11588Hardware.allianceColor.RED);
         waitForStart();
-        runTime.reset();
+        ElapsedTime timer = new ElapsedTime();
+        while (timer.milliseconds() < 2000) {}
         moveArm(Height.GROUND);
         reconParkAuto();
     }
