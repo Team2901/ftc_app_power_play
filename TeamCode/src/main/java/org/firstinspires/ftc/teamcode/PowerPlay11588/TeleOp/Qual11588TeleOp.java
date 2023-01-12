@@ -38,7 +38,7 @@ public class Qual11588TeleOp extends OpMode {
 
     @Override
     public void init() {
-        robot.init(hardwareMap, telemetry);
+        robot.init(hardwareMap, telemetry, false);
         impGamepad1 = new ImprovedGamepad(gamepad1, gamepadTimer, "g1");
         impGamepad2 = new ImprovedGamepad(gamepad2, gamepadTimer, "g2");
     }
@@ -90,7 +90,7 @@ public class Qual11588TeleOp extends OpMode {
 
         switch (currentClawPosition){
             case Open:
-                robot.claw.setPosition(robot.OPEN_POSITION);
+                robot.claw.setPosition(Qual11588Hardware.OPEN_POSITION);
                 if(impGamepad1.b.isInitialPress()){
                     currentClawPosition = ClawPosition.Closed;
                 }
@@ -125,8 +125,8 @@ public class Qual11588TeleOp extends OpMode {
             iArm = -iArmMax;
         }
 
-        if(total > .75){
-            total = .75;
+        if(total > .6){
+            total = .6;
         }
         if(total < .01){
             total = .01;

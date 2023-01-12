@@ -16,6 +16,7 @@ public class Qual11588OpenCV extends OpenCvPipeline {
     private Mat subMat = null;
     public enum ConeColor { RED, GREEN, BLUE};
     public ConeColor coneColor = null;
+    public Qual11588Hardware hardware;
     public double redAmount;
     public double blueAmount;
     public double greenAmount;
@@ -35,8 +36,9 @@ public class Qual11588OpenCV extends OpenCvPipeline {
 
     Telemetry telemetry;
 
-    public Qual11588OpenCV(Telemetry telemetry) {
+    public Qual11588OpenCV(Telemetry telemetry, Qual11588Hardware hardware) {
         this.telemetry = telemetry;
+        this.hardware = hardware;
     }
     //Constructor for RI3W11588OpenCV class
 
@@ -87,11 +89,11 @@ public class Qual11588OpenCV extends OpenCvPipeline {
             //This creates a percentage of pixels on the screen, this are not scaled to each other
             //TO a degree each value/mask is arbitrary
 
-            if (Qual11588Hardware.teamColor == null) {
+            if (hardware.teamColor == null) {
                 return lastImage;
             }
 
-            if (Qual11588Hardware.teamColor == Qual11588Hardware.allianceColor.BLUE) {
+            if (hardware.teamColor == Qual11588Hardware.allianceColor.BLUE) {
                 if (redAmount > (blueAmount - 3) && redAmount > greenAmount) {
                     coneColor = Qual11588OpenCV.ConeColor.RED;
                 } else if ((blueAmount - 3) > redAmount && (blueAmount - 3) > greenAmount) {
@@ -99,7 +101,7 @@ public class Qual11588OpenCV extends OpenCvPipeline {
                 } else if (greenAmount > redAmount && greenAmount > (blueAmount - 3)) {
                     coneColor = Qual11588OpenCV.ConeColor.GREEN;
                 }
-            } else if (Qual11588Hardware.teamColor == Qual11588Hardware.allianceColor.RED) {
+            } else if (hardware.teamColor == Qual11588Hardware.allianceColor.RED) {
                 if (redAmount > (blueAmount) && redAmount > greenAmount) {
                     coneColor = Qual11588OpenCV.ConeColor.RED;
                 } else if ((blueAmount) > redAmount && (blueAmount) > greenAmount) {

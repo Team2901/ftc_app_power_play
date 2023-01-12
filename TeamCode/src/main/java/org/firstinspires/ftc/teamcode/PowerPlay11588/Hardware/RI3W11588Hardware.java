@@ -81,7 +81,8 @@ public class RI3W11588Hardware implements OpenCvCamera.AsyncCameraOpenListener {
             int cameraMonitorViewID = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
             camera = OpenCvCameraFactory.getInstance().createWebcam(webcam, cameraMonitorViewID);
 
-            pipeLine = new Qual11588OpenCV(telemetry);
+            pipeLine = new Qual11588OpenCV(telemetry, null);
+            //The second parameter being null will break any auto based off this
             camera.setPipeline(pipeLine);
             camera.openCameraDeviceAsync(this);
         }
