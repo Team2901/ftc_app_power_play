@@ -11,7 +11,7 @@ public class Qual11588RedReconPark extends Qual11588BaseAuto {
         robot.init(this.hardwareMap, telemetry, true, Qual11588Hardware.allianceColor.RED);
         waitForStart();
         ElapsedTime timer = new ElapsedTime();
-        while (timer.milliseconds() < 2000) {}
+        while (timer.milliseconds() < 2000 && opModeIsActive()) {}
         moveArm(Height.GROUND);
         reconParkAuto();
     }
