@@ -327,6 +327,9 @@ public class Qual11588BaseAuto extends LinearOpMode {
     }
 
     public void telemetryStuff(){
+        telemetry.addData("Red seen", robot.pipeLine.redAmount);
+        telemetry.addData("Green seen", robot.pipeLine.greenAmount);
+        telemetry.addData("Blue seen", robot.pipeLine.blueAmount);
         telemetry.addData("Front Left Target", robot.frontLeft.getTargetPosition());
         telemetry.addData("Front Left Position", robot.frontLeft.getCurrentPosition());
         telemetry.addData("Front Right Target", robot.frontRight.getTargetPosition());

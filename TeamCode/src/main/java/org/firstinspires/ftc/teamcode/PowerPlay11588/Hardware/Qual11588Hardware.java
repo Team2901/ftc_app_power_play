@@ -46,7 +46,7 @@ public class Qual11588Hardware implements OpenCvCamera.AsyncCameraOpenListener {
     public Qual11588OpenCV pipeLine;
     public Telemetry telemetry;
     public BNO055IMU imu;
-    public static allianceColor teamColor = null;
+    public static allianceColor teamColor = allianceColor.BLUE;
 
     public void init(HardwareMap hardwareMap, Telemetry telemetry) {
         init(hardwareMap, telemetry, true,allianceColor.RED);
