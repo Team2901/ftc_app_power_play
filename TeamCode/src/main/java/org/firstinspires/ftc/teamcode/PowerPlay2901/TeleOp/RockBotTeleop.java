@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.PowerPlay2901.TeleOp;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -13,15 +12,11 @@ public class RockBotTeleop extends OpMode {
     RockBotHardware robot = new RockBotHardware();
     private ElapsedTime runtime = new ElapsedTime();
 
-    double liftPower = 0;
-    double feedForward = .3;
-    int target = 65;
     double leftPodPower = 0;
     double rightPodPower = 0;
     public double leftTurnPower = 0;
     public double rightTurnPower = 0;
     double moveAngle;
-    double speedMod = 1.8;
 
     @Override
     public void init() {
@@ -30,8 +25,8 @@ public class RockBotTeleop extends OpMode {
 
     @Override
     public void loop() {
-        double forwardPower = -gamepad1.left_stick_y;
-        double sidePower = -gamepad1.left_stick_x;
+        double forwardPower = gamepad1.left_stick_y;
+        double sidePower = gamepad1.left_stick_x;
         double turnPower = gamepad1.right_stick_x;
 
         if(gamepad1.right_bumper){
@@ -42,66 +37,28 @@ public class RockBotTeleop extends OpMode {
         } else {
             moveAngle = Math.toDegrees(Math.atan2(sidePower, -forwardPower+.001));
             //moveAngle = AngleUnit.normalizeDegrees(moveAngle+robot.getAngle()); //uncomment this for field oriented
-            leftPodPower = Math.sqrt(forwardPower*forwardPower+sidePower*sidePower)+(.7*turnPower*Math.cos(Math.toRadians(moveAngle)));
-            rightPodPower = Math.sqrt(forwardPower*forwardPower+sidePower*sidePower)-(.7*turnPower*Math.cos(Math.toRadians(moveAngle)));
+            leftPodPower = Math.sqrt(forwardPower*forwardPower+sidePower*sidePower)+(turnPower*Math.cos(Math.toRadians(moveAngle)));
+            rightPodPower = Math.sqrt(forwardPower*forwardPower+sidePower*sidePower)-(turnPower*Math.cos(Math.toRadians(moveAngle)));
             leftTurnPower = leftPodTurn(moveAngle-(45*turnPower*Math.sin(Math.toRadians(moveAngle))));
             rightTurnPower = rightPodTurn(moveAngle+(45*turnPower*Math.sin(Math.toRadians(moveAngle))));
         }
 
-        if(gamepad2.dpad_down){
-            robot.passthrough.setPosition(.02);
-        } else if(gamepad2.dpad_up){
-            robot.passthrough.setPosition(.67);
+        int speedMod = 3;
+        if(gamepad1.left_bumper){
+            speedMod = 1;
         }
 
-        if(gamepad2.left_trigger > 0.5){
-            robot.claw.setPosition(.38);
-        } else {
-            robot.claw.setPosition(.288);
+        if(gamepad2.dpad_up){
+            robot.passthrough.setPosition(.025);
+        } else if(gamepad2.dpad_down){
+            robot.passthrough.setPosition(.69);
         }
 
-        if(gamepad2.y){
-            target = 815;
-            liftI = 0;
-            speedMod = 2.5;
-        }
-        if(gamepad2.x) {
-            target = 575;
-            liftI = 0;
-            speedMod = 2;
-        }
-        if(gamepad2.b) {
-            target = 325;
-            liftI = 0;
-            speedMod = 1.8;
-        }
-        if(gamepad2.right_bumper){
-            target = 65;
-            liftI = 0;
-            speedMod = 1.8;
-        }
+        int target = 0;
 
-        if(gamepad2.a){
-            liftPower = liftPower(target - 65);
-            feedForward = 0;
-            liftI = 0;
-        } else {
-            liftPower = liftPower(target);
-            feedForward = .3;
-            telemetry.addData("liftPower", liftPower);
-        }
-
-        double result = Double.POSITIVE_INFINITY;
-        for (VoltageSensor sensor : hardwareMap.voltageSensor) {
-            double voltage = sensor.getVoltage();
-            if (voltage > 0) {
-                result = Math.min(result, voltage);
-            }
-        }
-        double scaleFactor = 12/result;
-
-        robot.liftOne.setPower((liftPower - feedForward) * scaleFactor);
-        robot.liftTwo.setPower((liftPower - feedForward) * scaleFactor);
+        double liftPower = liftPower(target);
+        robot.liftOne.setPower(liftPower);
+        robot.liftTwo.setPower(liftPower);
 
         robot.leftOne.setVelocity((leftPodPower/speedMod+leftTurnPower)*2500);
         robot.leftTwo.setVelocity((leftPodPower/speedMod-leftTurnPower)*2500);
@@ -179,9 +136,9 @@ public class RockBotTeleop extends OpMode {
         return total;
     }
 
-    double klp = 0.7;
-    double kli = 0.0005;
-    double kld = 0.015;
+    double klp = 0;
+    double kli = 0;
+    double kld = 0;
 
     public ElapsedTime runtimeLift = new ElapsedTime();
     double liftPosition = 0;
@@ -198,9 +155,9 @@ public class RockBotTeleop extends OpMode {
         liftI = liftI + (error * secs);
         liftP = error;
         double total = (klp* liftP + kli* liftI + kld* liftD)/100;
-        if(total > .65){
+        if(total > 1){
             liftI = 0;
-            total = .65;
+            total = 1;
         }
         if(total < -1){
             liftI = 0;
