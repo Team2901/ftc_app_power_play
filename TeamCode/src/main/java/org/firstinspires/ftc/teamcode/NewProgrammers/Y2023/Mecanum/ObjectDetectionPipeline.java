@@ -52,7 +52,7 @@ public class ObjectDetectionPipeline extends OpenCvPipeline {
         int x = blurImage.width();
         int y = blurImage.height();
 
-        Rect cropRect = new Rect((x / 2) - 40, (y / 2) - 40, 80, 80);
+        Rect cropRect = new Rect((x / 2) + 40, (y / 2) - 35, 80, 80);
         Imgproc.rectangle(blurImage, cropRect, new Scalar(64, 64, 64), 10);
 
         Mat cropImg = new Mat(blurImage, cropRect);
@@ -60,7 +60,7 @@ public class ObjectDetectionPipeline extends OpenCvPipeline {
         Mat circleImage = new Mat();
         //detecting hough circles
         //decreasing param2 will have it detect more circles (possibly even too many)
-        Imgproc.HoughCircles(cropImg, circleImage, Imgproc.HOUGH_GRADIENT, 1, 5, 100, 45, 5, 80);
+        Imgproc.HoughCircles(cropImg, circleImage, Imgproc.HOUGH_GRADIENT, 1, 2, 100, 40, 5, 80);
 
         for (int i = 0; i < circleImage.cols(); i++) {
             double[] data = circleImage.get(0, i);
@@ -113,6 +113,7 @@ public class ObjectDetectionPipeline extends OpenCvPipeline {
 
         telemetry.update();
         //return blurImage;*/
+
         return cropImg;
     }
 }
