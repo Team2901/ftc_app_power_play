@@ -79,13 +79,13 @@ public class EarlyDiffyHardware {
 
         leftTwo.setDirection(DcMotorSimple.Direction.REVERSE);
         rightTwo.setDirection(DcMotorSimple.Direction.REVERSE);
-        //liftTwo.setDirection(DcMotorSimple.Direction.REVERSE);
+        liftTwo.setDirection(DcMotorSimple.Direction.REVERSE);
 
         leftOne.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftTwo.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightOne.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightTwo.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        liftOne.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        liftOne.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         liftTwo.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         odoLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         odoRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);

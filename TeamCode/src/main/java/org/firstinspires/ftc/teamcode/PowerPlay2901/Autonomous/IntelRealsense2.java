@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.spartronics4915.lib.T265Camera;
 
@@ -93,11 +94,12 @@ public class IntelRealsense2 extends OpMode {
     boolean isMoving = true;
     boolean isTurning = false;
 
+    double liftPower = 0;
+
+
     public enum AutoState {
         MOVE_FORWARD,
         TURN_45,
-
-        //loop next part
         LIFT_SLIDES,
         INCH_FORWARD,
         EXTEND_CLAW,
@@ -110,9 +112,8 @@ public class IntelRealsense2 extends OpMode {
         RETRACT_SLIDES_2,
         MOVE_FORWARD2,
         TURN_N45,
-
-        //Final State
-        PARK
+        PARK,
+        FINAL_TURN
     }
     AutoState autoState;
 
@@ -142,6 +143,10 @@ public class IntelRealsense2 extends OpMode {
     double averagedY;
 
     double targetAngle2 = 0;
+
+    int liftTarget = 65;
+    double feedForward = .3;
+
 
     //XYhVector stores the odometry's x, y, and angle values (accessed with pos.x, pos.y, or pos.h)
     public XYhVector START_POS = new XYhVector(-cameraXOffset, -cameraYOffset, 0);
@@ -215,8 +220,8 @@ public class IntelRealsense2 extends OpMode {
             move(0, -24);
         }
         //Changes target angle
-        if(improvedGamepad.a.getValue()) {
-            targetAngle = 0;
+        if(improvedGamepad.a.isInitialPress()) {
+            liftTarget = 415;
         } else if(improvedGamepad.b.getValue()){
             targetAngle = 90;
         } else if(improvedGamepad.y.getValue()){
@@ -228,7 +233,7 @@ public class IntelRealsense2 extends OpMode {
 
 
 
-        if(firstRound){
+        /*if(firstRound){
             move(0, 48);
             firstRound = false;
             telemetry.addLine("First Round");
@@ -240,6 +245,12 @@ public class IntelRealsense2 extends OpMode {
 
             }
         }else if(autoState == AutoState.TURN_452) {
+            if (!isTurning && !isMoving) {
+                autoState = AutoState.LIFT_SLIDES;
+                liftTarget = 815;
+                isMoving = true;
+            }
+        }else if(autoState == AutoState.LIFT_SLIDES){
             if (!isTurning && !isMoving) {
                 autoState = AutoState.MOVE_BACK;
                 move(26, 0);
@@ -256,14 +267,26 @@ public class IntelRealsense2 extends OpMode {
                 autoState = AutoState.MOVE_FORWARD2;
                 move(-24, 0);
             }
-        } else if(autoState == AutoState.MOVE_FORWARD2){
+        }*/ /*else if(autoState == AutoState.MOVE_FORWARD2){
             if(!isTurning && !isMoving) {
-                autoState = AutoState.TURN_N45;
+                autoState = AutoState.PARK;
                 isTurning = true;
-                targetAngle = 45;
+                if(parking == 1) {
+                    moveTo(48, -24);
+                }else if(parking == 2){
+                    moveTo(48, 0);
+                } else if(parking == 3){
+                    moveTo(48, 24);
+                }
 
             }
-        }
+        } else if(autoState == AutoState.PARK){
+            if(!isTurning && !isMoving) {
+                autoState = AutoState.FINAL_TURN;
+                isTurning = true;
+                targetAngle = 45;
+            }
+        }*/
 
         //updates odometry
         odometry();
@@ -352,16 +375,35 @@ public class IntelRealsense2 extends OpMode {
         leftTurnPower = leftPodTurn(angleToTarget+(45*turnPower*Math.sin(Math.toRadians(angleToTarget))));
         rightTurnPower = rightPodTurn(angleToTarget-(45*turnPower*Math.sin(Math.toRadians(angleToTarget))));
 
-        //Next 4 lines are just for testing pod reset angles
-        if(autoState == AutoState.TURN_45 || autoState == AutoState.TURN_452 || autoState == AutoState.TURN_N45) {
+        if(autoState == AutoState.TURN_45 || autoState == AutoState.TURN_452 || autoState == AutoState.TURN_N45|| autoState == AutoState.FINAL_TURN) {
+            outputRight = -outputLeft;
             leftTurnPower = leftPodTurn(0);
             rightTurnPower = rightPodTurn(0);
             outputLeft = turnToAngle(targetAngle);
-            outputRight = -outputLeft;
             if (Math.abs(outputLeft) < 0.01) {
                 isTurning = false;
             }
         }
+
+        liftPower = liftPower(liftTarget);
+        telemetry.addData("liftPower", liftPower);
+        if(robot.passthrough.getPosition() == 0.67){
+            feedForward = 0.3;
+        } else if(robot.passthrough.getPosition() == 0.02){
+            feedForward = 0;
+        }
+
+        double result = Double.POSITIVE_INFINITY;
+        for (VoltageSensor sensor : hardwareMap.voltageSensor) {
+            double voltage = sensor.getVoltage();
+            if (voltage > 0) {
+                result = Math.min(result, voltage);
+            }
+        }
+        double scaleFactor = 12/result;
+
+        robot.liftOne.setPower((liftPower - feedForward)*scaleFactor);
+        robot.liftTwo.setPower((liftPower - feedForward)*scaleFactor);
 
         robot.leftOne.setVelocity((outputLeft/speedMod+leftTurnPower)*2500);
         robot.leftTwo.setVelocity((outputLeft/speedMod-leftTurnPower)*2500);
@@ -454,7 +496,7 @@ public class IntelRealsense2 extends OpMode {
     public double leftPodTurn(double angle) {
         leftPodAngle = (robot.leftOne.getCurrentPosition() - robot.leftTwo.getCurrentPosition()) / 8.95;
         double error = AngleUnit.normalizeDegrees(angle - leftPodAngle);
-        if (!improvedGamepad.start.getValue() && (error >= 90 || error <= -90)) {
+        if ((error >= 90 || error <= -90)) {
             error = AngleUnit.normalizeDegrees(error - 180);
             outputLeft = -outputLeft;
         }
@@ -485,7 +527,7 @@ public class IntelRealsense2 extends OpMode {
     public double rightPodTurn(double angle) {
         rightPodAngle = (robot.rightOne.getCurrentPosition() - robot.rightTwo.getCurrentPosition()) / 8.95;
         double error = AngleUnit.normalizeDegrees(angle - rightPodAngle);
-        if (!improvedGamepad.start.getValue() && (error >= 90 || error <= -90)) {
+        if ((error >= 90 || error <= -90)) {
             error = AngleUnit.normalizeDegrees(error - 180);
             outputRight = -outputRight;
         }
@@ -561,4 +603,63 @@ public class IntelRealsense2 extends OpMode {
         pos.x += dx * Math.sin(theta) + dy * Math.cos(theta);
         pos.h += dtheta;
     }
+
+
+
+    public void runLift(int target, boolean drop){
+        double result = Double.POSITIVE_INFINITY;
+        for (VoltageSensor sensor : hardwareMap.voltageSensor) {
+            double voltage = sensor.getVoltage();
+            if (voltage > 0) {
+                result = Math.min(result, voltage);
+            }
+        }
+        double scaleFactor = 12/result;
+
+        if(drop){
+            liftPower = liftPower(target - 65);
+            feedForward = 0;
+            liftI = 0;
+        } else {
+            liftPower = liftPower(target);
+            feedForward = .3;
+        }
+
+        robot.liftOne.setPower((liftPower - feedForward) * scaleFactor);
+        robot.liftTwo.setPower((liftPower - feedForward) * scaleFactor);
+    }
+
+    double klp = 0.7;
+    double kli = 0.0015;
+    double kld = 0.015;
+
+    public ElapsedTime runtimeLift = new ElapsedTime();
+    double liftPosition = 0;
+    double liftP = 0;
+    double liftI = 0;
+    double liftD = 0;
+
+    public double liftPower(int target){
+        int error = robot.liftOne.getCurrentPosition() - target;
+        telemetry.addData("error", error);
+        double secs = runtimeLift.seconds();
+        runtime.reset();
+        liftD = (error - liftP) / secs;
+        liftI = liftI + (error * secs);
+        liftP = error;
+        double total = (klp* liftP + kli* liftI + kld* liftD)/100;
+        if(total > .65){
+            liftI = 0;
+            total = .65;
+        }
+        if(total < -1){
+            liftI = 0;
+            total = -1;
+        }
+        if(Math.abs(error) < 2){
+            isMoving = false;
+        }
+        return total;
+    }
+
 }

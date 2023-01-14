@@ -88,6 +88,7 @@ public class RockBotTeleop extends OpMode {
         } else {
             liftPower = liftPower(target);
             feedForward = .3;
+            telemetry.addData("liftPower", liftPower);
         }
 
         double result = Double.POSITIVE_INFINITY;
