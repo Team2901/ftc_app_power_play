@@ -58,15 +58,15 @@ public class Qual11588TeleOp extends OpMode {
             armTarget = 775;
         }else if(impGamepad1.dpad_up.isInitialPress()){
             //Sets the armTarget to the high pole
-            armTarget = 1000;
+            armTarget = 1025;
         }
         /*Allows for the armTarget to be changed for the duration of the TeleOp rather than resetting
         when you change height*/
         if(impGamepad1.y.isInitialPress()){
-            modifier += 5;
+            modifier += 10;
         }
         if(impGamepad1.a.isInitialPress()){
-            modifier -= 5;
+            modifier -= 10;
         }
 
         realArmTarget = armTarget + modifier;
@@ -77,7 +77,7 @@ public class Qual11588TeleOp extends OpMode {
         }else if(impGamepad1.left_trigger.getValue() > 0){
             turningPower = -.3 * impGamepad1.left_trigger.getValue();
         }else{
-            turningPower = impGamepad1.right_stick_x.getValue();
+            turningPower = .75 * impGamepad1.right_stick_x.getValue();
         }
         double y = .75 * impGamepad1.left_stick_y.getValue();
         double x = .75 * impGamepad1.left_stick_x.getValue();
@@ -128,8 +128,8 @@ public class Qual11588TeleOp extends OpMode {
         if(total > .6){
             total = .6;
         }
-        if(total < .01){
-            total = .01;
+        if(total < .025){
+            total = .025;
         }
         lastTarget = armTarget;
 
