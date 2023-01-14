@@ -630,7 +630,7 @@ public class IntelRealsense2 extends OpMode {
     }
 
     double klp = 0.7;
-    double kli = 0.0015;
+    double kli = 0.0005;
     double kld = 0.015;
 
     public ElapsedTime runtimeLift = new ElapsedTime();
