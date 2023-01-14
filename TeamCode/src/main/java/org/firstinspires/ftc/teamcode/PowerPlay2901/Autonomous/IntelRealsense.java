@@ -37,6 +37,9 @@ public class IntelRealsense extends OpMode {
     ElapsedTime time = new ElapsedTime();
     ElapsedTime impTime = new ElapsedTime();
 
+    ElapsedTime velocityTime = new ElapsedTime();
+
+
     private ElapsedTime runtime = new ElapsedTime();
 
     private ElapsedTime matchTimer = new ElapsedTime();
@@ -111,7 +114,8 @@ public class IntelRealsense extends OpMode {
         TURN_N45,
 
         //Final State
-        PARK
+        PARK,
+        FINAL_TURN
     }
     AutoState autoState;
 
@@ -149,6 +153,9 @@ public class IntelRealsense extends OpMode {
 
     boolean firstRound = true;
 
+    double previousPosX;
+    double previousPosY;
+
     @Override
     public void init() {
         robot.init(hardwareMap);
@@ -164,9 +171,13 @@ public class IntelRealsense extends OpMode {
 
         autoState = AutoState.MOVE_FORWARD;
 
+        velocityTime.reset();
         //Sets the target position to offsets to prevent initial movement upon starting
         positionX = -cameraXOffset;
         positionY = -cameraYOffset;
+
+        previousPosX = -cameraXOffset;
+        previousPosY = -cameraYOffset;
     }
 
     @Override
@@ -369,7 +380,12 @@ public class IntelRealsense extends OpMode {
 //        }
 
         //updates odometry
+
+        slamra.sendOdometry(((pos.x-previousPosX)*(0.0254))/(velocityTime.time(TimeUnit.SECONDS)), ((pos.y-previousPosY)*(0.0254))/(velocityTime.time(TimeUnit.SECONDS)));
         odometry();
+        previousPosX = pos.x;
+        previousPosY = pos.y;
+        velocityTime.reset();
 
         //Movement PID code
         if (!isTurning && isMoving && (Math.abs(((positionX) - (offsetX))) > 0 || Math.abs((positionY) - (offsetY)) > 0)) {

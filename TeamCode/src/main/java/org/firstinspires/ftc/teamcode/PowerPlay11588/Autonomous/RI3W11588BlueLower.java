@@ -17,7 +17,7 @@ public class RI3W11588BlueLower extends RI3W11588BaseAutonomous{
         while(runTime.milliseconds() < 2000){
 
         }
-        robot.pipeLine.coneColor = Qual11588OpenCV.ConeColor.GREEN;
+        // robot.pipeLine.coneColor = Qual11588OpenCV.ConeColor.GREEN;
         park();
     }
 }
