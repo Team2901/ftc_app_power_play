@@ -256,7 +256,7 @@ public class IntelRealsense2 extends OpMode {
         if (autoState == AutoState.MOVE_FORWARD) {
             if (!isTurning && !isMoving && !isLifting) {
                 autoState = AutoState.REVERSE;
-                move(0, -22);
+                move(0, -24);
             }
         }else if(autoState == AutoState.REVERSE){
             if(!isTurning && !isMoving && !isLifting) {
@@ -421,6 +421,10 @@ public class IntelRealsense2 extends OpMode {
             } else if (outputLeft < -1) {
                 outputLeft = -1;
             }
+            telemetry.addData("angle to Traget", angleToTarget);
+            telemetry.addData("atan2 ", Math.atan2(dy, dx));
+
+
 //            telemetry.addData("dx", dx);
 //            telemetry.addData("dy", dy);
 
@@ -441,6 +445,11 @@ public class IntelRealsense2 extends OpMode {
 
         //Creates dead zone radius larger than target
 
+        if(autoState == AutoState.INCH_FORWARD){
+            angleToTarget = 0;
+        }else if(autoState == AutoState.INCH_BACK){
+            angleToTarget = 180;
+        }
         turnPower = -AngleUnit.normalizeDegrees(targetAngle - Math.toDegrees(robot.getAngle())) / 100;
 
         //pos.h change
@@ -501,7 +510,7 @@ public class IntelRealsense2 extends OpMode {
 //        telemetry.addData("output right", outputRight);
 //        telemetry.addData("x1", String.format("%.2f", x1));
 //        telemetry.addData("y1", String.format("%.2f", y1));
-//        telemetry.addData("Angle to Target", angleToTarget + "°");
+        telemetry.addData("Angle to Target", angleToTarget + "°");
     }
 
     @Override
