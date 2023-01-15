@@ -96,6 +96,7 @@ public class IntelRealsense2 extends OpMode {
     //Keeps track of current actions of robot for purposes of switching AutoState
     boolean isMoving = true;
     boolean isTurning = false;
+    boolean isLifting = false;
 
     double liftPower = 0;
 
@@ -106,7 +107,8 @@ public class IntelRealsense2 extends OpMode {
         TURN_45,
         LIFT_SLIDES,
         INCH_FORWARD,
-        EXTEND_CLAW,
+        EXTEND_PASSTHROUGH,
+        DELIVER,
         RETRACT_SLIDES,
         EXTEND_SLIDES,
         INCH_BACK,
@@ -148,8 +150,10 @@ public class IntelRealsense2 extends OpMode {
 
     double targetAngle2 = 0;
 
-    int liftTarget = 65;
+    int liftTarget = 0;
     double feedForward = .3;
+
+    boolean dropping = false;
 
 
     //XYhVector stores the odometry's x, y, and angle values (accessed with pos.x, pos.y, or pos.h)
@@ -197,7 +201,7 @@ public class IntelRealsense2 extends OpMode {
 
     @Override
     public void loop() {
-        telemetry.addData("parking", parking);
+        telemetry.addData("Auto State", autoState);
 
         up = slamra.getLastReceivedCameraUpdate();
         // We divide by 0.0254 to convert meters to inches
@@ -217,8 +221,8 @@ public class IntelRealsense2 extends OpMode {
         double adjustX = ((offsetX * Math.cos(angleOffset)) - (offsetY * Math.sin(angleOffset)));
         double adjustY = ((offsetX * Math.sin(angleOffset)) + (offsetY * Math.cos(angleOffset)));
 
-        averagedX = ((offsetX*1) + (pos.x*0));
-        averagedY = ((offsetY*1) + (pos.y*0));
+        averagedX = ((offsetX*0) + (pos.x*1));
+        averagedY = ((offsetY*0) + (pos.y*1));
 
         //Changes target Position
         if (improvedGamepad.dpad_right.isInitialPress()) {
@@ -241,25 +245,74 @@ public class IntelRealsense2 extends OpMode {
             targetAngle = -90;
         }
 
-
+        //For parking, set the 'parking' variable to pipeline.winner
+        //parking = pipleine.winner;
+        //I just can't seem to get a value out of it other than -1
 
         if(firstRound) {
             move(0, 72);
             firstRound = false;
-        } else if (autoState == AutoState.MOVE_FORWARD) {
-            if (!isTurning && !isMoving) {
+        }
+        if (autoState == AutoState.MOVE_FORWARD) {
+            if (!isTurning && !isMoving && !isLifting) {
                 autoState = AutoState.REVERSE;
-                move(0, -24);
+                move(0, -22);
             }
         }else if(autoState == AutoState.REVERSE){
-            if(!isTurning && !isMoving) {
+            if(!isTurning && !isMoving && !isLifting) {
+                autoState = AutoState.EXTEND_PASSTHROUGH;
+                isTurning = true;
+                targetAngle = 45;
+            }
+        }else if(autoState == AutoState.TURN_45) {
+            if (!isTurning && !isMoving && !isLifting) {
+                autoState = AutoState.LIFT_SLIDES;
+//                liftTarget = 415;
+//                isLifting = true;
+            }
+        }else if(autoState == AutoState.LIFT_SLIDES) {
+            if (!isTurning && !isMoving && !isLifting) {
+                autoState = AutoState.EXTEND_PASSTHROUGH;
+//                robot.passthrough.setPosition(0.67);
+            }
+        }else if (autoState == AutoState.EXTEND_PASSTHROUGH) {
+            if (!isTurning && !isMoving && !isLifting) {
+                autoState = AutoState.INCH_FORWARD;
+                move(-9, 9);
+            }
+        }else if(autoState == AutoState.INCH_FORWARD) {
+            if (!isTurning && !isMoving && !isLifting) {
+                autoState = AutoState.DELIVER;
+//                robot.claw.setPosition(0.38);
+            }
+        }else if (autoState == AutoState.DELIVER) {
+            if (!isTurning && !isMoving && !isLifting) {
+                autoState = AutoState.INCH_BACK;
+//                robot.claw.setPosition(0.288);
+//                robot.passthrough.setPosition(0.02);
+                move(7, -7);
+            }
+        }else if(autoState == AutoState.INCH_BACK) {
+            if (!isTurning && !isMoving && !isLifting) {
+                autoState = AutoState.RETRACT_SLIDES;
+//                liftTarget = 0;
+//                isLifting = true;
+            }
+        }else if(autoState == AutoState.RETRACT_SLIDES){
+            if(!isTurning && !isMoving && !isLifting) {
+                autoState = AutoState.TURN_N45;
+                isTurning = true;
+                targetAngle = 0;
+            }
+        }else if(autoState == AutoState.TURN_N45){
+            if(!isTurning && !isMoving && !isLifting) {
                 autoState = AutoState.PARK;
                 if(parking == 0||parking == -1) {
-                    moveTo(-26, 48);
+                    moveTo(-26, 50);
                 }else if(parking == 1){
-                    moveTo(0, 48);
+                    moveTo(0, 50);
                 } else if(parking == 2){
-                    moveTo(26, 48);
+                    moveTo(26, 50);
                 }
 
             }
@@ -368,8 +421,8 @@ public class IntelRealsense2 extends OpMode {
             } else if (outputLeft < -1) {
                 outputLeft = -1;
             }
-            telemetry.addData("dx", dx);
-            telemetry.addData("dy", dy);
+//            telemetry.addData("dx", dx);
+//            telemetry.addData("dy", dy);
 
 
         } else {
@@ -381,10 +434,10 @@ public class IntelRealsense2 extends OpMode {
 
 
 
-        telemetry.addData("position x", positionX);
-        telemetry.addData("position y", positionY);
-        telemetry.addData("camera x", averagedX);
-        telemetry.addData("camera y", averagedY);
+//        telemetry.addData("position x", positionX);
+//        telemetry.addData("position y", positionY);
+//        telemetry.addData("camera x", averagedX);
+//        telemetry.addData("camera y", averagedY);
 
         //Creates dead zone radius larger than target
 
@@ -404,14 +457,14 @@ public class IntelRealsense2 extends OpMode {
             rightTurnPower = 0;
             isMoving = false;
         }
-        telemetry.addData("leftTurnPower", leftTurnPower);
-        telemetry.addData("rightTurnPower", rightTurnPower);
-        telemetry.addData("outputLeft", outputLeft);
-        telemetry.addData("outputRight", outputRight);
-        telemetry.addData("Distance to Target x", (positionX - averagedX));
-        telemetry.addData("Distance to Target y", (positionY - averagedY));
+//        telemetry.addData("leftTurnPower", leftTurnPower);
+//        telemetry.addData("rightTurnPower", rightTurnPower);
+//        telemetry.addData("outputLeft", outputLeft);
+//        telemetry.addData("outputRight", outputRight);
+//        telemetry.addData("Distance to Target x", (positionX - averagedX));
+//        telemetry.addData("Distance to Target y", (positionY - averagedY));
 
-        /*if(autoState == AutoState.TURN_45 || autoState == AutoState.TURN_452 || autoState == AutoState.TURN_N45|| autoState == AutoState.FINAL_TURN) {
+        if(isTurning) {
             leftTurnPower = leftPodTurn(0);
             rightTurnPower = rightPodTurn(0);
             outputLeft = turnToAngle(targetAngle);
@@ -419,9 +472,8 @@ public class IntelRealsense2 extends OpMode {
             if (Math.abs(outputLeft) < 0.01) {
                 isTurning = false;
             }
-        }*/
-
-        //runLift(liftTarget, false);
+        }
+        //runLift(liftTarget, dropping);
 
         robot.leftOne.setVelocity((outputLeft/speedMod+leftTurnPower)*2500);
         robot.leftTwo.setVelocity((outputLeft/speedMod-leftTurnPower)*2500);
@@ -449,27 +501,7 @@ public class IntelRealsense2 extends OpMode {
 //        telemetry.addData("output right", outputRight);
 //        telemetry.addData("x1", String.format("%.2f", x1));
 //        telemetry.addData("y1", String.format("%.2f", y1));
-////        telemetry.addData("Adjusted Rotation", String.format("%.2f", fieldTheta) + "°");
-////        telemetry.addData("Adjusted x", String.format("%.2f", adjustX) + " inches");
-////        telemetry.addData("Adjusted y", String.format("%.2f", adjustY) + " inches");
-//        telemetry.addData("Translation", translation);
-//        telemetry.addData("addX", addX);
-//        telemetry.addData("addY", addY);
-////        telemetry.addData("Slide Position", robot.liftOne.getCurrentPosition());
-////        telemetry.addData("Slide Target Position", robot.liftOne.getTargetPosition());
-//        telemetry.addData("kp", kp);
-//        telemetry.addData("kd", kd);
-//        telemetry.addData("ki", ki);
-//        telemetry.addData("turnkp", turnKp);
-//        telemetry.addData("turnkd", turnKd);
-//        telemetry.addData("turnki", turnKi);
 //        telemetry.addData("Angle to Target", angleToTarget + "°");
-//        telemetry.addData("Raw Rotation", rotation);
-//        telemetry.addData("Offsetted X", offsetX);
-//        telemetry.addData("Offsetted Y", offsetY);
-//        telemetry.addData("odo x", pos.x);
-//        telemetry.addData("odo y", pos.y);
-//        telemetry.addData("odo h", pos.h);
     }
 
     @Override
@@ -632,10 +664,11 @@ public class IntelRealsense2 extends OpMode {
         } else {
             liftPower = liftPower(target);
             feedForward = .3;
+            telemetry.addData("Lift Power", liftPower);
         }
 
-        robot.liftOne.setPower((liftPower - feedForward) * scaleFactor);
-        robot.liftTwo.setPower((liftPower - feedForward) * scaleFactor);
+        robot.liftOne.setPower(((liftPower - feedForward)/2) * scaleFactor);
+        robot.liftTwo.setPower(((liftPower - feedForward)/2) * scaleFactor);
     }
 
     double klp = 0.7;
@@ -665,8 +698,8 @@ public class IntelRealsense2 extends OpMode {
             liftI = 0;
             total = -1;
         }
-        if(Math.abs(error) < 2){
-            isMoving = false;
+        if(Math.abs(error) < 4){
+            isLifting = false;
         }
         return total;
     }
