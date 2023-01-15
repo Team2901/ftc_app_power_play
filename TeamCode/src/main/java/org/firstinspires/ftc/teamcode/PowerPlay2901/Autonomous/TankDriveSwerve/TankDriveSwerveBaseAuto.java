@@ -28,11 +28,11 @@ public class TankDriveSwerveBaseAuto extends LinearOpMode {
         double target = (inches * 8192 / 8.9);
         double distance;
         double distanceToTarget;
-        double startDiff = robot.encoderLeft.getCurrentPosition() - robot.encoderRight.getCurrentPosition();
+        double startDiff = robot.odoLeft.getCurrentPosition() - robot.odoRight.getCurrentPosition();
 
-        while(gamepad1.a && robot.encoderLeft.getCurrentPosition() > target-100 && robot.encoderRight.getCurrentPosition() > target-100 && robot.encoderLeft.getCurrentPosition() < target+100 && robot.encoderRight.getCurrentPosition() < target+100) {
+        while(gamepad1.a && robot.odoLeft.getCurrentPosition() > target-100 && robot.odoRight.getCurrentPosition() > target-100 && robot.odoLeft.getCurrentPosition() < target+100 && robot.odoRight.getCurrentPosition() < target+100) {
             runLift(lift, extended, false);
-            distance = Math.abs(robot.encoderLeft.getCurrentPosition());
+            distance = Math.abs(robot.odoLeft.getCurrentPosition());
             distanceToTarget = Math.abs(target) - distance;
 
             double forwardPower;
@@ -53,7 +53,7 @@ public class TankDriveSwerveBaseAuto extends LinearOpMode {
                 forwardPower = -1;
             }
 
-            double turnPower = (robot.encoderLeft.getCurrentPosition() - robot.encoderRight.getCurrentPosition()) - (startDiff) * (forwardPower+.3) / 10000;
+            double turnPower = (robot.odoLeft.getCurrentPosition() - robot.odoRight.getCurrentPosition()) - (startDiff) * (forwardPower+.3) / 10000;
 
             leftPodPower = forwardPower - turnPower;
             rightPodPower = forwardPower + turnPower;

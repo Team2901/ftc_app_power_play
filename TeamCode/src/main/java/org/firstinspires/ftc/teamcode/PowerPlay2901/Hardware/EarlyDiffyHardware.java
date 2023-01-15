@@ -10,12 +10,20 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.teamcode.NewProgrammers.Y2023.Mecanum.ObjectDetectionPipeline;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvCameraRotation;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvCameraRotation;
 
-public class EarlyDiffyHardware {
+public class EarlyDiffyHardware implements OpenCvCamera.AsyncCameraOpenListener{
     private ElapsedTime runtime = new ElapsedTime();
 
     public static final double ticksPerMotorRev = 134.4;
@@ -40,7 +48,7 @@ public class EarlyDiffyHardware {
     public DcMotor liftOne;
     public DcMotor liftTwo;
     public Servo passthrough;
-//    public Servo clawOne;
+    public Servo claw;
 //    public Servo clawTwo;
     //public Rev2mDistanceSensor clawSensor;
 
@@ -57,8 +65,15 @@ public class EarlyDiffyHardware {
 
 
     public BNO055IMU imu;
+    public OpenCvCamera camera;
+    public ObjectDetectionPipeline pipeLine;
+
 
     public void init(HardwareMap hardwareMap) {
+        init(hardwareMap,null,false);
+    }
+
+    public void init(HardwareMap hardwareMap, Telemetry telemetry, boolean useCam) {
         leftOne = hardwareMap.get(DcMotorEx.class, "left 1");
         leftTwo = hardwareMap.get(DcMotorEx.class, "left 2");
         rightOne = hardwareMap.get(DcMotorEx.class, "right 1");
@@ -70,7 +85,7 @@ public class EarlyDiffyHardware {
         liftTwo = hardwareMap.get(DcMotor.class, "lift 2");
         passthrough = hardwareMap.get(Servo.class, "passthrough");
 
-//        clawOne = hardwareMap.get(Servo.class, "claw 1");
+        claw = hardwareMap.get(Servo.class, "claw");
 //        clawTwo = hardwareMap.get(Servo.class, "claw 2");
 //        //clawSensor = hardwareMap.get(Rev2mDistanceSensor.class, "claw sensor");
 //
@@ -89,6 +104,15 @@ public class EarlyDiffyHardware {
         liftTwo.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         odoLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         odoRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        if (useCam) {
+            WebcamName webcam = hardwareMap.get(WebcamName.class, "Webcam 1");
+            pipeLine = new ObjectDetectionPipeline(telemetry);
+            int cameraMonitorViewID = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+            camera = OpenCvCameraFactory.getInstance().createWebcam(webcam, cameraMonitorViewID);
+            camera.setPipeline(pipeLine);
+            camera.openCameraDeviceAsync(this);
+        }
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
@@ -128,5 +152,14 @@ public class EarlyDiffyHardware {
     public double getAngle() {
         Orientation orientation = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
         return AngleUnit.normalizeDegrees(orientation.firstAngle);
+    }
+    @Override
+    public void onOpened() {
+        camera.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+    }
+
+    @Override
+    public void onError(int errorCode) {
+
     }
 }
