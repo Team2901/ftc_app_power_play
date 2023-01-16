@@ -51,7 +51,7 @@ public class RockBotTeleop extends OpMode {
         if(gamepad2.dpad_down){
             robot.passthrough.setPosition(.02);
         } else if(gamepad2.dpad_up){
-            robot.passthrough.setPosition(.67);
+            robot.passthrough.setPosition(.7);
         }
 
         if(gamepad2.left_trigger > 0.5){
@@ -75,13 +75,13 @@ public class RockBotTeleop extends OpMode {
             liftI = 0;
             speedMod = 1.8;
         }
-        if(gamepad2.right_bumper){
+        if(gamepad2.a){
             target = 65;
             liftI = 0;
             speedMod = 1.8;
         }
 
-        if(gamepad2.a){
+        if(gamepad2.right_trigger > .5){
             liftPower = liftPower(target - 65);
             feedForward = 0;
             liftI = 0;
