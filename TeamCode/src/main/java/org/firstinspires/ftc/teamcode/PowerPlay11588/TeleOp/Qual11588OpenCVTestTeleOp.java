@@ -34,6 +34,9 @@ public class Qual11588OpenCVTestTeleOp extends OpMode {
     double cosArm = 0.0;
     double iArmMax = .25;
     double armAngle = 0;
+    int firstRedFrame = -1;
+    int firstGreenFrame =-1;
+    int firstBlueFrame = -1;
 
 
     @Override
@@ -101,6 +104,13 @@ public class Qual11588OpenCVTestTeleOp extends OpMode {
                     currentClawPosition = Qual11588TeleOp.ClawPosition.Open;
                 }
         }
+        if (firstRedFrame == -1 && robot.pipeLine.redAmount > 0) {
+            firstRedFrame = robot.pipeLine.framesProceeded;
+        } else if (firstGreenFrame == -1 && robot.pipeLine.greenAmount > 0) {
+            firstGreenFrame = robot.pipeLine.framesProceeded;
+        } else if (firstBlueFrame == -1 && robot.pipeLine.blueAmount > 0) {
+            firstBlueFrame = robot.pipeLine.framesProceeded;
+        }
         telemetryStuff();
     }
 
@@ -140,6 +150,9 @@ public class Qual11588OpenCVTestTeleOp extends OpMode {
         telemetry.addData("Blue amount", robot.pipeLine.blueAmount);
         telemetry.addData("Green amount", robot.pipeLine.greenAmount);
         telemetry.addData("red amount", robot.pipeLine.redAmount);
+        telemetry.addData("First red frame", firstRedFrame);
+        telemetry.addData("First green frame", firstGreenFrame);
+        telemetry.addData("First blue frame", firstBlueFrame);
         telemetry.update();
     }
 }

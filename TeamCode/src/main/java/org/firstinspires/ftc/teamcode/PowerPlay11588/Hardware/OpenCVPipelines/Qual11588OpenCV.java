@@ -20,12 +20,12 @@ public class Qual11588OpenCV extends OpenCvPipeline {
     public double redAmount;
     public double blueAmount;
     public double greenAmount;
-//    public double redAmountAllTime;
-//    public double greenAmountAllTime;
-//    public double blueAmountAllTime;
-//    public double redAmountAverage;
-//    public double greenAmountAverage;
-//    public double blueAmountAverage;
+    public double redAmountAllTime;
+    public double greenAmountAllTime;
+    public double blueAmountAllTime;
+    public double redAmountAverage;
+    public double greenAmountAverage;
+    public double blueAmountAverage;
     public int framesProceeded;
     Rect r = new Rect(100, 100, 100, 100);
     Mat redMask = new Mat();
@@ -55,7 +55,7 @@ public class Qual11588OpenCV extends OpenCvPipeline {
 //Makes sure doesn't crash when the camera does nothing
         }
 
-        if(coneColor == null) {
+        if(framesProceeded < 30) {
             input.copyTo(lastImage);
             //copies the last input to lastImage, actually assigning it
 
@@ -86,43 +86,25 @@ public class Qual11588OpenCV extends OpenCvPipeline {
             blueAmount = nonZeroPixelsBlue / subMat.total() * 100;
 
             greenAmount = nonZeroPixelsGreen / subMat.total() * 100;
+
             //This creates a percentage of pixels on the screen, this are not scaled to each other
             //TO a degree each value/mask is arbitrary
 
             if (hardware.teamColor == null) {
                 return lastImage;
             }
-
-            if (hardware.teamColor == Qual11588Hardware.allianceColor.BLUE) {
-                if (redAmount > (blueAmount - 3) && redAmount > greenAmount) {
-                    coneColor = Qual11588OpenCV.ConeColor.RED;
-                } else if ((blueAmount - 3) > redAmount && (blueAmount - 3) > greenAmount) {
-                    coneColor = Qual11588OpenCV.ConeColor.BLUE;
-                } else if (greenAmount > redAmount && greenAmount > (blueAmount - 3)) {
-                    coneColor = Qual11588OpenCV.ConeColor.GREEN;
-                }
-            } else if (hardware.teamColor == Qual11588Hardware.allianceColor.RED) {
-                if (redAmount > (blueAmount) && redAmount > greenAmount) {
-                    coneColor = Qual11588OpenCV.ConeColor.RED;
-                } else if ((blueAmount) > redAmount && (blueAmount) > greenAmount) {
-                    coneColor = Qual11588OpenCV.ConeColor.BLUE;
-                } else if (greenAmount > redAmount && greenAmount > (blueAmount - 3)) {
-                    coneColor = Qual11588OpenCV.ConeColor.GREEN;
-                }
-
-            }
             //Imgproc.cvtColor(redMask, redMask, Imgproc.COLOR_GRAY2RGB);
             //Core.bitwise_and(subMat, redMask, lastImage);
             //Core.bitwise_and(subMat, subMat, subMat, redMask);
             //This commented out code is only for visualizing the pipeline
 
-//            redAmountAllTime = redAmountAllTime + redAmount;
-//            blueAmountAllTime = blueAmountAllTime + blueAmount;
-//            greenAmountAllTime = greenAmountAllTime + greenAmount;
-//
-//            redAmountAverage = redAmountAllTime / framesProceeded;
-//            greenAmountAverage = greenAmountAllTime / framesProceeded;
-//            blueAmountAverage = blueAmountAllTime / framesProceeded;
+            redAmountAllTime = redAmountAllTime + redAmount;
+            blueAmountAllTime = blueAmountAllTime + blueAmount;
+            greenAmountAllTime = greenAmountAllTime + greenAmount;
+
+            redAmountAverage = redAmountAllTime / framesProceeded;
+            greenAmountAverage = greenAmountAllTime / framesProceeded;
+            blueAmountAverage = blueAmountAllTime / framesProceeded;
 
 //            This code is literally only for testing and getting an average
 
@@ -136,6 +118,24 @@ public class Qual11588OpenCV extends OpenCvPipeline {
         we get a value for coneColor because we don't want it to change in the middle of our run because that
         might change what color it thinks the cone is.
         */
+        if (hardware.teamColor == Qual11588Hardware.allianceColor.BLUE) {
+            if (redAmountAverage > (blueAmountAverage - 3) && redAmountAverage > greenAmountAverage) {
+                coneColor = Qual11588OpenCV.ConeColor.RED;
+            } else if ((blueAmountAverage - 3) > redAmountAverage && (blueAmountAverage - 3) > greenAmountAverage) {
+                coneColor = Qual11588OpenCV.ConeColor.BLUE;
+            } else if (greenAmountAverage > redAmountAverage && greenAmountAverage > (blueAmountAverage - 3)) {
+                coneColor = Qual11588OpenCV.ConeColor.GREEN;
+            }
+        } else if (hardware.teamColor == Qual11588Hardware.allianceColor.RED) {
+            if (redAmountAverage > (blueAmountAverage) && redAmountAverage > greenAmountAverage) {
+                coneColor = Qual11588OpenCV.ConeColor.RED;
+            } else if ((blueAmountAverage) > redAmountAverage && (blueAmountAverage) > greenAmountAverage) {
+                coneColor = Qual11588OpenCV.ConeColor.BLUE;
+            } else if (greenAmountAverage > redAmountAverage && greenAmountAverage > (blueAmountAverage - 3)) {
+                coneColor = Qual11588OpenCV.ConeColor.GREEN;
+            }
+
+        }
         return lastImage;
     }
 

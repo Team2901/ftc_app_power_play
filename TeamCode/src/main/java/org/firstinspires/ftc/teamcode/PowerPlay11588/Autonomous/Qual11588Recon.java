@@ -1,11 +1,11 @@
 package org.firstinspires.ftc.teamcode.PowerPlay11588.Autonomous;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.Qual11588Hardware;
-
-@Autonomous(name = "Qual 11588 Red Recon-Park ", group = "11588")
-public class Qual11588RedReconPark extends Qual11588BaseAuto {
+@Autonomous(name = "Qual 11588 Recon", group = "11588")
+public class Qual11588Recon extends Qual11588BaseAuto {
     ElapsedTime timer = new ElapsedTime();
     @Override
     public void runOpMode() throws InterruptedException {
@@ -16,6 +16,6 @@ public class Qual11588RedReconPark extends Qual11588BaseAuto {
 
         }
         moveArm(Qual11588BaseAuto.Height.GROUND);
-        reconParkAuto();
+        recon();
     }
 }
