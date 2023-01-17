@@ -3,24 +3,23 @@ package org.firstinspires.ftc.teamcode.PowerPlay2901.Autonomous;
 import com.arcrobotics.ftclib.geometry.Rotation2d;
 import com.arcrobotics.ftclib.geometry.Transform2d;
 import com.arcrobotics.ftclib.geometry.Translation2d;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.spartronics4915.lib.T265Camera;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.NewProgrammers.Y2023.Mecanum.ObjectDetectionPipeline;
+import org.firstinspires.ftc.teamcode.PowerPlay2901.Autonomous.XYhVector;
 import org.firstinspires.ftc.teamcode.PowerPlay2901.Hardware.EarlyDiffyHardware;
 import org.firstinspires.ftc.teamcode.Shared.Gamepad.ImprovedGamepad;
 import org.firstinspires.ftc.teamcode.Utility.CountDownTimer;
 
 import java.util.concurrent.TimeUnit;
 
-@TeleOp(name="Test T265 2", group="Iterative Opmode")
-public class IntelRealsense2 extends OpMode {
+@TeleOp(name="Test T265 3", group="Iterative Opmode")
+public class IntelRealsense3 extends OpMode {
     // We treat this like a singleton because there should only ever be one object per camera
     private static T265Camera slamra = null;
     public double initTheta;
@@ -36,7 +35,7 @@ public class IntelRealsense2 extends OpMode {
     Translation2d translation;
     Rotation2d rotation;
 
-    public ObjectDetectionPipeline pipeline;
+    //public ObjectDetectionPipeline pipeline;
 
     ElapsedTime time = new ElapsedTime();
     ElapsedTime impTime = new ElapsedTime();
@@ -78,6 +77,12 @@ public class IntelRealsense2 extends OpMode {
     double ki = 0;
     double kd = 0;
     final double max_i = 1;
+
+    double dx = 0;
+    double dy = 0;
+
+    double xTolerance = 3;
+    double yTolerance = 3;
 
     double addX = 0;
     double addY = 0;
@@ -186,7 +191,7 @@ public class IntelRealsense2 extends OpMode {
         //julia circle vision
         ElapsedTime stopwatch = new ElapsedTime();
         double seconds = stopwatch.seconds();
-        pipeline = new ObjectDetectionPipeline(this.telemetry);
+        //pipeline = new ObjectDetectionPipeline(this.telemetry);
     }
 
     @Override
@@ -201,6 +206,9 @@ public class IntelRealsense2 extends OpMode {
     @Override
     public void loop() {
         telemetry.addData("Auto State", autoState);
+        telemetry.addData("x error", dx);
+        telemetry.addData("y error", dy);
+        telemetry.addData("is turning", isTurning);
 
         up = slamra.getLastReceivedCameraUpdate();
         // We divide by 0.0254 to convert meters to inches
@@ -224,7 +232,7 @@ public class IntelRealsense2 extends OpMode {
         averagedY = ((offsetY*0) + (pos.y*1));
 
         //Changes target Position
-        if (improvedGamepad.dpad_right.isInitialPress()) {
+        /*if (improvedGamepad.dpad_right.isInitialPress()) {
             move(24, 0);
         } else if (improvedGamepad.dpad_left.isInitialPress()) {
             move(-24, 0);
@@ -242,49 +250,44 @@ public class IntelRealsense2 extends OpMode {
             targetAngle = 180;
         } else if(improvedGamepad.x.getValue()){
             targetAngle = -90;
-        }
+        }*/
 
         //For parking, set the 'parking' variable to pipeline.winner
         //parking = pipeline.winner;
         //I just can't seem to get a value out of it other than -1
 
         if(firstRound) {
-            move(0, 72);
+            xTolerance = 10;
+            moveTo(0, 48);
             firstRound = false;
         }
-        if (autoState == AutoState.MOVE_FORWARD) {
-            if (!isTurning && !isMoving && !isLifting) {
-                autoState = AutoState.REVERSE;
-                telemetry.addData("Auto State", autoState);
-                move(0, -24);
-            }
-        }else if(autoState == AutoState.REVERSE){
+        if(autoState == AutoState.MOVE_FORWARD){
             if(!isTurning && !isMoving && !isLifting) {
                 autoState = AutoState.EXTEND_PASSTHROUGH;
                 telemetry.addData("Auto State", autoState);
                 isTurning = true;
-                targetAngle = 45;
+                runtime.reset();
+                targetAngle = 25;
             }
-        }else if(autoState == AutoState.TURN_45) {
+        }else if(autoState == AutoState.EXTEND_PASSTHROUGH) {
             if (!isTurning && !isMoving && !isLifting) {
                 autoState = AutoState.LIFT_SLIDES;
                 telemetry.addData("Auto State", autoState);
-//                liftTarget = 415;
-//                isLifting = true;
+                liftTarget = 750;
             }
         }else if(autoState == AutoState.LIFT_SLIDES) {
             if (!isTurning && !isMoving && !isLifting) {
-                autoState = AutoState.EXTEND_PASSTHROUGH;
+                autoState = AutoState.TURN_45;
                 telemetry.addData("Auto State", autoState);
-//                robot.passthrough.setPosition(0.67);
+                robot.passthrough.setPosition(0.67);
             }
-        }else if (autoState == AutoState.EXTEND_PASSTHROUGH) {
+        }else if (autoState == AutoState.TURN_45) {
             if (!isTurning && !isMoving && !isLifting) {
                 autoState = AutoState.INCH_FORWARD;
                 telemetry.addData("Auto State", autoState);
-                //move(-9, 9);
+                moveTo(5.6, 60);
             }
-        }else if(autoState == AutoState.INCH_FORWARD) {
+        }/*else if(autoState == AutoState.INCH_FORWARD) {
             if (!isTurning && !isMoving && !isLifting) {
                 autoState = AutoState.DELIVER;
                 telemetry.addData("Auto State", autoState);
@@ -317,7 +320,7 @@ public class IntelRealsense2 extends OpMode {
                 autoState = AutoState.PARK;
                 telemetry.addData("Auto State", autoState);
                 //if(parking == 0||parking == -1) {
-                    moveTo(-26, 50);
+                    move(-26, 0);
                 //}else if(parking == 1){
                     //moveTo(0, 50);
                 //} else if(parking == 2){
@@ -379,31 +382,14 @@ public class IntelRealsense2 extends OpMode {
         //updates odometry
         odometry();
 
+        dx = ((positionX) - (averagedX));
+        dy = ((positionY) - (averagedY));
+        double angle = Math.atan2(dy, dx);
+        currentError = Math.sqrt((Math.pow(dx, 2) + Math.pow(dy, 2)));
+        angleToTarget = Math.toDegrees(angle);
+
         //Movement PID code
         if (!isTurning && isMoving && (Math.abs(((positionX) - (averagedX))) > 0 || Math.abs((positionY) - (averagedY)) > 0)) {
-
-            double dx = ((positionX) - (averagedX));
-            double dy = ((positionY) - (averagedY));
-            double angle = Math.atan(dy / dx);
-            currentError = Math.sqrt((Math.pow(dx, 2) + Math.pow(dy, 2)));
-            angleToTarget = -Math.toDegrees(angle);
-
-            //Adjusts angle for pods
-            if (dy > 0) {
-                angleToTarget += 180;
-            } else if (dx < 0 && dy < 0) {
-                angleToTarget += 360;
-            }
-            if (dx > 0 && dy < 0) {
-                angleToTarget -= 180;
-            }
-            if (dx < 0 && dy > 0) {
-                angleToTarget += 180;
-            }
-            if (angleToTarget > 180) {
-                angleToTarget -= 360;
-            }
-
             //If pods are moving perpendicular change this value by +90 or -90
             //If pods are moving opposite direction change this value by +180/-180
             angleToTarget -= 90;
@@ -432,10 +418,8 @@ public class IntelRealsense2 extends OpMode {
             }
             telemetry.addData("angle to Traget", angleToTarget);
             telemetry.addData("atan2 ", Math.atan2(dy, dx));
-
-
-//            telemetry.addData("dx", dx);
-//            telemetry.addData("dy", dy);
+            telemetry.addData("x error", dx);
+            telemetry.addData("y error", dy);
 
 
         } else {
@@ -454,27 +438,48 @@ public class IntelRealsense2 extends OpMode {
 
         //Creates dead zone radius larger than target
 
-        if(autoState == AutoState.INCH_FORWARD){
-            angleToTarget = 0;
-        }else if(autoState == AutoState.INCH_BACK){
-            angleToTarget = 180;
+        double error = AngleUnit.normalizeDegrees(angleToTarget - robot.getAngle());
+        //turnPower = -turnPID(error);
+        outputLeft *= Math.cos(Math.toRadians(error));
+        if(outputLeft > 1){
+            outputLeft = 1;
+        } else if(outputLeft < -1){
+            outputLeft = -1;
         }
-        turnPower = -AngleUnit.normalizeDegrees(targetAngle - Math.toDegrees(robot.getAngle())) / 100;
-        double angleDiff = AngleUnit.normalizeDegrees(angleToTarget - robot.getAngle());
+        //if(error > 10 && error < 170 || error < -10 && error > -170){
+            //outputLeft = 0;
+        //}
 
         //pos.h change
         outputRight = outputLeft;
-        outputRight -= (turnPower*Math.cos(Math.toRadians(angleDiff)));
-        outputLeft += (turnPower*Math.cos(Math.toRadians(angleDiff)));
-        leftTurnPower = leftPodTurn(angleDiff+(45*turnPower*Math.sin(Math.toRadians(angleDiff))));
-        rightTurnPower = rightPodTurn(angleDiff-(45*turnPower*Math.sin(Math.toRadians(angleDiff))));
+        outputRight += turnPower;
+        outputLeft -= turnPower;
+        leftTurnPower = leftPodTurn(0);
+        rightTurnPower = rightPodTurn(0);
+        runLift(liftTarget, false);
 
-        if (isMoving && (Math.abs(((positionX) - (averagedX))) < 0.5 && Math.abs((positionY) - (averagedY)) < 0.5)) {
+        if(isTurning) {
+            outputLeft = turnToAngle(targetAngle);
+            outputRight = -outputLeft;
+            if (Math.abs(AngleUnit.normalizeDegrees(robot.getAngle() - targetAngle)) < 10) {
+                isTurning = false;
+            }
+        }
+        if (!isTurning && (Math.abs(dx) < xTolerance && Math.abs(dy) < yTolerance)) {
             outputLeft = 0;
             outputRight = 0;
             leftTurnPower = 0;
             rightTurnPower = 0;
+            robot.leftOne.setVelocity(0);
+            robot.leftTwo.setVelocity(0);
+            robot.rightOne.setVelocity(0);
+            robot.rightTwo.setVelocity(0);
             isMoving = false;
+        } else {
+            robot.leftOne.setVelocity((outputLeft/speedMod+leftTurnPower)*2500);
+            robot.leftTwo.setVelocity((outputLeft/speedMod-leftTurnPower)*2500);
+            robot.rightOne.setVelocity((outputRight/speedMod+rightTurnPower)*2500);
+            robot.rightTwo.setVelocity((outputRight/speedMod-rightTurnPower)*2500);
         }
 //        telemetry.addData("leftTurnPower", leftTurnPower);
 //        telemetry.addData("rightTurnPower", rightTurnPower);
@@ -483,7 +488,7 @@ public class IntelRealsense2 extends OpMode {
 //        telemetry.addData("Distance to Target x", (positionX - averagedX));
 //        telemetry.addData("Distance to Target y", (positionY - averagedY));
 
-        if(isTurning) {
+        /*if(isTurning) {
             leftTurnPower = leftPodTurn(0);
             rightTurnPower = rightPodTurn(0);
             outputLeft = turnToAngle(targetAngle);
@@ -491,13 +496,8 @@ public class IntelRealsense2 extends OpMode {
             if (Math.abs(outputLeft) < 0.01) {
                 isTurning = false;
             }
-        }
+        }*/
         //runLift(liftTarget, dropping);
-
-        robot.leftOne.setVelocity((outputLeft/speedMod+leftTurnPower)*2500);
-        robot.leftTwo.setVelocity((outputLeft/speedMod-leftTurnPower)*2500);
-        robot.rightOne.setVelocity((outputRight/speedMod+rightTurnPower)*2500);
-        robot.rightTwo.setVelocity((outputRight/speedMod-rightTurnPower)*2500);
 
         if(improvedGamepad2.dpad_up.isInitialPress()){
             turnKp += 0.01;
@@ -513,14 +513,14 @@ public class IntelRealsense2 extends OpMode {
             turnKd -= 0.01;
         }
 
-        telemetry.addData("isturning", isTurning);
+        /*telemetry.addData("isturning", isTurning);
         telemetry.addData("isMoving", isMoving);
         telemetry.addData("Auto State", autoState);
-//        telemetry.addData("output", outputLeft);
-//        telemetry.addData("output right", outputRight);
-//        telemetry.addData("x1", String.format("%.2f", x1));
-//        telemetry.addData("y1", String.format("%.2f", y1));
-        telemetry.addData("Angle to Target", angleToTarget + "°");
+        telemetry.addData("output", outputLeft);
+        telemetry.addData("output right", outputRight);
+        telemetry.addData("x1", String.format("%.2f", x1));
+        telemetry.addData("y1", String.format("%.2f", y1));
+        telemetry.addData("Angle to Target", angleToTarget + "°");*/
     }
 
     @Override
@@ -561,7 +561,7 @@ public class IntelRealsense2 extends OpMode {
             outputLeft = -outputLeft;
         }
         double secs = runtimePodLeft.seconds();
-        runtime.reset();
+        runtimePodLeft.reset();
         dAngleLeft = (error - pAngleLeft) / secs;
         iAngleLeft = iAngleLeft + (error * secs);
         pAngleLeft = error;
@@ -592,7 +592,7 @@ public class IntelRealsense2 extends OpMode {
             outputRight = -outputRight;
         }
         double secs = runtimePodRight.seconds();
-        runtime.reset();
+        runtimePodRight.reset();
         dAngleRight = (error - pAngleRight) / secs;
         iAngleRight = iAngleRight + (error * secs);
         pAngleRight = error;
@@ -682,14 +682,40 @@ public class IntelRealsense2 extends OpMode {
         } else {
             liftPower = liftPower(target);
             feedForward = .3;
-            telemetry.addData("Lift Power", liftPower);
+            //telemetry.addData("Lift Power", liftPower);
         }
 
-        robot.liftOne.setPower(((liftPower - feedForward)/2) * scaleFactor);
-        robot.liftTwo.setPower(((liftPower - feedForward)/2) * scaleFactor);
+        robot.liftOne.setPower((liftPower - feedForward) * scaleFactor);
+        robot.liftTwo.setPower((liftPower - feedForward) * scaleFactor);
     }
 
-    double klp = 0.7;
+    private ElapsedTime runtimeTurn = new ElapsedTime();
+    double pTurn = 0;
+    double iTurn = 0;
+    double dTurn = 0;
+    double ktp = 0.5;
+    double kti = 0;
+    double ktd = 0.3;
+
+    public double turnPID(double error){
+        double secs = runtimeTurn.seconds();
+        runtimeTurn.reset();
+        dTurn = (error - pTurn) / secs;
+        iTurn = iTurn + (error * secs);
+        pTurn = error;
+        double total = (ktp* pTurn + kti* iTurn + ktd*dTurn)/100;
+        if(total > 1){
+            iTurn = 0;
+            total = 1;
+        }
+        if(total < -1){
+            iTurn = 0;
+            total = -1;
+        }
+        return total;
+    }
+
+    double klp = 0.55;
     double kli = 0;
     double kld = 0.015;
 
@@ -700,9 +726,9 @@ public class IntelRealsense2 extends OpMode {
 
     public double liftPower(int target){
         int error = robot.liftOne.getCurrentPosition() - target;
-        telemetry.addData("error", error);
+        //telemetry.addData("error", error);
         double secs = runtimeLift.seconds();
-        runtime.reset();
+        runtimeLift.reset();
         liftD = (error - liftP) / secs;
         liftI = liftI + (error * secs);
         liftP = error;

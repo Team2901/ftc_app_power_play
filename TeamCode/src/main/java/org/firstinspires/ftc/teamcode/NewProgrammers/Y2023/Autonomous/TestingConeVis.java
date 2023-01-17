@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.NewProgrammers.Y2023.Autonomous;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -8,6 +9,7 @@ import org.firstinspires.ftc.teamcode.NewProgrammers.Y2023.Mecanum.ObjectDetecti
 import org.firstinspires.ftc.teamcode.PowerPlay2901.Hardware.RockBotHardware;
 
 
+@Autonomous(name = "Julia Circles")
 public class TestingConeVis extends LinearOpMode {
     public ObjectDetectionPipeline pipeline;
     RockBotHardware robot = new RockBotHardware();
@@ -15,7 +17,7 @@ public class TestingConeVis extends LinearOpMode {
 
     public void runOpMode() throws InterruptedException {
         robot.init(hardwareMap, telemetry, true);
-         pipeline = new ObjectDetectionPipeline(this.telemetry);
+        pipeline = new ObjectDetectionPipeline(this.telemetry);
 
         ElapsedTime stopwatch = new ElapsedTime();
         double seconds = stopwatch.seconds();

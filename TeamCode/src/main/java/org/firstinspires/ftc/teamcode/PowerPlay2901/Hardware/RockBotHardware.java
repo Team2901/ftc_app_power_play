@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.PowerPlay2901.Hardware;
 
-import android.graphics.Camera;
-
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -17,8 +15,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+//import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.OpenCVPipelines.Qual11588OpenCV;
 import org.firstinspires.ftc.teamcode.NewProgrammers.Y2023.Mecanum.ObjectDetectionPipeline;
-import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.OpenCVPipelines.Qual11588OpenCV;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
@@ -34,8 +32,8 @@ public class RockBotHardware implements OpenCvCamera.AsyncCameraOpenListener {
     public static final double encoderTicksPerWheelRev = 8192;
     public static final double wheelCircumference = (3 * Math.PI);
     public static final double wheelRadius = 1.5;
-    public static final double leftRightDistance = 12;
-    public static final double midpointBackDistance = 12;
+//    public static final double leftRightDistance = 12;
+//    public static final double midpointBackDistance = 12;
     public static final double encoderTicksPerInch = encoderTicksPerWheelRev/wheelCircumference;
     public static final double inchPerTick = wheelCircumference/encoderTicksPerWheelRev;
 
@@ -45,8 +43,8 @@ public class RockBotHardware implements OpenCvCamera.AsyncCameraOpenListener {
     public DcMotorEx rightTwo;
     public DcMotor liftOne;
     public DcMotor liftTwo;
-    public DcMotor encoderLeft;
-    public DcMotor encoderRight;
+    public DcMotor odoLeft;
+    public DcMotor odoRight;
 
     public Servo passthrough;
     public Servo claw;
@@ -67,20 +65,20 @@ public class RockBotHardware implements OpenCvCamera.AsyncCameraOpenListener {
         liftTwo = hardwareMap.get(DcMotor.class, "lift 2");
         passthrough = hardwareMap.get(Servo.class, "passthrough");
         claw = hardwareMap.get(Servo.class, "claw");
-        encoderLeft = hardwareMap.get(DcMotor.class, "left encoder");
-        encoderRight = hardwareMap.get(DcMotor.class, "right encoder");
+        odoLeft = hardwareMap.get(DcMotor.class, "left encoder");
+        odoRight = hardwareMap.get(DcMotor.class, "right encoder");
 
         leftTwo.setDirection(DcMotorSimple.Direction.REVERSE);
         rightTwo.setDirection(DcMotorSimple.Direction.REVERSE);
         liftTwo.setDirection(DcMotorSimple.Direction.REVERSE);
-        encoderRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        odoRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
         leftOne.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftTwo.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightOne.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightTwo.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        encoderLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        encoderRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        odoLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        odoRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         if (useCam) {
             WebcamName webcam = hardwareMap.get(WebcamName.class, "Webcam 1");
