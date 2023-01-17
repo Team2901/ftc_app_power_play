@@ -2,8 +2,6 @@ package org.firstinspires.ftc.teamcode.PowerPlay11588.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.Qual11588Hardware;
-
 @Autonomous(name = "Qual 11588 Blue Recon-Park ", group = "11588")
 public class Qual11588BlueReconPark extends Qual11588BaseAuto {
     ElapsedTime timer = new ElapsedTime();
@@ -12,7 +10,8 @@ public class Qual11588BlueReconPark extends Qual11588BaseAuto {
         robot.init(this.hardwareMap, telemetry);
         waitForStart();
         timer.reset();
-        while(robot.pipeLine.framesProceeded < 30){
+        timer.reset();
+        while(robot.pipeLine.framesProceeded < 30 && timer.milliseconds() < 5000){
 
         }
         moveArm(Qual11588BaseAuto.Height.GROUND);
