@@ -258,7 +258,7 @@ public class IntelRealsense3 extends OpMode {
 
         if(firstRound) {
             xTolerance = 10;
-            moveTo(0, 48);
+            moveTo(0, 52);
             firstRound = false;
         }
         if(autoState == AutoState.MOVE_FORWARD){
@@ -267,13 +267,13 @@ public class IntelRealsense3 extends OpMode {
                 telemetry.addData("Auto State", autoState);
                 isTurning = true;
                 runtime.reset();
-                targetAngle = 25;
+                targetAngle = 35;
             }
         }else if(autoState == AutoState.EXTEND_PASSTHROUGH) {
             if (!isTurning && !isMoving && !isLifting) {
                 autoState = AutoState.LIFT_SLIDES;
                 telemetry.addData("Auto State", autoState);
-                liftTarget = 750;
+                liftTarget = 710;
             }
         }else if(autoState == AutoState.LIFT_SLIDES) {
             if (!isTurning && !isMoving && !isLifting) {
@@ -285,15 +285,15 @@ public class IntelRealsense3 extends OpMode {
             if (!isTurning && !isMoving && !isLifting) {
                 autoState = AutoState.INCH_FORWARD;
                 telemetry.addData("Auto State", autoState);
-                moveTo(5.6, 60);
+                moveTo(5.56, 64);
             }
-        }/*else if(autoState == AutoState.INCH_FORWARD) {
+        }else if(autoState == AutoState.INCH_FORWARD) {
             if (!isTurning && !isMoving && !isLifting) {
                 autoState = AutoState.DELIVER;
                 telemetry.addData("Auto State", autoState);
-//                robot.claw.setPosition(0.38);
+                robot.claw.setPosition(0.38);
             }
-        }else if (autoState == AutoState.DELIVER) {
+        }/*else if (autoState == AutoState.DELIVER) {
             if (!isTurning && !isMoving && !isLifting) {
                 autoState = AutoState.INCH_BACK;
                 telemetry.addData("Auto State", autoState);
@@ -384,7 +384,7 @@ public class IntelRealsense3 extends OpMode {
 
         dx = ((positionX) - (averagedX));
         dy = ((positionY) - (averagedY));
-        double angle = Math.atan2(dy, dx);
+        double angle = Math.atan2(-dx, dy+.001);
         currentError = Math.sqrt((Math.pow(dx, 2) + Math.pow(dy, 2)));
         angleToTarget = Math.toDegrees(angle);
 
@@ -392,7 +392,6 @@ public class IntelRealsense3 extends OpMode {
         if (!isTurning && isMoving && (Math.abs(((positionX) - (averagedX))) > 0 || Math.abs((positionY) - (averagedY)) > 0)) {
             //If pods are moving perpendicular change this value by +90 or -90
             //If pods are moving opposite direction change this value by +180/-180
-            angleToTarget -= 90;
 
             currentTime = time.time(TimeUnit.MILLISECONDS);
 
@@ -459,9 +458,9 @@ public class IntelRealsense3 extends OpMode {
         runLift(liftTarget, false);
 
         if(isTurning) {
-            outputLeft = turnToAngle(targetAngle);
+            outputLeft = 2.5 * turnToAngle(targetAngle);
             outputRight = -outputLeft;
-            if (Math.abs(AngleUnit.normalizeDegrees(robot.getAngle() - targetAngle)) < 10) {
+            if (runtime.seconds() > 3 || Math.abs(AngleUnit.normalizeDegrees(robot.getAngle() - targetAngle)) < 10) {
                 isTurning = false;
             }
         }
