@@ -27,6 +27,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
     double cosArm = 0.0;
     double iArmMax = .25;
     double armAngle = 0;
+    String colorSeen = "none";
 
     double startAngle = 0;
     //Has targetAngle return -1 if it has not been defined, it is redefined before it is used
@@ -173,6 +174,18 @@ public class Qual11588BaseAuto extends LinearOpMode {
             // Move forward 26 inches
             moveXYPID((int) 45, 0);
         }
+    }
+
+    public void recon() {
+        if(robot.pipeLine.coneColor == Qual11588OpenCV.ConeColor.RED){
+            colorSeen = "red";
+        }else if(robot.pipeLine.coneColor == Qual11588OpenCV.ConeColor.GREEN) {
+            colorSeen = "green";
+        }else if(robot.pipeLine.coneColor == Qual11588OpenCV.ConeColor.BLUE){
+            colorSeen = "blue";
+        }
+        ElapsedTime waitTimer = new ElapsedTime();
+        while(waitTimer.milliseconds() < 10000) {}
     }
 /*
     public void moveArm(int height){
@@ -327,9 +340,11 @@ public class Qual11588BaseAuto extends LinearOpMode {
     }
 
     public void telemetryStuff(){
+        telemetry.addData("Frames Processed", robot.pipeLine.framesProceeded);
         telemetry.addData("Red seen", robot.pipeLine.redAmount);
         telemetry.addData("Green seen", robot.pipeLine.greenAmount);
         telemetry.addData("Blue seen", robot.pipeLine.blueAmount);
+        telemetry.addData("Color decided", colorSeen);
         telemetry.addData("Front Left Target", robot.frontLeft.getTargetPosition());
         telemetry.addData("Front Left Position", robot.frontLeft.getCurrentPosition());
         telemetry.addData("Front Right Target", robot.frontRight.getTargetPosition());
