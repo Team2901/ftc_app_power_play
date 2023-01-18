@@ -127,7 +127,11 @@ public class Qual11588TeleOp extends OpMode {
          */
 
         if(impGamepad1.x.isInitialPress()){
+            lowPolePosition = robot.arm.getCurrentPosition();
             zeroAngleTicks = lowPolePosition - 150;
+            groundPolePosition = lowPolePosition - 350;
+            mediumPolePosition = lowPolePosition +  250;
+            highPolePosition = lowPolePosition + 600;
         }
 
         //realArmTarget = armTarget + modifier;
@@ -226,7 +230,6 @@ public class Qual11588TeleOp extends OpMode {
         telemetry.addData("Claw Position", robot.claw.getPosition());
         telemetry.addData("Claw State", currentClawPosition);
         telemetry.addData("Arm Target", armTarget);
-        //telemetry.addData("Real Arm Target", realArmTarget);
         telemetry.addData("Arm Position", robot.arm.getCurrentPosition());
         telemetry.addData("Arm Angle", recalculateAngle());
         telemetry.addData("Current Target Height", currentArmHeight);
