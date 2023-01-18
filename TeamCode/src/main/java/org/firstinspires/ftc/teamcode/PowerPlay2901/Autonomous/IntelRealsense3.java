@@ -10,8 +10,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.spartronics4915.lib.T265Camera;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.NewProgrammers.Y2023.Mecanum.ObjectDetectionPipeline;
-import org.firstinspires.ftc.teamcode.PowerPlay2901.Autonomous.XYhVector;
 import org.firstinspires.ftc.teamcode.PowerPlay2901.Hardware.EarlyDiffyHardware;
 import org.firstinspires.ftc.teamcode.Shared.Gamepad.ImprovedGamepad;
 import org.firstinspires.ftc.teamcode.Utility.CountDownTimer;
@@ -99,9 +97,9 @@ public class IntelRealsense3 extends OpMode {
     double turnByAngle;
 
     //Keeps track of current actions of robot for purposes of switching AutoState
-    boolean isMoving = true;
+    boolean isMoving = false;
     boolean isTurning = false;
-    boolean isLifting = false;
+    boolean isWaiting = false;
 
     double liftPower = 0;
 
@@ -159,6 +157,8 @@ public class IntelRealsense3 extends OpMode {
     double feedForward = .3;
 
     boolean dropping = false;
+    boolean timer = false;
+    double timerTime = 0;
 
 
     //XYhVector stores the odometry's x, y, and angle values (accessed with pos.x, pos.y, or pos.h)
@@ -209,6 +209,10 @@ public class IntelRealsense3 extends OpMode {
         telemetry.addData("x error", dx);
         telemetry.addData("y error", dy);
         telemetry.addData("is turning", isTurning);
+        telemetry.addData("is moving", isMoving);
+        telemetry.addData("target angle", targetAngle);
+        telemetry.addData("current angle", robot.getAngle());
+        telemetry.addData("turn power", turnPower);
 
         up = slamra.getLastReceivedCameraUpdate();
         // We divide by 0.0254 to convert meters to inches
@@ -257,65 +261,73 @@ public class IntelRealsense3 extends OpMode {
         //I just can't seem to get a value out of it other than -1
 
         if(firstRound) {
-            xTolerance = 10;
-            moveTo(0, 52);
+            move(0, 52);
+            xTolerance = 5;
             firstRound = false;
-        }
-        if(autoState == AutoState.MOVE_FORWARD){
-            if(!isTurning && !isMoving && !isLifting) {
+        }else if(autoState == AutoState.MOVE_FORWARD){
+            if(!isTurning && !isMoving && !isWaiting) {
                 autoState = AutoState.EXTEND_PASSTHROUGH;
                 telemetry.addData("Auto State", autoState);
                 isTurning = true;
-                runtime.reset();
-                targetAngle = 35;
+                targetAngle = 45;
             }
         }else if(autoState == AutoState.EXTEND_PASSTHROUGH) {
-            if (!isTurning && !isMoving && !isLifting) {
+            if (!isTurning && !isMoving && !isWaiting) {
                 autoState = AutoState.LIFT_SLIDES;
                 telemetry.addData("Auto State", autoState);
-                liftTarget = 710;
+                liftTarget = 717;
             }
         }else if(autoState == AutoState.LIFT_SLIDES) {
-            if (!isTurning && !isMoving && !isLifting) {
+            if (!isTurning && !isMoving && !isWaiting) {
                 autoState = AutoState.TURN_45;
                 telemetry.addData("Auto State", autoState);
-                robot.passthrough.setPosition(0.67);
+                robot.passthrough.setPosition(0.7);
             }
         }else if (autoState == AutoState.TURN_45) {
-            if (!isTurning && !isMoving && !isLifting) {
+            if (!isTurning && !isMoving && !isWaiting) {
                 autoState = AutoState.INCH_FORWARD;
                 telemetry.addData("Auto State", autoState);
-                moveTo(5.56, 64);
+                xTolerance = 5;
+                yTolerance = 3;
+                move(-5, 5);
+                timer = true;
+                timerTime = 1500;
+                runtime.reset();
             }
         }else if(autoState == AutoState.INCH_FORWARD) {
-            if (!isTurning && !isMoving && !isLifting) {
+            if (!isTurning && !isMoving && !isWaiting) {
                 autoState = AutoState.DELIVER;
+                telemetry.addData("Auto State", autoState);
+                isWaiting = true;
+                timer = true;
+                timerTime = 500;
+                runtime.reset();
+            }
+        }else if (autoState == AutoState.DELIVER) {
+            if (!isTurning && !isMoving && !isWaiting) {
+                autoState = AutoState.INCH_BACK;
                 telemetry.addData("Auto State", autoState);
                 robot.claw.setPosition(0.38);
             }
-        }/*else if (autoState == AutoState.DELIVER) {
-            if (!isTurning && !isMoving && !isLifting) {
-                autoState = AutoState.INCH_BACK;
-                telemetry.addData("Auto State", autoState);
-//                robot.claw.setPosition(0.288);
-//                robot.passthrough.setPosition(0.02);
-                //move(7, -7);
-            }
-        }else if(autoState == AutoState.INCH_BACK) {
+        }/*else if(autoState == AutoState.INCH_BACK) {
             if (!isTurning && !isMoving && !isLifting) {
                 autoState = AutoState.RETRACT_SLIDES;
                 telemetry.addData("Auto State", autoState);
-//                liftTarget = 0;
-//                isLifting = true;
+                xTolerance = 5;
+                yTolerance = 3;
+                move(10, -10);
+                robot.passthrough.setPosition(.02);
             }
         }else if(autoState == AutoState.RETRACT_SLIDES){
             if(!isTurning && !isMoving && !isLifting) {
                 autoState = AutoState.TURN_N45;
                 telemetry.addData("Auto State", autoState);
+                liftTarget = 0;
+                robot.claw.setPosition(.288);
                 isTurning = true;
-                targetAngle = 90;
+                targetAngle = 0;
             }
-        }else if(autoState == AutoState.TURN_N45){
+        }/*else if(autoState == AutoState.TURN_N45){
             if(!isTurning && !isMoving && !isLifting) {
                 autoState = AutoState.PARK;
                 telemetry.addData("Auto State", autoState);
@@ -446,7 +458,7 @@ public class IntelRealsense3 extends OpMode {
             outputLeft = -1;
         }
         //if(error > 10 && error < 170 || error < -10 && error > -170){
-            //outputLeft = 0;
+        //outputLeft = 0;
         //}
 
         //pos.h change
@@ -458,13 +470,24 @@ public class IntelRealsense3 extends OpMode {
         runLift(liftTarget, false);
 
         if(isTurning) {
-            outputLeft = 2.5 * turnToAngle(targetAngle);
-            outputRight = -outputLeft;
-            if (runtime.seconds() > 3 || Math.abs(AngleUnit.normalizeDegrees(robot.getAngle() - targetAngle)) < 10) {
+            telemetry.addData("target angle", targetAngle);
+            telemetry.addData("current angle", robot.getAngle());
+            turnPower = turnPID(targetAngle - robot.getAngle());
+            outputRight = turnPower;
+            outputLeft = -turnPower;
+            telemetry.addData("turn power", turnPower);
+            if (Math.abs(AngleUnit.normalizeDegrees(targetAngle - robot.getAngle())) < 2 && Math.abs(dTurn) < 10) {
                 isTurning = false;
             }
         }
-        if (!isTurning && (Math.abs(dx) < xTolerance && Math.abs(dy) < yTolerance)) {
+
+        if(timer && runtime.milliseconds() > timerTime){
+            isWaiting = false;
+            isMoving = false;
+            isTurning = false;
+        }
+
+        if (!isTurning && isMoving && (Math.abs(dx) < xTolerance && Math.abs(dy) < yTolerance)) {
             outputLeft = 0;
             outputRight = 0;
             leftTurnPower = 0;
@@ -474,6 +497,15 @@ public class IntelRealsense3 extends OpMode {
             robot.rightOne.setVelocity(0);
             robot.rightTwo.setVelocity(0);
             isMoving = false;
+        } else if(!isTurning && !isMoving){
+            outputLeft = 0;
+            outputRight = 0;
+            leftTurnPower = 0;
+            rightTurnPower = 0;
+            robot.leftOne.setVelocity(0);
+            robot.leftTwo.setVelocity(0);
+            robot.rightOne.setVelocity(0);
+            robot.rightTwo.setVelocity(0);
         } else {
             robot.leftOne.setVelocity((outputLeft/speedMod+leftTurnPower)*2500);
             robot.leftTwo.setVelocity((outputLeft/speedMod-leftTurnPower)*2500);
@@ -692,7 +724,7 @@ public class IntelRealsense3 extends OpMode {
     double pTurn = 0;
     double iTurn = 0;
     double dTurn = 0;
-    double ktp = 0.5;
+    double ktp = 1.1;
     double kti = 0;
     double ktd = 0.3;
 
@@ -741,9 +773,10 @@ public class IntelRealsense3 extends OpMode {
             total = -1;
         }
         if(Math.abs(error) < 4){
-            isLifting = false;
+            isWaiting = false;
         }
         return total;
     }
 
 }
+
