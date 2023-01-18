@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.PowerPlay11588.TeleOp;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.Qual11588Hardware;
@@ -35,10 +36,12 @@ public class Qual11588TeleOp extends OpMode {
     double iArmMax = .25;
     double armAngle = 0;
 
+    int lowPolePosition = 550;
+    int zeroAngleTicks = 500;
 
     @Override
     public void init() {
-        robot.init(hardwareMap, telemetry, false);
+        robot.teleOpInit(hardwareMap, telemetry, false);
         impGamepad1 = new ImprovedGamepad(gamepad1, gamepadTimer, "g1");
         impGamepad2 = new ImprovedGamepad(gamepad2, gamepadTimer, "g2");
     }
@@ -50,15 +53,19 @@ public class Qual11588TeleOp extends OpMode {
         if(impGamepad1.dpad_left.isInitialPress()){
             //Sets the armTarget to ground/intake
             armTarget = 200;
+            //armTarget = lowPolePosition - 350;
         }else if(impGamepad1.dpad_down.isInitialPress()){
             //Sets the armTarget to the low pole
             armTarget = 550;
+            //armTarget = lowPolePosition;
         }else if(impGamepad1.dpad_right.isInitialPress()){
             //Sets the armTarget to the mid pole
             armTarget = 800;
+            //armTarget = lowPolePosition + 250;
         }else if(impGamepad1.dpad_up.isInitialPress()){
             //Sets the armTarget to the high pole
-            armTarget = 1100;
+            armTarget = 1150;
+            //armTarget = lowPolePosition + 600;
         }
         /*Allows for the armTarget to be changed for the duration of the TeleOp rather than resetting
         when you change height*/
@@ -69,9 +76,17 @@ public class Qual11588TeleOp extends OpMode {
             modifier -= 10;
         }
 
+        if(impGamepad1.x.isInitialPress()){
+            zeroAngleTicks = lowPolePosition - 150;
+        }
+
         realArmTarget = armTarget + modifier;
         robot.arm.setPower(armPower(realArmTarget));
 
+        if(impGamepad1.back.isInitialPress()){
+            robot.arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            robot.arm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        }
         if(impGamepad1.right_trigger.getValue() > 0){
             turningPower = .3 * impGamepad1.right_trigger.getValue();
         }else if(impGamepad1.left_trigger.getValue() > 0){
@@ -110,7 +125,8 @@ public class Qual11588TeleOp extends OpMode {
         dArm = (error - pArm) / PIDTimer.seconds();
         iArm = iArm + (error * PIDTimer.seconds());
         pArm = error;
-        armAngle = 0.102856 * robot.arm.getCurrentPosition() - 43.6276;
+        //armAngle = 0.102856 * robot.arm.getCurrentPosition() - 43.6276;
+        armAngle = recalculateAngle();
         cosArm = Math.cos(Math.toRadians(armAngle));
         total = ((pArm * kp) + (iArm * ki) + (dArm * kd))/100 + (cosArm * kCos);
         PIDTimer.reset();
@@ -128,12 +144,22 @@ public class Qual11588TeleOp extends OpMode {
         if(total > .6){
             total = .6;
         }
-        if(total < .01){
+        if(recalculateAngle() > 60 && total < -.5){
+            total = -.5;
+        }else if(total < .01 && recalculateAngle() < 60){
             total = .01;
         }
         lastTarget = armTarget;
 
         return total;
+    }
+
+    public double recalculateAngle(){
+        //Placeholder variables that will be deleted
+        double rightAngleDiff = 800;
+        double slope = 90/((zeroAngleTicks + rightAngleDiff) - zeroAngleTicks);
+        double newAngle = slope * (robot.arm.getCurrentPosition() - zeroAngleTicks);
+        return newAngle;
     }
 
     public void telemetryStuff(){
@@ -144,7 +170,9 @@ public class Qual11588TeleOp extends OpMode {
         telemetry.addData("Claw Position", robot.claw.getPosition());
         telemetry.addData("Claw State", currentClawPosition);
         telemetry.addData("Arm Target", armTarget);
+        telemetry.addData("Real Arm Target", realArmTarget);
         telemetry.addData("Arm Position", robot.arm.getCurrentPosition());
+        telemetry.addData("Arm Angle", recalculateAngle());
         telemetry.addData("PID Total", total);
         telemetry.addData("P Arm", pArm);
         telemetry.addData("I Arm", iArm);

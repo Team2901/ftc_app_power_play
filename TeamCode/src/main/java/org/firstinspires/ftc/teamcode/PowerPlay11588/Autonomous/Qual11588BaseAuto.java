@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.PowerPlay11588.Autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -118,7 +117,8 @@ public class Qual11588BaseAuto extends LinearOpMode {
 
         while (opModeIsActive() && (robot.frontLeft.isBusy() || robot.frontRight.isBusy() ||
                 robot.backLeft.isBusy() || robot.backRight.isBusy())){
-            armAngle = 0.102856 * robot.arm.getCurrentPosition() - 43.6276;
+            armAngle = (90.0/(1200 - 400)) * (robot.arm.getCurrentPosition() - 400);
+            //armAngle = 0.102856 * robot.arm.getCurrentPosition() - 43.6276;
             cosArm = Math.cos(Math.toRadians(armAngle));
             double ffTotal = cosArm * kCos;
             robot.arm.setPower(ffTotal);
@@ -187,40 +187,16 @@ public class Qual11588BaseAuto extends LinearOpMode {
         ElapsedTime waitTimer = new ElapsedTime();
         while(waitTimer.milliseconds() < 10000) {}
     }
-/*
-    public void moveArm(int height){
-        armTarget = height;
-        error = armTarget - robot.arm.getCurrentPosition();
-        PIDTimer.reset();
-
-        while(opModeIsActive() && !(error < 5 && error > -5)){
-            error = armTarget - robot.arm.getCurrentPosition();
-            dArm = (error - pArm)/PIDTimer.seconds();
-            iArm = iArm + (error * PIDTimer.seconds());
-            pArm = error;
-            total = ((kp*pArm) + (ki*iArm) + (kd*dArm))/100;
-            robot.arm.setPower(total);
-
-            if(iArm > iArmMax){
-                iArm = iArmMax;
-            } else if(iArm < -iArmMax){
-                iArm = -iArmMax;
-            }
-            PIDTimer.reset();
-            telemetryStuff();
-        }
-    }
-    */
 
     public void moveArm(Height height){
         if(height == Height.GROUND){
             armTarget = 200;
         } else if(height == Height.LOW){
-            armTarget = 475;
+            armTarget = 550;
         } else if(height == Height.MEDIUM){
-            armTarget = 775;
+            armTarget = 800;
         } else if(height == Height.HIGH){
-            armTarget = 1000;
+            armTarget = 1150;
         }
         error = armTarget - robot.arm.getCurrentPosition();
         PIDTimer.reset();
@@ -230,7 +206,8 @@ public class Qual11588BaseAuto extends LinearOpMode {
             dArm = (error - pArm)/PIDTimer.seconds();
             iArm = iArm + (error * PIDTimer.seconds());
             pArm = error;
-            armAngle = 0.102856 * robot.arm.getCurrentPosition() - 43.6276;
+            armAngle = (90.0/(1200 - 400)) * (robot.arm.getCurrentPosition() - 400);
+            //armAngle = 0.102856 * robot.arm.getCurrentPosition() - 43.6276;
             cosArm = Math.cos(Math.toRadians(armAngle));
             total = ((kp*pArm) + (ki*iArm) + (kd*dArm))/100 + (kCos *cosArm);
             robot.arm.setPower(total);
@@ -240,15 +217,19 @@ public class Qual11588BaseAuto extends LinearOpMode {
             } else if(iArm < -iArmMax){
                 iArm = -iArmMax;
             }
-            if(total > .75){
-                total = .75;
+            if(total > .6){
+                total = .6;
             }
-            if(total < .01){
+            if(armAngle > 60 && total < -.5){
+                total = -.5;
+            }
+            else if(armAngle < 60 && total < .01){
                 total = .01;
             }
             telemetryStuff();
         }
-        armAngle = 0.102856 * robot.arm.getCurrentPosition() - 43.6276;
+        armAngle = (90.0/(1200 - 400)) * (robot.arm.getCurrentPosition() - 400);
+        //armAngle = 0.102856 * robot.arm.getCurrentPosition() - 43.6276;
         cosArm = Math.cos(Math.toRadians(armAngle));
         double ffTotal = cosArm * kCos;
         robot.arm.setPower(ffTotal);
