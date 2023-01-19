@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.NewProgrammers.Y2023.Mecanum;
+package org.firstinspires.ftc.teamcode.NewProgrammers.Y2023.Hardware;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.PowerPlay2901.Autonomous.IntelRealsense2;
@@ -51,10 +51,10 @@ public class ObjectDetectionPipeline extends OpenCvPipeline {
         Mat blurImage = grayImage;
         //Imgproc.medianBlur(grayImage, blurImage, 5);
 
-        int x = blurImage.width();
-        int y = blurImage.height();
+        int x = blurImage.width()/2;
+        int y = blurImage.height()/2;
 
-        Rect cropRect = new Rect((x / 2) + 75, (y / 2) - 45, 150, 90);
+        Rect cropRect = new Rect(x  + 20, y+10, 70, 100);
         Imgproc.rectangle(blurImage, cropRect, new Scalar(64, 64, 64), 10);
 
         Mat cropImg = new Mat(blurImage, cropRect);
@@ -94,7 +94,7 @@ public class ObjectDetectionPipeline extends OpenCvPipeline {
         telemetry.addData("Count 2:", count2);
         telemetry.addData("Count 0:",count0);
         //to make sure that there are actually 2 circles but accommodating to the toggle
-        if(framesProcessed > 45) {
+        if(framesProcessed > 120 && framesProcessed < 170) {
             if (count2 >= 2) {
                 winner = 2;
                 auto.parking = 2;
