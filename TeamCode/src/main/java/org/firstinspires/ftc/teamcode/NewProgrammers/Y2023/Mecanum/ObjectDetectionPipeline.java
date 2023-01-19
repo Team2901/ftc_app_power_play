@@ -54,7 +54,7 @@ public class ObjectDetectionPipeline extends OpenCvPipeline {
         int x = blurImage.width();
         int y = blurImage.height();
 
-        Rect cropRect = new Rect((x / 2) + 50, (y / 2) - 45, 100, 90);
+        Rect cropRect = new Rect((x / 2) + 75, (y / 2) - 45, 150, 90);
         Imgproc.rectangle(blurImage, cropRect, new Scalar(64, 64, 64), 10);
 
         Mat cropImg = new Mat(blurImage, cropRect);

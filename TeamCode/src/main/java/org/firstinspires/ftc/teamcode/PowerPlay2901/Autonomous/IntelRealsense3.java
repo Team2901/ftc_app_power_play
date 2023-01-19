@@ -191,8 +191,8 @@ public class IntelRealsense3 extends OpMode {
         autoState = AutoState.MOVE_FORWARD;
 
         //julia circle vision
-        ElapsedTime stopwatch = new ElapsedTime();
-        double seconds = stopwatch.seconds();
+        //ElapsedTime stopwatch = new ElapsedTime();
+        //double seconds = stopwatch.seconds();
         //pipeline = new ObjectDetectionPipeline(this.telemetry);
     }
 
@@ -215,6 +215,7 @@ public class IntelRealsense3 extends OpMode {
         telemetry.addData("target angle", targetAngle);
         telemetry.addData("current angle", robot.getAngle());
         telemetry.addData("turn power", turnPower);
+        telemetry.addData("parking zone", parking);
 
         up = slamra.getLastReceivedCameraUpdate();
         // We divide by 0.0254 to convert meters to inches
@@ -266,6 +267,7 @@ public class IntelRealsense3 extends OpMode {
             move(0, 52);
             xTolerance = 5;
             firstRound = false;
+            parking = robot.pipeLine.winner;
         }else if(autoState == AutoState.MOVE_FORWARD){
             if(!isTurning && !isMoving && !isLifting) {
                 autoState = AutoState.EXTEND_PASSTHROUGH;
@@ -298,8 +300,8 @@ public class IntelRealsense3 extends OpMode {
                 autoState = AutoState.INCH_FORWARD;
                 telemetry.addData("Auto State", autoState);
                 xTolerance = 5;
-                yTolerance = 1;
-                move(-3.5, 3.5);
+                yTolerance = .5;
+                move(-3, 3);
                 timer = true;
                 timerTime = 3000;
                 runtime.reset();
@@ -334,7 +336,7 @@ public class IntelRealsense3 extends OpMode {
                autoState = AutoState.TURN_N45;
                telemetry.addData("Auto State", autoState);
                xTolerance = 50;
-               move(2, -2);
+               move(6, -6);
            }
        }else if(autoState == AutoState.TURN_N45){
            if(!isTurning && !isMoving && !isLifting) {
@@ -344,14 +346,14 @@ public class IntelRealsense3 extends OpMode {
                isTurning = true;
                liftTarget = 200;
            }
-       } /*else if(autoState == AutoState.REVERSE){
+       } else if(autoState == AutoState.REVERSE){
            if(!isTurning && !isMoving) {
-               autoState = AutoState.TURN_45;
-               isTurning = true;
-               targetAngle = 45;
-
+               autoState = AutoState.PARK;
+               xTolerance = .5;
+               yTolerance = 5;
+               move(-18, 0);
            }
-       }else if(autoState == AutoState.TURN_452) {
+       }/*else if(autoState == AutoState.TURN_452) {
            if (!isTurning && !isMoving) {
                autoState = AutoState.LIFT_SLIDES;
                liftTarget = 815;
@@ -579,7 +581,7 @@ public class IntelRealsense3 extends OpMode {
     }
 
     //Left Pod PID
-    private ElapsedTime runtimePodLeft = new ElapsedTime();
+    //private ElapsedTime runtimePodLeft = new ElapsedTime();
     double leftPodAngle = 0;
     double pAngleLeft = 0;
     double iAngleLeft = 0;
@@ -596,10 +598,10 @@ public class IntelRealsense3 extends OpMode {
             error = AngleUnit.normalizeDegrees(error - 180);
             outputLeft = -outputLeft;
         }
-        double secs = runtimePodLeft.seconds();
+        /*double secs = runtimePodLeft.seconds();
         runtimePodLeft.reset();
         dAngleLeft = (error - pAngleLeft) / secs;
-        iAngleLeft = iAngleLeft + (error * secs);
+        iAngleLeft = iAngleLeft + (error * secs);*/
         pAngleLeft = error;
         double total = (kpPod * pAngleLeft + kiPod * iAngleLeft + kdPod * dAngleLeft) / 100;
         if (total > 1) {
@@ -614,7 +616,7 @@ public class IntelRealsense3 extends OpMode {
     }
 
     //Right Pod PID
-    private ElapsedTime runtimePodRight = new ElapsedTime();
+    //private ElapsedTime runtimePodRight = new ElapsedTime();
     double rightPodAngle = 0;
     double pAngleRight = 0;
     double iAngleRight = 0;
@@ -627,10 +629,10 @@ public class IntelRealsense3 extends OpMode {
             error = AngleUnit.normalizeDegrees(error - 180);
             outputRight = -outputRight;
         }
-        double secs = runtimePodRight.seconds();
+        /*double secs = runtimePodRight.seconds();
         runtimePodRight.reset();
         dAngleRight = (error - pAngleRight) / secs;
-        iAngleRight = iAngleRight + (error * secs);
+        iAngleRight = iAngleRight + (error * secs);*/
         pAngleRight = error;
         double total = (kpPod * pAngleRight + kiPod * iAngleRight + kdPod * dAngleRight) / 100;
         if (total > 1) {
@@ -645,7 +647,7 @@ public class IntelRealsense3 extends OpMode {
     }
 
     //Enter angle for robot to turn by, robot oriented
-    public double turnToAngle(double turnAngle){
+    /*public double turnToAngle(double turnAngle){
         double targetAngle = turnAngle;
         ElapsedTime runtime = new ElapsedTime();
         double p = 0;
@@ -673,7 +675,7 @@ public class IntelRealsense3 extends OpMode {
         }
 
         return 0;
-    }
+    }*/
 
     //Gets coordinates of robot using 3 dead wheels with encoders
     public void odometry() {
@@ -729,7 +731,7 @@ public class IntelRealsense3 extends OpMode {
     double pTurn = 0;
     double iTurn = 0;
     double dTurn = 0;
-    double ktp = 1.2;
+    double ktp = 1.25;
     double kti = 0;
     double ktd = 0.3;
 
@@ -762,7 +764,7 @@ public class IntelRealsense3 extends OpMode {
 
     public double liftPower(int target){
         int error = robot.liftOne.getCurrentPosition() - target;
-        //telemetry.addData("error", error);
+        telemetry.addData("error", error);
         double secs = runtimeLift.seconds();
         runtimeLift.reset();
         liftD = (error - liftP) / secs;
