@@ -17,6 +17,5 @@ public class Qual11588RedReconPark extends Qual11588BaseAuto {
         }
         moveArm(Height.MEDIUM);
         reconParkAuto();
-        moveArm(Height.GROUND);
     }
 }

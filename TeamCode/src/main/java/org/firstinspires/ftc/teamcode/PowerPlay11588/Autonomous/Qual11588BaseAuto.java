@@ -175,6 +175,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
             // Move forward 26 inches
             moveXYPID((int) 35, 0);
         }
+        moveArm(Height.GROUND);
     }
 
     public void recon() {
