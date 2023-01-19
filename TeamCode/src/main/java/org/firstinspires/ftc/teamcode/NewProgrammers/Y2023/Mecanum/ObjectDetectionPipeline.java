@@ -19,6 +19,9 @@ public class ObjectDetectionPipeline extends OpenCvPipeline {
     public int count1 = 0;
     public int count2 = 0;
     public int count0 = 0;
+    public int preCount0 = 0;
+    public int preCount1 = 0;
+    public int preCount2 = 0;
 
     int count = 0;
     public ObjectDetectionPipeline(Telemetry telemetry){
@@ -29,7 +32,6 @@ public class ObjectDetectionPipeline extends OpenCvPipeline {
     @Override
     public Mat processFrame(Mat input) {
         framesProcessed++;
-        telemetry.clearAll();
         telemetry.addData("count", count);
         count++;
 
@@ -54,7 +56,7 @@ public class ObjectDetectionPipeline extends OpenCvPipeline {
         int x = blurImage.width()/2;
         int y = blurImage.height()/2;
 
-        Rect cropRect = new Rect(x  + 20, y+10, 70, 100);
+        Rect cropRect = new Rect(x + 20, y + 10, 70, 100);
         Imgproc.rectangle(blurImage, cropRect, new Scalar(64, 64, 64), 10);
 
         Mat cropImg = new Mat(blurImage, cropRect);
@@ -93,8 +95,13 @@ public class ObjectDetectionPipeline extends OpenCvPipeline {
         telemetry.addData("Count 1:", count1);
         telemetry.addData("Count 2:", count2);
         telemetry.addData("Count 0:",count0);
+        if(framesProcessed > 100){
+            count0 = 0;
+            count1 = 0;
+            count2 = 0;
+        }
         //to make sure that there are actually 2 circles but accommodating to the toggle
-        if(framesProcessed > 120 && framesProcessed < 170) {
+        if(framesProcessed > 45) {
             if (count2 >= 2) {
                 winner = 2;
                 auto.parking = 2;
