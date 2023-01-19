@@ -225,8 +225,8 @@ public class Qual11588BaseAuto extends LinearOpMode {
             if(armAngle > 60 && total < -.5){
                 total = -.5;
             }
-            else if(armAngle < 60 && total < .005){
-                total = .005;
+            else if(armAngle < 60 && total < .01){
+                total = .01;
             }
             telemetryStuff();
         }

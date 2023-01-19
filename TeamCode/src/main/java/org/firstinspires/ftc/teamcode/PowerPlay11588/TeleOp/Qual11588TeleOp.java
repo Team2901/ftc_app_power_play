@@ -60,28 +60,20 @@ public class Qual11588TeleOp extends OpMode {
         impGamepad2.update();
         if(impGamepad1.dpad_left.isInitialPress()){
             //Sets the armTarget to ground/intake
-            //armTarget = 200;
             armTarget = groundPolePosition;
             currentArmHeight = Height.GROUND;
-            //armTarget = lowPolePosition - 350;
         }else if(impGamepad1.dpad_down.isInitialPress()){
             //Sets the armTarget to the low pole
-            //armTarget = 550;
             armTarget = lowPolePosition;
             currentArmHeight = Height.LOW;
-            //armTarget = lowPolePosition;
         }else if(impGamepad1.dpad_right.isInitialPress()){
             //Sets the armTarget to the mid pole
-            //armTarget = 800;
             armTarget = mediumPolePosition;
             currentArmHeight = Height.MEDIUM;
-            //armTarget = lowPolePosition + 250;
         }else if(impGamepad1.dpad_up.isInitialPress()){
             //Sets the armTarget to the high pole
-            //armTarget = 1150;
             armTarget = highPolePosition;
             currentArmHeight = Height.HIGH;
-            //armTarget = lowPolePosition + 600;
         }
         /*Allows for the armTarget to be changed for the duration of the TeleOp rather than resetting
         when you change height*/
