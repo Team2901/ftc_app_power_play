@@ -66,7 +66,7 @@ public class EarlyDiffyHardware implements OpenCvCamera.AsyncCameraOpenListener{
 
     public BNO055IMU imu;
     public OpenCvCamera camera;
-    //public ObjectDetectionPipeline pipeLine;
+    public ObjectDetectionPipeline pipeLine;
 
 
     public void init(HardwareMap hardwareMap) {
@@ -105,14 +105,14 @@ public class EarlyDiffyHardware implements OpenCvCamera.AsyncCameraOpenListener{
         odoLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         odoRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        /*if (useCam) {
+        if (useCam) {
             WebcamName webcam = hardwareMap.get(WebcamName.class, "Webcam 1");
             pipeLine = new ObjectDetectionPipeline(telemetry);
             int cameraMonitorViewID = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
             camera = OpenCvCameraFactory.getInstance().createWebcam(webcam, cameraMonitorViewID);
             camera.setPipeline(pipeLine);
             camera.openCameraDeviceAsync(this);
-        }*/
+        }
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
