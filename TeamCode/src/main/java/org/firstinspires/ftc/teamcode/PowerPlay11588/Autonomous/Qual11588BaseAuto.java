@@ -171,7 +171,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
         }else if(color == Qual11588OpenCV.ConeColor.BLUE){
             telemetry.addData("Saw blue, going to spot 3", "");
             // Move right 24 inches
-            moveXYPID(0, 24);
+            moveXYPID(0, 26);
             // Move forward 26 inches
             moveXYPID((int) 35, 0);
         }
