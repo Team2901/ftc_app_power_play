@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.PowerPlay11588.TeleOp;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.Qual11588Hardware;
@@ -10,8 +11,10 @@ import org.firstinspires.ftc.teamcode.Shared.Gamepad.ImprovedGamepad;
 public class Qual11588TeleOp extends OpMode {
     Qual11588Hardware robot = new Qual11588Hardware();
     public ElapsedTime gamepadTimer = new ElapsedTime();
-    public enum ClawPosition{Open, Closed};
+    public enum ClawPosition{Open, Closed}
     ClawPosition currentClawPosition = ClawPosition.Closed;
+    public enum Height{GROUND, LOW, MEDIUM, HIGH}
+    Height currentArmHeight = Height.GROUND;
     public ImprovedGamepad impGamepad1;
     public ImprovedGamepad impGamepad2;
     double turningPower = 0;
@@ -20,7 +23,16 @@ public class Qual11588TeleOp extends OpMode {
     ElapsedTime PIDTimer = new ElapsedTime();
     int armTarget = 200;
     int realArmTarget = armTarget;
-    int lastTarget = armTarget;
+    //int lastTarget = armTarget;
+
+    //Making different variables for each target height
+    Height lastArmHeight = currentArmHeight;
+    int groundPolePosition = 200;
+    int lowPolePosition = 550;
+    int mediumPolePosition = 800;
+    int highPolePosition = 1150;
+    int zeroAngleTicks = lowPolePosition - 150;
+
     int modifier = 0;
     double error = 0.0;
     double total = 0.0;
@@ -35,10 +47,9 @@ public class Qual11588TeleOp extends OpMode {
     double iArmMax = .25;
     double armAngle = 0;
 
-
     @Override
     public void init() {
-        robot.init(hardwareMap, telemetry, false);
+        robot.teleOpInit(hardwareMap, telemetry, false);
         impGamepad1 = new ImprovedGamepad(gamepad1, gamepadTimer, "g1");
         impGamepad2 = new ImprovedGamepad(gamepad2, gamepadTimer, "g2");
     }
@@ -49,29 +60,87 @@ public class Qual11588TeleOp extends OpMode {
         impGamepad2.update();
         if(impGamepad1.dpad_left.isInitialPress()){
             //Sets the armTarget to ground/intake
-            armTarget = 200;
+            //armTarget = 200;
+            armTarget = groundPolePosition;
+            currentArmHeight = Height.GROUND;
+            //armTarget = lowPolePosition - 350;
         }else if(impGamepad1.dpad_down.isInitialPress()){
             //Sets the armTarget to the low pole
-            armTarget = 475;
+            //armTarget = 550;
+            armTarget = lowPolePosition;
+            currentArmHeight = Height.LOW;
+            //armTarget = lowPolePosition;
         }else if(impGamepad1.dpad_right.isInitialPress()){
             //Sets the armTarget to the mid pole
-            armTarget = 775;
+            //armTarget = 800;
+            armTarget = mediumPolePosition;
+            currentArmHeight = Height.MEDIUM;
+            //armTarget = lowPolePosition + 250;
         }else if(impGamepad1.dpad_up.isInitialPress()){
             //Sets the armTarget to the high pole
-            armTarget = 1025;
+            //armTarget = 1150;
+            armTarget = highPolePosition;
+            currentArmHeight = Height.HIGH;
+            //armTarget = lowPolePosition + 600;
         }
         /*Allows for the armTarget to be changed for the duration of the TeleOp rather than resetting
         when you change height*/
+        if(impGamepad1.y.isInitialPress()){
+            if(currentArmHeight == Height.GROUND){
+                groundPolePosition += 10;
+            }else if(currentArmHeight == Height.LOW){
+                lowPolePosition += 10;
+            }else if(currentArmHeight == Height.MEDIUM){
+                mediumPolePosition += 10;
+            }else if(currentArmHeight == Height.HIGH){
+                highPolePosition += 10;
+            }
+        }
+        if(impGamepad1.a.isInitialPress()){
+            if(currentArmHeight == Height.GROUND){
+                groundPolePosition -= 10;
+            }else if(currentArmHeight == Height.LOW){
+                lowPolePosition -= 10;
+            }else if(currentArmHeight == Height.MEDIUM){
+                mediumPolePosition -= 10;
+            }else if(currentArmHeight == Height.HIGH){
+                highPolePosition -= 10;
+            }
+        }
+
+        if(currentArmHeight == Height.GROUND){
+            armTarget = groundPolePosition;
+        }else if(currentArmHeight == Height.LOW){
+            armTarget = lowPolePosition;
+        }else if(currentArmHeight == Height.MEDIUM){
+            armTarget = mediumPolePosition;
+        }else if(currentArmHeight == Height.HIGH){
+            armTarget = highPolePosition;
+        }
+        /*
         if(impGamepad1.y.isInitialPress()){
             modifier += 10;
         }
         if(impGamepad1.a.isInitialPress()){
             modifier -= 10;
         }
+         */
 
-        realArmTarget = armTarget + modifier;
-        robot.arm.setPower(armPower(realArmTarget));
+        if(impGamepad1.x.isInitialPress()){
+            lowPolePosition = robot.arm.getCurrentPosition();
+            zeroAngleTicks = lowPolePosition - 150;
+            groundPolePosition = lowPolePosition - 350;
+            mediumPolePosition = lowPolePosition +  250;
+            highPolePosition = lowPolePosition + 600;
+        }
 
+        //realArmTarget = armTarget + modifier;
+        robot.arm.setPower(armPower(armTarget));
+
+        if(impGamepad1.back.isInitialPress()){
+            robot.arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            robot.arm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        }
         if(impGamepad1.right_trigger.getValue() > 0){
             turningPower = .3 * impGamepad1.right_trigger.getValue();
         }else if(impGamepad1.left_trigger.getValue() > 0){
@@ -110,12 +179,18 @@ public class Qual11588TeleOp extends OpMode {
         dArm = (error - pArm) / PIDTimer.seconds();
         iArm = iArm + (error * PIDTimer.seconds());
         pArm = error;
-        armAngle = 0.102856 * robot.arm.getCurrentPosition() - 43.6276;
+        //armAngle = 0.102856 * robot.arm.getCurrentPosition() - 43.6276;
+        armAngle = recalculateAngle();
         cosArm = Math.cos(Math.toRadians(armAngle));
         total = ((pArm * kp) + (iArm * ki) + (dArm * kd))/100 + (cosArm * kCos);
         PIDTimer.reset();
 
+        /*
         if(armTarget != lastTarget){
+            iArm = 0;
+        }
+         */
+        if(currentArmHeight != lastArmHeight){
             iArm = 0;
         }
 
@@ -128,12 +203,23 @@ public class Qual11588TeleOp extends OpMode {
         if(total > .6){
             total = .6;
         }
-        if(total < .025){
-            total = .025;
+        if(recalculateAngle() > 60 && total < -.5){
+            total = -.5;
+        }else if(total < .005 && recalculateAngle() < 60){
+            total = .005;
         }
-        lastTarget = armTarget;
+        //lastTarget = armTarget;
+        lastArmHeight = currentArmHeight;
 
         return total;
+    }
+
+    public double recalculateAngle(){
+        //Placeholder variables that will be deleted
+        double rightAngleDiff = 800;
+        double slope = 90/((zeroAngleTicks + rightAngleDiff) - zeroAngleTicks);
+        double newAngle = slope * (robot.arm.getCurrentPosition() - zeroAngleTicks);
+        return newAngle;
     }
 
     public void telemetryStuff(){
@@ -145,6 +231,12 @@ public class Qual11588TeleOp extends OpMode {
         telemetry.addData("Claw State", currentClawPosition);
         telemetry.addData("Arm Target", armTarget);
         telemetry.addData("Arm Position", robot.arm.getCurrentPosition());
+        telemetry.addData("Arm Angle", recalculateAngle());
+        telemetry.addData("Current Target Height", currentArmHeight);
+        telemetry.addData("Ground Position", groundPolePosition);
+        telemetry.addData("Low Position", lowPolePosition);
+        telemetry.addData("Medium Position", mediumPolePosition);
+        telemetry.addData("High Position", highPolePosition);
         telemetry.addData("PID Total", total);
         telemetry.addData("P Arm", pArm);
         telemetry.addData("I Arm", iArm);

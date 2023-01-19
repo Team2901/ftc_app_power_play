@@ -9,12 +9,13 @@ public class Qual11588RedReconPark extends Qual11588BaseAuto {
     ElapsedTime timer = new ElapsedTime();
     @Override
     public void runOpMode() throws InterruptedException {
-        robot.init(this.hardwareMap, telemetry);
+        robot.autoInit(this.hardwareMap, telemetry, Qual11588Hardware.allianceColor.RED);
         waitForStart();
         timer.reset();
-        while(robot.pipeLine.framesProceeded < 30){
+        while(robot.pipeLine.framesProceeded < 30 && timer.milliseconds() < 5000){
 
         }
+
         moveArm(Qual11588BaseAuto.Height.GROUND);
         reconParkAuto();
     }

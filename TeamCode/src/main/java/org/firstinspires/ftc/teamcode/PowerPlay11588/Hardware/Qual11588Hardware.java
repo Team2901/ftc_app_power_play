@@ -31,9 +31,9 @@ public class Qual11588Hardware implements OpenCvCamera.AsyncCameraOpenListener {
     public static final double OPEN_POSITION = 0.5;
     public static final double CLOSED_POSITION = 0.15;
     public static final double GROUND_ENCODER_VALUE = 200;
-    public static final double LOW_POLE_ENCODER_VALUE = 475;
-    public static final double MID_POLE_ENCODER_VALUE = 775;
-    public static final double HIGH_POLE_ENCODER_VALUE = 1000;
+    public static final double LOW_POLE_ENCODER_VALUE = 550;
+    public static final double MID_POLE_ENCODER_VALUE = 800;
+    public static final double HIGH_POLE_ENCODER_VALUE = 1150;
     public static final double ARM_GEAR_RATIO = 40.0/16.0;
 
     public DcMotorEx frontLeft;
@@ -48,15 +48,15 @@ public class Qual11588Hardware implements OpenCvCamera.AsyncCameraOpenListener {
     public BNO055IMU imu;
     public static allianceColor teamColor = allianceColor.BLUE;
 
-    public void init(HardwareMap hardwareMap, Telemetry telemetry) {
-        init(hardwareMap, telemetry, true,allianceColor.RED);
+    public void autoInit(HardwareMap hardwareMap, Telemetry telemetry, allianceColor team) {
+        init(hardwareMap, telemetry,true, team, true);
     }
 
-    public void init(HardwareMap hardwareMap, Telemetry telemetry, Boolean useCam) {
-        init(hardwareMap, telemetry, useCam, null);
+    public void teleOpInit(HardwareMap hardwareMap, Telemetry telemetry, Boolean useCam) {
+        init(hardwareMap, telemetry, useCam, null, false);
     }
 
-    public void init(HardwareMap hardwareMap, Telemetry telemetry, boolean useCam, allianceColor team){
+    public void init(HardwareMap hardwareMap, Telemetry telemetry, boolean useCam, allianceColor team, boolean encoderReset){
         frontLeft = hardwareMap.get(DcMotorEx.class, "frontLeft");
         frontRight = hardwareMap.get(DcMotorEx.class, "frontRight");
         backLeft = hardwareMap.get(DcMotorEx.class, "backLeft");
@@ -91,7 +91,9 @@ public class Qual11588Hardware implements OpenCvCamera.AsyncCameraOpenListener {
         frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        if(encoderReset){
+            arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        }
 
         frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -133,4 +135,10 @@ public class Qual11588Hardware implements OpenCvCamera.AsyncCameraOpenListener {
 
     public enum allianceColor { RED, BLUE}
 
+    public enum Height {
+        GROUND,
+        LOW,
+        MEDIUM,
+        HIGH
+    }
 }

@@ -10,7 +10,7 @@ public class Qual11588BlueConeAndPark extends Qual11588BaseAuto{
     ElapsedTime runTime = new ElapsedTime();
     @Override
     public void runOpMode() throws InterruptedException {
-        robot.init(this.hardwareMap, telemetry);
+        robot.autoInit(this.hardwareMap, telemetry, Qual11588Hardware.allianceColor.BLUE);
         waitForStart();
         runTime.reset();
         //moveArm(Height.GROUND);
