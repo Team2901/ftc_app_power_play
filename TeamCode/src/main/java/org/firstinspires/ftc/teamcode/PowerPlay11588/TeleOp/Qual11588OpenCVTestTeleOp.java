@@ -41,7 +41,7 @@ public class Qual11588OpenCVTestTeleOp extends OpMode {
 
     @Override
     public void init() {
-        robot.init(hardwareMap, telemetry, true);
+        robot.teleOpInit(hardwareMap, telemetry, true);
         impGamepad1 = new ImprovedGamepad(gamepad1, gamepadTimer, "g1");
         impGamepad2 = new ImprovedGamepad(gamepad2, gamepadTimer, "g2");
     }

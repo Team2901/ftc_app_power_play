@@ -20,7 +20,7 @@ public class TunerTeleop extends OpMode {
 
     @Override
     public void init() {
-        robot.init(hardwareMap, telemetry);
+        robot.autoInit(hardwareMap, telemetry, Qual11588Hardware.allianceColor.RED);
         impGamepad1 = new ImprovedGamepad(gamepad1, gamepadTimer, "g1");
         impGamepad2 = new ImprovedGamepad(gamepad2, gamepadTimer, "g2");
     }
