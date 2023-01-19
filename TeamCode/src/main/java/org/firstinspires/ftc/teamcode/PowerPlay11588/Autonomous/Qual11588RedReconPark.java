@@ -15,8 +15,8 @@ public class Qual11588RedReconPark extends Qual11588BaseAuto {
         while(robot.pipeLine.framesProceeded < 30 && timer.milliseconds() < 5000){
 
         }
-
-        moveArm(Qual11588BaseAuto.Height.GROUND);
+        moveArm(Height.MEDIUM);
         reconParkAuto();
+        moveArm(Height.GROUND);
     }
 }

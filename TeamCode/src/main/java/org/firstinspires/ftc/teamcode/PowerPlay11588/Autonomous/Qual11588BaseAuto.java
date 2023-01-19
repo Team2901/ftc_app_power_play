@@ -157,22 +157,23 @@ public class Qual11588BaseAuto extends LinearOpMode {
     }
 
     public void reconParkAuto() {
-        if(robot.pipeLine.coneColor == Qual11588OpenCV.ConeColor.RED){
+        Qual11588OpenCV.ConeColor color = robot.pipeLine.getColor();
+        if(color == Qual11588OpenCV.ConeColor.RED){
             telemetry.addData("Saw red, going to spot 1", "");
             // Move left 24 inches
-            moveXYPID(0, -24);
+            moveXYPID(0, -26);
             // Move forward 26 inches
-            moveXYPID((int) 45, 0);
-        }else if(robot.pipeLine.coneColor == Qual11588OpenCV.ConeColor.GREEN) {
+            moveXYPID((int) 35, 0);
+        }else if(color == Qual11588OpenCV.ConeColor.GREEN) {
             telemetry.addData("Saw green, going to spot 2", "");
             // Move forward 26 inches
-            moveXYPID(45, 0);
-        }else if(robot.pipeLine.coneColor == Qual11588OpenCV.ConeColor.BLUE){
+            moveXYPID(35, 0);
+        }else if(color == Qual11588OpenCV.ConeColor.BLUE){
             telemetry.addData("Saw blue, going to spot 3", "");
             // Move right 24 inches
             moveXYPID(0, 24);
             // Move forward 26 inches
-            moveXYPID((int) 45, 0);
+            moveXYPID((int) 35, 0);
         }
     }
 
@@ -264,60 +265,8 @@ public class Qual11588BaseAuto extends LinearOpMode {
     }
 
     public void coneAndPark(){
-        /*
-        step 1:
-        move forward 37.5 inches
-        */
-        moveXY(37.5, 0);
-        while(opModeIsActive() && !gamepad1.a){
-            telemetryStuff();
-        }
-        /*
-        Step 2:
-        Pivot clockwise 90 degrees
-         */
-        turnByAngle(90); // + = counter-clockwise, - = clockwise ??? yes right hand rule
-        while(opModeIsActive()  && !gamepad1.a){
-            telemetryStuff();
-        }
-        /*
-        Step 3:
-        raise the arm to the medium junction
-         */
-        moveArm(Height.MEDIUM);
-        while(opModeIsActive() && !gamepad1.a){
-            telemetryStuff();
-        }
-        /*
-        Step 4:
-        Open the claw
-         */
-        robot.claw.setPosition(robot.OPEN_POSITION);
-        while(opModeIsActive() && !gamepad1.a){
-            telemetryStuff();
-        }
-        /*
-        Step 5:
-        if you're in location 2, you're done.
-         */
-        robot.pipeLine.coneColor = Qual11588OpenCV.ConeColor.GREEN;
-        if(robot.pipeLine.coneColor == Qual11588OpenCV.ConeColor.GREEN) {
-            telemetry.addData("Saw green, finished", "");
-            return;
-        } else {
-            //For both location 1 and 3
-            moveXY(0, 12);
-            while(opModeIsActive() && !gamepad1.a){
-
-            }
-            if(robot.pipeLine.coneColor == Qual11588OpenCV.ConeColor.RED){
-                telemetry.addData("Saw red, going to spot 1", "");
-                moveXY(-24, 0);
-            } else {
-                telemetry.addData("Saw blue, going to spot 3", "");
-                moveXY(24, 0);
-            }
-        }
+        moveXY(0, 36);
+        moveXY(32, 0);
     }
 
     public void telemetryStuff(){
