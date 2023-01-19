@@ -16,7 +16,8 @@ public class Qual11588Recon extends Qual11588BaseAuto {
         while(robot.pipeLine.framesProceeded < 30){
 
         }
-        moveArm(Qual11588BaseAuto.Height.GROUND);
+        moveArm(Height.MEDIUM);
         recon();
+        moveArm(Height.GROUND);
     }
 }
