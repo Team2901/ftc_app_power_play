@@ -19,8 +19,8 @@ import org.firstinspires.ftc.teamcode.Utility.CountDownTimer;
 
 import java.util.concurrent.TimeUnit;
 
-@Autonomous(name="Purple Gears Auto Right", group="Iterative Opmode")
-public class IntelRealsense3 extends OpMode {
+@Autonomous(name="Purple Gears Auto Left", group="Iterative Opmode")
+public class IntelRealsense3Left extends OpMode {
     // We treat this like a singleton because there should only ever be one object per camera
     private static T265Camera slamra = null;
     public double initTheta;
@@ -275,7 +275,7 @@ public class IntelRealsense3 extends OpMode {
                 autoState = AutoState.EXTEND_PASSTHROUGH;
                 telemetry.addData("Auto State", autoState);
                 isTurning = true;
-                targetAngle = 40;
+                targetAngle = -40;
                 liftEngage = true;
             }
         }else if(autoState == AutoState.EXTEND_PASSTHROUGH) {
@@ -304,7 +304,7 @@ public class IntelRealsense3 extends OpMode {
                 telemetry.addData("Auto State", autoState);
                 xTolerance = 5;
                 yTolerance = .5;
-                move(-3, 3);
+                move(3, 3);
                 timer = true;
                 timerTime = 1500;
                 runtime.reset();
@@ -329,43 +329,43 @@ public class IntelRealsense3 extends OpMode {
                 runtime.reset();
             }
         }else if(autoState == AutoState.INCH_BACK) {
-           if (!isTurning && !isMoving && !isLifting) {
-               autoState = AutoState.RETRACT_SLIDES;
-               telemetry.addData("Auto State", autoState);
-               robot.passthrough.setPosition(.02);
-               robot.claw.setPosition(.288);
-           }
-       }else if(autoState == AutoState.RETRACT_SLIDES){
-           if(!isTurning && !isMoving && !isLifting) {
-               autoState = AutoState.TURN_N45;
-               telemetry.addData("Auto State", autoState);
-               xTolerance = 50;
-               yTolerance = 2;
-               move(7, -7);
-               timer = true;
-               timerTime = 1500;
-               runtime.reset();
-           }
-       }else if(autoState == AutoState.TURN_N45){
-           if(!isTurning && !isMoving && !isLifting) {
-               autoState = AutoState.PARK;
-               telemetry.addData("Auto State", autoState);
-               targetAngle = 90;
-               timer = true;
-               timerTime = 1500;
-               runtime.reset();
-               isTurning = true;
-               liftTarget = 200;
-           }
-       } else if(autoState == AutoState.REVERSE){
-           if(!isTurning && !isMoving) {
-               autoState = AutoState.PARK;
-               liftEngage = false;
-               xTolerance = .5;
-               yTolerance = 5;
-               move(-18, 0);
-           }
-       }/*else if(autoState == AutoState.TURN_452) {
+            if (!isTurning && !isMoving && !isLifting) {
+                autoState = AutoState.RETRACT_SLIDES;
+                telemetry.addData("Auto State", autoState);
+                robot.passthrough.setPosition(.02);
+                robot.claw.setPosition(.288);
+            }
+        }else if(autoState == AutoState.RETRACT_SLIDES){
+            if(!isTurning && !isMoving && !isLifting) {
+                autoState = AutoState.TURN_N45;
+                telemetry.addData("Auto State", autoState);
+                xTolerance = 50;
+                yTolerance = 2;
+                move(-7, -7);
+                timer = true;
+                timerTime = 1500;
+                runtime.reset();
+            }
+        }else if(autoState == AutoState.TURN_N45){
+            if(!isTurning && !isMoving && !isLifting) {
+                autoState = AutoState.PARK;
+                telemetry.addData("Auto State", autoState);
+                targetAngle = -90;
+                timer = true;
+                timerTime = 1500;
+                runtime.reset();
+                isTurning = true;
+                liftTarget = 200;
+            }
+        } else if(autoState == AutoState.REVERSE){
+            if(!isTurning && !isMoving) {
+                autoState = AutoState.PARK;
+                liftEngage = false;
+                xTolerance = .5;
+                yTolerance = 5;
+                move(18, 0);
+            }
+        }/*else if(autoState == AutoState.TURN_452) {
            if (!isTurning && !isMoving) {
                autoState = AutoState.LIFT_SLIDES;
                liftTarget = 815;
