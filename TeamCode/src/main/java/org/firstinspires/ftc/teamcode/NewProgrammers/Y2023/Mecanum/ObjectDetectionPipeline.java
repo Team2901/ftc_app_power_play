@@ -102,7 +102,7 @@ public class ObjectDetectionPipeline extends OpenCvPipeline {
         }
         //to make sure that there are actually 2 circles but accommodating to the toggle
         if(framesProcessed > 45) {
-            if (count2 >= 2) {
+            if (count2 >= 40) {
                 winner = 2;
                 auto.parking = 2;
                 telemetry.addData("2 circles", true);
