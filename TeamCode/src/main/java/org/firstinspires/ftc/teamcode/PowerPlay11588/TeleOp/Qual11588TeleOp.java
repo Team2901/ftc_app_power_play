@@ -22,8 +22,6 @@ public class Qual11588TeleOp extends OpMode {
     //All the variables that are needed for pid
     ElapsedTime PIDTimer = new ElapsedTime();
     int armTarget = 200;
-    int realArmTarget = armTarget;
-    //int lastTarget = armTarget;
 
     //Making different variables for each target height
     Height lastArmHeight = currentArmHeight;
@@ -33,7 +31,6 @@ public class Qual11588TeleOp extends OpMode {
     int highPolePosition = 1150;
     int zeroAngleTicks = lowPolePosition - 150;
 
-    int modifier = 0;
     double error = 0.0;
     double total = 0.0;
     double kp = 0.9;
