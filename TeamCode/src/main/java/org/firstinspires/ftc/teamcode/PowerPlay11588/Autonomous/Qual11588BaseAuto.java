@@ -264,9 +264,55 @@ public class Qual11588BaseAuto extends LinearOpMode {
         robot.claw.setPosition(robot.OPEN_POSITION);
     }
 
-    public void coneAndPark(){
-        moveXY(0, 36);
-        moveXY(32, 0);
+    public void coneAndPark(boolean goLeft){
+        Qual11588OpenCV.ConeColor color = robot.pipeLine.getColor();
+        if(goLeft) {
+            moveXY(0, -44);
+            moveXY(22, 0);
+            moveArm(Height.HIGH);
+            ElapsedTime timer = new ElapsedTime();
+            timer.reset();
+            while (timer.milliseconds() > 1000) {}
+            moveArm(Height.HIGH);
+            robot.claw.setPosition(robot.OPEN_POSITION);
+            moveXYPID(4, 0);
+            if(color == Qual11588OpenCV.ConeColor.RED){
+                telemetry.addData("Saw red, going to spot 1", "");
+                moveXYPID(0, 10);
+            }else if(color == Qual11588OpenCV.ConeColor.GREEN) {
+                telemetry.addData("Saw green, going to spot 2", "");
+                moveXYPID(0, 34);
+            }else if(color == Qual11588OpenCV.ConeColor.BLUE){
+                telemetry.addData("Saw blue, going to spot 3", "");
+                moveXYPID(0, 60);
+            }
+        } else {
+            moveXY(0, 44);
+            moveXY(22, 0);
+            moveArm(Height.HIGH);
+            ElapsedTime timer = new ElapsedTime();
+            timer.reset();
+            while (timer.milliseconds() > 1000) {}
+            moveArm(Height.HIGH);
+            robot.claw.setPosition(robot.OPEN_POSITION);
+            moveXYPID(4, 0);
+            if(color == Qual11588OpenCV.ConeColor.RED){
+                telemetry.addData("Saw red, going to spot 1", "");
+                moveXYPID(0, -10);
+            }else if(color == Qual11588OpenCV.ConeColor.GREEN) {
+                telemetry.addData("Saw green, going to spot 2", "");
+                moveXYPID(0, -34);
+            }else if(color == Qual11588OpenCV.ConeColor.BLUE){
+                telemetry.addData("Saw blue, going to spot 3", "");
+                moveXYPID(0, -60);
+            }
+        }
+
+
+    }
+
+    public void coneAndPark() {
+        coneAndPark(true);
     }
 
     public void telemetryStuff(){
