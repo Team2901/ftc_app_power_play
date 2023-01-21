@@ -208,7 +208,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
             dArm = (error - pArm)/PIDTimer.seconds();
             iArm = iArm + (error * PIDTimer.seconds());
             pArm = error;
-            armAngle = (90.0/(1200 - 400)) * (robot.arm.getCurrentPosition() - 400);
+            armAngle = (90.0/(1200.0 - 400.0)) * (robot.arm.getCurrentPosition() - 400.0);
             //armAngle = 0.102856 * robot.arm.getCurrentPosition() - 43.6276;
             cosArm = Math.cos(Math.toRadians(armAngle));
             total = ((kp*pArm) + (ki*iArm) + (kd*dArm))/100 + (kCos *cosArm);
@@ -222,12 +222,14 @@ public class Qual11588BaseAuto extends LinearOpMode {
             if(total > .6){
                 total = .6;
             }
-            if(total < .025){
+            if(armAngle > 60 && total < -.5){
+                total = -.5;
+            }else if(total < .025 && armAngle < 60){
                 total = .025;
             }
             telemetryStuff();
         }
-        armAngle = (90.0/(1200 - 400)) * (robot.arm.getCurrentPosition() - 400);
+        armAngle = (90.0/(1200.0 - 400.0)) * (robot.arm.getCurrentPosition() - 400.0);
         //armAngle = 0.102856 * robot.arm.getCurrentPosition() - 43.6276;
         cosArm = Math.cos(Math.toRadians(armAngle));
         double ffTotal = cosArm * kCos;
