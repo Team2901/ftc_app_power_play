@@ -27,6 +27,7 @@ public class Qual11588OpenCV extends OpenCvPipeline {
     public double greenAmountAverage;
     public double blueAmountAverage;
     public int framesProceeded;
+    public boolean noStart = true;
     Rect r = new Rect(100, 100, 100, 100);
     Mat redMask = new Mat();
     Mat blueMask = new Mat();
@@ -47,8 +48,14 @@ public class Qual11588OpenCV extends OpenCvPipeline {
         lastImage = new Mat(input.rows(), input.cols(), input.type());
 
     }
+
+    public void startCam() {
+        this.noStart = false;
+    }
+
     @Override
     public Mat processFrame(Mat input) {
+        while (noStart) {}
         framesProceeded++;
         if (input == null) {
             return null;
