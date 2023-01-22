@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.PowerPlay2901.Hardware.RockBotHardware;
 
-@TeleOp(name = "Dwayne TeleOp", group = "RockBot")
+@TeleOp(name = "Dwayne TeleOp", group = "AAAAAAAAAAAAhRockBot")
 public class RockBotTeleop extends OpMode {
     RockBotHardware robot = new RockBotHardware();
     private ElapsedTime runtime = new ElapsedTime();
@@ -76,10 +76,16 @@ public class RockBotTeleop extends OpMode {
             speedMod = 1.8;
         }
         if(gamepad2.a){
-            target = 65;
+            target = 85;
             liftI = 0;
             speedMod = 1.8;
         }
+        if(gamepad2.dpad_left){
+            target = 165;
+            liftI = 0;
+            speedMod = 1.8;
+        }
+
 
         if(gamepad2.right_trigger > .5){
             liftPower = liftPower(target - 65);
