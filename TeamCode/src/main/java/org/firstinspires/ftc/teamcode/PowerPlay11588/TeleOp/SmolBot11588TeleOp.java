@@ -17,7 +17,7 @@ public class SmolBot11588TeleOp extends OpMode {
     double turningPower = 0.0;
 
     //Everything Lift Pid
-    public enum LiftHeight{GROUND, STACK, LOW, MEDIUM, HIGH}
+    public enum LiftHeight{GROUND, LOW, MID, HIGH, STACK}
     LiftHeight currentLiftHeight = LiftHeight.GROUND;
     LiftHeight lastLiftHeight = currentLiftHeight;
     ElapsedTime LiftPIDTimer = new ElapsedTime();
@@ -98,7 +98,88 @@ public class SmolBot11588TeleOp extends OpMode {
                 break;
         }
 
+        if(currentGamepad1.x && !previousGamepad1.x){
+            lowLiftPosition = robot.lift.getCurrentPosition();
+            groundLiftPosition = lowLiftPosition - 75;
+            midLiftPosition = lowLiftPosition + 350;
+            highLiftPosition = lowLiftPosition + 600;
+            stackLiftPosition = lowLiftPosition - 25;
+        }
 
+        if(gamepad1.dpad_left){
+            currentLiftHeight = LiftHeight.GROUND;
+        }else if(gamepad1.dpad_down){
+            currentLiftHeight = LiftHeight.LOW;
+        }else if(gamepad1.dpad_right){
+            currentLiftHeight = LiftHeight.MID;
+        }else if(gamepad1.dpad_up){
+            currentLiftHeight = LiftHeight.HIGH;
+        }else if(currentGamepad1.right_bumper && !previousGamepad1.right_bumper){
+            if(currentLiftHeight == LiftHeight.STACK){
+                stackLiftPosition += 50;
+            }else{
+                currentLiftHeight = LiftHeight.STACK;
+            }
+        }else if(currentGamepad1.left_bumper && !previousGamepad1.left_bumper){
+            if(currentLiftHeight == LiftHeight.STACK){
+                stackLiftPosition -= 50;
+            }else {
+                currentLiftHeight = LiftHeight.STACK;
+            }
+        }
+
+        if(currentGamepad1.y && !previousGamepad1.y){
+            switch(currentLiftHeight){
+                case GROUND:
+                    groundLiftPosition += 10;
+                    break;
+                case LOW:
+                    lowLiftPosition += 10;
+                    break;
+                case MID:
+                    midLiftPosition += 10;
+                    break;
+                case HIGH:
+                    highLiftPosition += 10;
+                    break;
+            }
+        }
+
+        if(currentGamepad1.a && !previousGamepad1.a){
+            switch (currentLiftHeight){
+                case GROUND:
+                    groundLiftPosition -= 10;
+                    break;
+                case LOW:
+                    lowLiftPosition -= 10;
+                    break;
+                case MID:
+                    midLiftPosition -= 10;
+                    break;
+                case HIGH:
+                    highLiftPosition -= 10;
+                    break;
+            }
+        }
+        //Should I do this as a switch statement?
+        switch(currentLiftHeight){
+            case GROUND:
+                liftTarget = groundLiftPosition;
+                break;
+            case LOW:
+                liftTarget = lowLiftPosition;
+                break;
+            case MID:
+                liftTarget = midLiftPosition;
+                break;
+            case HIGH:
+                liftTarget = highLiftPosition;
+                break;
+            case STACK:
+                liftTarget = stackLiftPosition;
+                break;
+        }
+         robot.lift.setPower(liftPower(liftTarget));
     }
 
     public double liftPower(int target){
@@ -106,6 +187,21 @@ public class SmolBot11588TeleOp extends OpMode {
     }
 
     public void teleOpTelemetry(){
-
+        telemetry.addData("Front Left Position", robot.frontLeft.getCurrentPosition());
+        telemetry.addData("Front Left Power", robot.frontLeft.getPower());
+        telemetry.addData("Front Right Position", robot.frontRight.getCurrentPosition());
+        telemetry.addData("Front Right Power", robot.frontRight.getPower());
+        telemetry.addData("Back Left Position", robot.backLeft.getCurrentPosition());
+        telemetry.addData("Back Right Position", robot.backRight.getCurrentPosition());
+        telemetry.addData("Claw State", currentClawPosition);
+        telemetry.addData("Lift Level", currentLiftHeight);
+        telemetry.addData("Lift Position", robot.lift.getCurrentPosition());
+        telemetry.addData("Lift Target", liftTarget);
+        telemetry.addData("Ground Position", groundLiftPosition);
+        telemetry.addData("Low Position", lowLiftPosition);
+        telemetry.addData("Mid Position", midLiftPosition);
+        telemetry.addData("High Position", highLiftPosition);
+        telemetry.addData("Lift PID Total", liftTotal);
+        telemetry.update();
     }
 }
