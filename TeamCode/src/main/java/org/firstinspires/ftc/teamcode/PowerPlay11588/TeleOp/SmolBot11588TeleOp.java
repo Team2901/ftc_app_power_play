@@ -179,10 +179,28 @@ public class SmolBot11588TeleOp extends OpMode {
                 liftTarget = stackLiftPosition;
                 break;
         }
-         robot.lift.setPower(liftPower(liftTarget));
+        robot.lift.setPower(liftPower(liftTarget));
+        teleOpTelemetry();
     }
 
     public double liftPower(int target){
+        liftError = target - robot.lift.getCurrentPosition();
+        dLift = (liftError - pLift) / LiftPIDTimer.seconds();
+        iLift = iLift + (liftError * LiftPIDTimer.seconds());
+        pLift = liftError;
+        liftTotal = ((pLift * kpLift) + (iLift * kiLift) + (dLift * kdLift))/100;
+        LiftPIDTimer.reset();
+
+        if(currentLiftHeight != lastLiftHeight){
+            iLift = 0;
+        }
+        if(iLift > iLiftMax){
+            iLift = iLiftMax;
+        }else if(iLift < -iLiftMax){
+            iLift = -iLiftMax;
+        }
+        lastLiftHeight = currentLiftHeight;
+
         return liftTotal;
     }
 
@@ -192,7 +210,9 @@ public class SmolBot11588TeleOp extends OpMode {
         telemetry.addData("Front Right Position", robot.frontRight.getCurrentPosition());
         telemetry.addData("Front Right Power", robot.frontRight.getPower());
         telemetry.addData("Back Left Position", robot.backLeft.getCurrentPosition());
+        telemetry.addData("Back Left Power", robot.backLeft.getPower());
         telemetry.addData("Back Right Position", robot.backRight.getCurrentPosition());
+        telemetry.addData("Back Right Position", robot.backRight.getPower());
         telemetry.addData("Claw State", currentClawPosition);
         telemetry.addData("Lift Level", currentLiftHeight);
         telemetry.addData("Lift Position", robot.lift.getCurrentPosition());
@@ -202,6 +222,10 @@ public class SmolBot11588TeleOp extends OpMode {
         telemetry.addData("Mid Position", midLiftPosition);
         telemetry.addData("High Position", highLiftPosition);
         telemetry.addData("Lift PID Total", liftTotal);
+        telemetry.addData("P Lift", pLift);
+        telemetry.addData("I Lift", iLift);
+        telemetry.addData("D Lift", dLift);
+        telemetry.addData("F Lift", fLift);
         telemetry.update();
     }
 }

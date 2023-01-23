@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.PowerPlay11588.Autonomous.SmolBot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.SmolBot11588Hardware;
 
 public class SmolBot11588BaseAutonomous extends LinearOpMode {
@@ -50,6 +51,9 @@ public class SmolBot11588BaseAutonomous extends LinearOpMode {
     }
 
     public void turnByAngle(double turnAngle){
+        startAngle = robot.getAngle();
+        targetAngle = AngleUnit.normalizeDegrees(startAngle + turnAngle);
+        turnError = targetAngle - robot.getAngle();
 
     }
 
