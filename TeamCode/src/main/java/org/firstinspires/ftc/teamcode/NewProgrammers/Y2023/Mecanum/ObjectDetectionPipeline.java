@@ -100,22 +100,23 @@ public class ObjectDetectionPipeline extends OpenCvPipeline {
             count1 = 0;
             count2 = 0;
             framesProcessed = 0;
+            winner = -1;
         }
         //to make sure that there are actually 2 circles but accommodating to the toggle
         if(framesProcessed > 45) {
-            if (count2 >= 40) {
+            if (count2 >= 40 && count1 < 20) {
                 winner = 2;
                 auto.parking = 2;
                 telemetry.addData("2 circles", true);
             }
             //if the amount of times that there is one is over 15 and it is greater than seeing 2 circles
-            if (count1 > 20 && count1 > count2 && winner != 2) {
+            if (count1 > 20 && winner != 2) {
                 winner = 1;
                 auto.parking = 1;
                 telemetry.addData("1 circle", true);
             }
             //only if 0 circles is greater than the amount of times that it sees 1 and 2 circles
-            if (count0 > count1 && count0 > count2 && count0>40 && winner != 2 && winner!= 1) {
+            if (count0 > count1 && count0 > count2 && count0>20 && winner != 2 && winner!= 1) {
                 winner = 0;
                 auto.parking = 0;
                 telemetry.addData("0 circles", true);

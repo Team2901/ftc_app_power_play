@@ -5,22 +5,19 @@ import com.arcrobotics.ftclib.geometry.Transform2d;
 import com.arcrobotics.ftclib.geometry.Translation2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.spartronics4915.lib.T265Camera;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.NewProgrammers.Y2023.Mecanum.ObjectDetectionPipeline;
-import org.firstinspires.ftc.teamcode.PowerPlay2901.Autonomous.XYhVector;
 import org.firstinspires.ftc.teamcode.PowerPlay2901.Hardware.EarlyDiffyHardware;
 import org.firstinspires.ftc.teamcode.Shared.Gamepad.ImprovedGamepad;
 import org.firstinspires.ftc.teamcode.Utility.CountDownTimer;
 
 import java.util.concurrent.TimeUnit;
 
-@Autonomous(name="Purple Gears Auto Right", group="Iterative Opmode")
-public class IntelRealsense3 extends OpMode {
+@Autonomous(name="8 - Preload/Park Left", group="Iterative Opmode")
+public class IntelRealsense8Left extends OpMode {
     // We treat this like a singleton because there should only ever be one object per camera
     private static T265Camera slamra = null;
     public double initTheta;
@@ -83,7 +80,7 @@ public class IntelRealsense3 extends OpMode {
     double dy = 0;
 
     double xTolerance = 3;
-    double yTolerance = 3;
+    double yTolerance = 0.5;
 
     double addX = 0;
     double addY = 0;
@@ -105,6 +102,7 @@ public class IntelRealsense3 extends OpMode {
     boolean isLifting = false;
 
     double liftPower = 0;
+    double randomInt = 0;
 
 
     public enum AutoState {
@@ -125,7 +123,8 @@ public class IntelRealsense3 extends OpMode {
         MOVE_FORWARD2,
         TURN_N45,
         PARK,
-        FINAL_TURN
+        FINAL_TURN,
+        STOP
     }
     AutoState autoState;
 
@@ -266,45 +265,46 @@ public class IntelRealsense3 extends OpMode {
         //I just can't seem to get a value out of it other than -1
 
         if(firstRound && (robot.pipeLine.winner != -1)) {
-            move(0, 52);
+            move(0, 50);
             xTolerance = 5;
             firstRound = false;
             parking = robot.pipeLine.winner;
         }else if(autoState == AutoState.MOVE_FORWARD){
             if(!isTurning && !isMoving && !isLifting) {
-                autoState = AutoState.EXTEND_PASSTHROUGH;
+                autoState = AutoState.TURN_45;
                 telemetry.addData("Auto State", autoState);
                 isTurning = true;
-                targetAngle = 40;
+                randomInt = 16+dx;
+                targetAngle = -Math.toDegrees(Math.atan(10/(randomInt)));
                 liftEngage = true;
             }
-        }else if(autoState == AutoState.EXTEND_PASSTHROUGH) {
+        }else if(autoState == AutoState.TURN_45) {
             if (!isTurning && !isMoving && !isLifting) {
                 autoState = AutoState.LIFT_SLIDES;
                 telemetry.addData("Auto State", autoState);
-                liftTarget = 725;
+                liftTarget = 735;
             }
         }else if(autoState == AutoState.LIFT_SLIDES) {
             if (!isTurning && !isMoving && !isLifting) {
-                autoState = AutoState.TURN_45;
+                autoState = AutoState.EXTEND_PASSTHROUGH;
                 telemetry.addData("Auto State", autoState);
-                robot.passthrough.setPosition(0.7);
+                robot.passthrough.setPosition(0.67);
             }
-        }else if(autoState == AutoState.TURN_45){
+        }else if(autoState == AutoState.EXTEND_PASSTHROUGH){
             if(!isTurning && !isMoving) {
-                autoState = AutoState.TURN_452;
+                autoState = AutoState.TURN_N45;
                 isLifting = true;
                 timer = true;
                 timerTime = 500;
                 runtime.reset();
             }
-        }else if (autoState == AutoState.TURN_452) {
+        }else if (autoState == AutoState.TURN_N45) {
             if (!isTurning && !isMoving && !isLifting) {
                 autoState = AutoState.INCH_FORWARD;
                 telemetry.addData("Auto State", autoState);
-                xTolerance = 5;
+                xTolerance = 0.5;
                 yTolerance = .5;
-                move(-3, 3);
+                move(randomInt, 8);
                 timer = true;
                 timerTime = 1500;
                 runtime.reset();
@@ -337,35 +337,58 @@ public class IntelRealsense3 extends OpMode {
             }
         }else if(autoState == AutoState.RETRACT_SLIDES){
             if(!isTurning && !isMoving && !isLifting) {
-                autoState = AutoState.TURN_N45;
+                autoState = AutoState.FINAL_TURN;
                 telemetry.addData("Auto State", autoState);
-                xTolerance = 50;
+                xTolerance = 2;
                 yTolerance = 2;
-                move(7, -7);
+                move(-randomInt-4, -6);
                 timer = true;
                 timerTime = 1500;
                 runtime.reset();
             }
-        }else if(autoState == AutoState.TURN_N45){
-           if(!isTurning && !isMoving && !isLifting) {
-               autoState = AutoState.PARK;
-               telemetry.addData("Auto State", autoState);
-               targetAngle = 90;
-               timer = true;
-               timerTime = 1500;
-               runtime.reset();
-               isTurning = true;
-               liftTarget = 200;
-           }
-       } else if(autoState == AutoState.REVERSE){
-           if(!isTurning && !isMoving) {
-               autoState = AutoState.PARK;
-               liftEngage = false;
-               xTolerance = .5;
-               yTolerance = 5;
-               move(-18, 0);
-           }
-       }/*else if(autoState == AutoState.TURN_452) {
+        }else if(autoState == AutoState.FINAL_TURN){
+            if(!isTurning && !isMoving && !isLifting) {
+                autoState = AutoState.MOVE_BACK;
+                telemetry.addData("Auto State", autoState);
+                targetAngle = 90;
+                timer = true;
+                timerTime = 1500;
+                runtime.reset();
+                isTurning = true;
+                liftTarget = 200;
+            }
+        }else if(autoState == AutoState.MOVE_BACK) {
+            if (!isTurning && !isMoving && !isLifting) {
+                autoState = AutoState.PARK;
+                telemetry.addData("Auto State", autoState);
+                if(parking == 1){
+                    xTolerance = 1;
+                    move(-19, 0);
+                    timer = true;
+                    timerTime = 5000;
+                    runtime.reset();
+                } else if(parking == 2){
+                    xTolerance = 1;
+                    move(-1.5, 0);
+                    timer = true;
+                    timerTime = 1500;
+                    runtime.reset();
+                } else if(parking == 0){
+                    move(19, 0);
+                    timer = true;
+                    timerTime = 5000;
+                    runtime.reset();
+                }
+            }
+        } else if(autoState == AutoState.PARK){
+            if(!isTurning && !isMoving && !isLifting) {
+                autoState = AutoState.STOP;
+                telemetry.addData("Auto State", autoState);
+                isTurning = true;
+                targetAngle = 45;
+            }
+        } else if(autoState == AutoState.STOP){}
+       /*else if(autoState == AutoState.TURN_452) {
            if (!isTurning && !isMoving) {
                autoState = AutoState.LIFT_SLIDES;
                liftTarget = 815;
@@ -481,8 +504,8 @@ public class IntelRealsense3 extends OpMode {
 
         //pos.h change
         outputRight = outputLeft;
-        outputRight += turnPower;
-        outputLeft -= turnPower;
+//        outputRight += turnPower;
+//        outputLeft -= turnPower;
         leftTurnPower = leftPodTurn(0);
         rightTurnPower = rightPodTurn(0);
         if(liftEngage) {
@@ -713,7 +736,7 @@ public class IntelRealsense3 extends OpMode {
 
         double theta = pos.h + (dtheta / 2.0);
         pos.y += dx * Math.cos(theta) - dy * Math.sin(theta);
-        pos.x -= dx * Math.sin(theta) + dy * Math.cos(theta);
+        pos.x += dx * Math.sin(theta) + dy * Math.cos(theta);
         pos.h += dtheta;
     }
 

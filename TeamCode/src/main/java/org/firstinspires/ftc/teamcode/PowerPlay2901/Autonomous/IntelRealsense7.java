@@ -262,7 +262,8 @@ public class IntelRealsense7 extends OpMode {
         //parking = pipeline.winner;
         //I just can't seem to get a value out of it other than -1
 
-        if(firstRound && (robot.pipeLine.winner != -1)) {
+        if(robot.pipeLine.winner == -1){}
+        else if(firstRound) {
             move(0, 52);
             xTolerance = 5;
             firstRound = false;

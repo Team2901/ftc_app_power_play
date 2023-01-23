@@ -174,8 +174,8 @@ public class Qual11588TeleOp extends OpMode {
             iArm = -iArmMax;
         }
 
-        if(total > .6){
-            total = .6;
+        if(total > .5){
+            total = .5;
         }
         if(recalculateAngle() > 60 && total < -.5){
             total = -.5;

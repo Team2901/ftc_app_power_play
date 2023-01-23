@@ -11,6 +11,7 @@ public class Qual11588RedReconPark extends Qual11588BaseAuto {
     public void runOpMode() throws InterruptedException {
         robot.autoInit(this.hardwareMap, telemetry, Qual11588Hardware.allianceColor.RED);
         waitForStart();
+        robot.pipeLine.startCam();
         timer.reset();
         while(robot.pipeLine.framesProceeded < 30 && timer.milliseconds() < 5000){
 
