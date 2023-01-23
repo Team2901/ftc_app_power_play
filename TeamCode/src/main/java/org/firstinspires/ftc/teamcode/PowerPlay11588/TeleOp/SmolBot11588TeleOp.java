@@ -30,14 +30,14 @@ public class SmolBot11588TeleOp extends OpMode {
     int highLiftPosition = 1150;
     double liftError = 0.0;
     double liftTotal = 0.0;
-    double kpLift = 0.5;
-    double kiLift = 0.0;
-    double kdLift = 0.0;
-    double kfLift = 0.0;
     double pLift = 0.0;
     double iLift = 0.0;
     double dLift = 0.0;
     double fLift = 0.0;
+    double kpLift = 0.5;
+    double kiLift = 0.0;
+    double kdLift = 0.0;
+    double kfLift = 0.0;
     double iLiftMax = 0.25;
     /*
         I still can't for the life of me figure out which way to do gamepad.
