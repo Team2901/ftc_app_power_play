@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.OpenCVPipelines;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.PowerPlay11588.Autonomous.Qual11588BaseAuto;
 import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.Qual11588Hardware;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
