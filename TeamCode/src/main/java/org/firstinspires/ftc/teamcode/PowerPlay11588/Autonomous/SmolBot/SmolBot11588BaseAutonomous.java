@@ -26,10 +26,10 @@ public class SmolBot11588BaseAutonomous extends LinearOpMode {
     //Everything to do with the lift pid
     public enum LiftHeight{
         GROUND,
-        STACK,
         LOW,
         MID,
-        HIGH
+        HIGH,
+        STACK
     }
     ElapsedTime liftPIDTimer = new ElapsedTime();
     int liftTarget = 50;
@@ -147,6 +147,14 @@ public class SmolBot11588BaseAutonomous extends LinearOpMode {
         telemetry.addData("Back Left Position", robot.backLeft.getCurrentPosition());
         telemetry.addData("Back Right Target", robot.backRight.getTargetPosition());
         telemetry.addData("Back Right Position", robot.backRight.getCurrentPosition());
+        telemetry.addData("Robot Angle", robot.getAngle());
+        telemetry.addData("Turn Target", turnTarget);
+        telemetry.addData("Turn Error", turnError);
+        telemetry.addData("Turning Power", turnTotal);
+        telemetry.addData("Lift Position", robot.lift.getCurrentPosition());
+        telemetry.addData("Lift Target", liftTarget);
+        telemetry.addData("Lift Error", liftError);
+        telemetry.addData("Lift Power", liftTotal);
         telemetry.update();
     }
 }

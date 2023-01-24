@@ -180,6 +180,7 @@ public class SmolBot11588TeleOp extends OpMode {
                 break;
         }
         robot.lift.setPower(liftPower(liftTarget));
+
         teleOpTelemetry();
     }
 
