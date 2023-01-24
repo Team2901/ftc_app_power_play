@@ -179,12 +179,13 @@ public class SmolBot11588TeleOp extends OpMode {
                 liftTarget = stackLiftPosition;
                 break;
         }
-        robot.lift.setPower(liftPower(liftTarget));
+        //robot.lift.setPower(liftPower(liftTarget));
 
         teleOpTelemetry();
     }
 
     public double liftPower(int target){
+        /*
         liftError = target - robot.lift.getCurrentPosition();
         dLift = (liftError - pLift) / LiftPIDTimer.seconds();
         iLift = iLift + (liftError * LiftPIDTimer.seconds());
@@ -202,6 +203,8 @@ public class SmolBot11588TeleOp extends OpMode {
         }
         lastLiftHeight = currentLiftHeight;
 
+
+         */
         return liftTotal;
     }
 
