@@ -8,6 +8,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 public class NewClawbotHardware {
+    public static final double CLAW_OPEN_POSITION = 0.6;
+    public static final double CLAW_CLOSED_POSITION = 0.4;
     public DcMotorEx leftDrive;
     public DcMotorEx rightDrive;
     public DcMotorEx arm;
