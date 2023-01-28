@@ -18,6 +18,12 @@ public class NewClawbotTeleOp extends OpMode {
     public ElapsedTime gamepadTimer = new ElapsedTime();
 
     public boolean gamepadOverride = false;
+    public double armAngle = 0.0;
+    public double zeroDegreeVoltage = 1.347;
+    public double nintyDegreeVoltage = 2.737;
+    public double cosArm = 0.0;
+    public double kCos = 0.1;
+    public double pidArm = 0.0;
 
     NewClawbotHardware robot = new NewClawbotHardware();
     @Override
@@ -62,6 +68,18 @@ public class NewClawbotTeleOp extends OpMode {
                 }
                 break;
         }
+
+        armAngle = (90/(nintyDegreeVoltage - zeroDegreeVoltage) * robot.potentiometer.getVoltage() - zeroDegreeVoltage);
+        cosArm = Math.cos(Math.toRadians(armAngle));
+        pidArm = cosArm * kCos;
+        if(gamepadInControl.dpad_up.isPressed() || gamepadInControl.y.isPressed()){
+            robot.arm.setPower(pidArm + .5);
+        }else if(gamepadInControl.dpad_down.isPressed() || gamepadInControl.a.isPressed()){
+            robot.arm.setPower(pidArm - .5);
+        }else{
+            robot.arm.setPower(pidArm);
+        }
+
 
         telemetry.addData("Override", gamepadOverride);
         telemetry.addData("Gamepad In Control", gamepadInControl);
