@@ -8,8 +8,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 public class NewClawbotHardware {
-    public static final double CLAW_OPEN_POSITION = 0.9;
-    public static final double CLAW_CLOSED_POSITION = 0.35;
+    public static final double CLAW_OPEN_POSITION = 0.0;
+    public static final double CLAW_CLOSED_POSITION = 0.45;
     public DcMotorEx leftDrive;
     public DcMotorEx rightDrive;
     public DcMotorEx arm;
@@ -27,7 +27,9 @@ public class NewClawbotHardware {
         arm.setPower(0);
         leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        arm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         claw = hardwareMap.servo.get("claw");
         claw.setPosition(0);
         potentiometer = hardwareMap.analogInput.get("potentiometer");

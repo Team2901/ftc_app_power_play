@@ -18,8 +18,8 @@ public class VoltagePIDTuner extends OpMode {
     double cosArm = 0;
     double kCos = 0;
     double armAngle = 0;
-    public double zeroDegreeVoltage = 1.347;
-    public double nintyDegreeVoltage = 2.737;
+    public double zeroDegreeVoltage = 2.737;
+    public double nintyDegreeVoltage = 1.347;
 
     Gamepad currentGamepad1 = new Gamepad();
     Gamepad currentGamepad2 = new Gamepad();
@@ -72,9 +72,9 @@ public class VoltagePIDTuner extends OpMode {
         plug it into desmos how it is modeled using a linear regression
         0 degrees = 425 90 degrees = 1300
          */
-        armAngle = (90/(nintyDegreeVoltage - zeroDegreeVoltage) * potentiometer.getVoltage() - zeroDegreeVoltage);
+        armAngle = (90/(nintyDegreeVoltage - zeroDegreeVoltage) * (potentiometer.getVoltage() - zeroDegreeVoltage));
         cosArm = Math.cos(Math.toRadians(armAngle));
-        double ffTotal = (kCos * cosArm)/100;
+        double ffTotal = (kCos * cosArm);
         return ffTotal;
     }
 }
