@@ -54,7 +54,9 @@ public class Qual11588OpenCV extends OpenCvPipeline {
 
     @Override
     public Mat processFrame(Mat input) {
-        while (noStart) {}
+        if (noStart) {
+            return null;
+        }
         framesProceeded++;
         if (input == null) {
             return null;

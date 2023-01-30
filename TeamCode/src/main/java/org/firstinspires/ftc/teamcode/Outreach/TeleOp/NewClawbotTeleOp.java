@@ -22,7 +22,7 @@ public class NewClawbotTeleOp extends OpMode {
     public double zeroDegreeVoltage = 1.347;
     public double nintyDegreeVoltage = 2.737;
     public double cosArm = 0.0;
-    public double kCos = 0.1;
+    public double kCos = 0.3;
     public double pidArm = 0.0;
 
     NewClawbotHardware robot = new NewClawbotHardware();
