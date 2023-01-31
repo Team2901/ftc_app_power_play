@@ -263,7 +263,6 @@ public class Qual11588BaseAuto extends LinearOpMode {
         moveArm(Height.LOW);
         robot.claw.setPosition(robot.OPEN_POSITION);
     }
-
     public void coneAndPark(){
         moveXY(0, 36);
         moveXY(32, 0);
