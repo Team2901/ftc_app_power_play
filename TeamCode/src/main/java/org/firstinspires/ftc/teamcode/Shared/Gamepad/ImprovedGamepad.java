@@ -148,6 +148,9 @@ public class ImprovedGamepad {
   }
 
   public boolean areButtonsActive(){
-    return dpad_left.pressed || dpad_down.pressed || a.pressed || dpad_up.pressed || dpad_right.pressed || !(right_stick_y.getValue()==0);
+    return dpad_left.isPressed() || dpad_down.isPressed() || dpad_up.isPressed() || dpad_right.isPressed() ||
+            a.isPressed() || b.isPressed() || x.isPressed() || y.isPressed() ||
+            right_bumper.isPressed() || left_bumper.isPressed() || right_trigger.isPressed() ||
+            left_trigger.isPressed() || right_stick.isPressed() || left_stick.isPressed();
   }
 }

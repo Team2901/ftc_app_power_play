@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.PowerPlay11588.Autonomous;
+package org.firstinspires.ftc.teamcode.PowerPlay11588.Autonomous.RI3WBot;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;

@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.OpenCVPipelines;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.PowerPlay11588.Autonomous.Qual11588BaseAuto;
 import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.Qual11588Hardware;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -27,6 +26,7 @@ public class Qual11588OpenCV extends OpenCvPipeline {
     public double greenAmountAverage;
     public double blueAmountAverage;
     public int framesProceeded;
+    public boolean noStart = true;
     Rect r = new Rect(100, 100, 100, 100);
     Mat redMask = new Mat();
     Mat blueMask = new Mat();
@@ -47,8 +47,16 @@ public class Qual11588OpenCV extends OpenCvPipeline {
         lastImage = new Mat(input.rows(), input.cols(), input.type());
 
     }
+
+    public void startCam() {
+        this.noStart = false;
+    }
+
     @Override
     public Mat processFrame(Mat input) {
+        if (noStart) {
+            return null;
+        }
         framesProceeded++;
         if (input == null) {
             return null;

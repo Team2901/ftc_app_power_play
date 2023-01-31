@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.PowerPlay11588.Autonomous;
+package org.firstinspires.ftc.teamcode.PowerPlay11588.Autonomous.QualBot;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -14,6 +14,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
     ElapsedTime PIDTimer = new ElapsedTime();
     //Defining the pidvariables outside the method so they can be used in a telemetry method
     int armTarget = 50;
+    int lastArmTarget = armTarget;
     int error = 0;
     double total = 0.0;
     double kp = 0.9;
@@ -119,6 +120,35 @@ public class Qual11588BaseAuto extends LinearOpMode {
                 robot.backLeft.isBusy() || robot.backRight.isBusy())){
             armAngle = (90.0/(1200 - 400)) * (robot.arm.getCurrentPosition() - 400);
             //armAngle = 0.102856 * robot.arm.getCurrentPosition() - 43.6276;
+
+            error = armTarget - robot.arm.getCurrentPosition();
+            dArm = (error - pArm) / PIDTimer.seconds();
+            iArm = iArm + (error * PIDTimer.seconds());
+            pArm = error;
+            cosArm = Math.cos(Math.toRadians(armAngle));
+            total = ((pArm * kp) + (iArm * ki) + (dArm * kd))/100 + (cosArm * kCos);
+            PIDTimer.reset();
+
+            if(armTarget != lastArmTarget){
+                iArm = 0;
+            }
+
+            if(iArm > iArmMax){
+                iArm = iArmMax;
+            }else if(iArm < -iArmMax){
+                iArm = -iArmMax;
+            }
+
+            if(total > .65){
+                total = .65;
+            }
+            if(armAngle > 60 && total < -.5){
+                total = -.5;
+            }else if(total < .005 && armAngle < 60){
+                total = .005;
+            }
+            lastArmTarget = armTarget;
+
             cosArm = Math.cos(Math.toRadians(armAngle));
             double ffTotal = cosArm * kCos;
             robot.arm.setPower(ffTotal);
@@ -161,7 +191,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
         if(color == Qual11588OpenCV.ConeColor.RED){
             telemetry.addData("Saw red, going to spot 1", "");
             // Move left 24 inches
-            moveXYPID(0, -26);
+            moveXYPID(0, -28);
             // Move forward 26 inches
             moveXYPID((int) 35, 0);
         }else if(color == Qual11588OpenCV.ConeColor.GREEN) {
@@ -171,11 +201,15 @@ public class Qual11588BaseAuto extends LinearOpMode {
         }else if(color == Qual11588OpenCV.ConeColor.BLUE){
             telemetry.addData("Saw blue, going to spot 3", "");
             // Move right 24 inches
-            moveXYPID(0, 26);
+            moveXYPID(0, 28);
             // Move forward 26 inches
             moveXYPID((int) 35, 0);
         }
+        moveArm(Height.LOW);
         moveArm(Height.GROUND);
+        ElapsedTime timer = new ElapsedTime();
+        timer.reset();
+        while(timer.milliseconds() < 1000);
     }
 
     public void recon() {
@@ -219,8 +253,8 @@ public class Qual11588BaseAuto extends LinearOpMode {
             } else if(iArm < -iArmMax){
                 iArm = -iArmMax;
             }
-            if(total > .6){
-                total = .6;
+            if(total > .5){
+                total = .5;
             }
             if(armAngle > 60 && total < -.5){
                 total = -.5;
@@ -263,9 +297,60 @@ public class Qual11588BaseAuto extends LinearOpMode {
         moveArm(Height.LOW);
         robot.claw.setPosition(robot.OPEN_POSITION);
     }
-    public void coneAndPark(){
-        moveXY(0, 36);
-        moveXY(32, 0);
+
+    public void coneAndPark(boolean goLeft){
+        Qual11588OpenCV.ConeColor color = robot.pipeLine.getColor();
+        if(goLeft) {
+            moveXYPID(0, -42);
+            moveXYPID(22, 0);
+            moveArm(Height.HIGH);
+            moveXYPID(4, 0);
+            ElapsedTime timer = new ElapsedTime();
+            timer.reset();
+            while (timer.milliseconds() > 1000) {}
+            moveArm(Height.HIGH);
+            robot.claw.setPosition(robot.OPEN_POSITION);
+            moveXYPID(4, 0);
+            if(color == Qual11588OpenCV.ConeColor.RED){
+                telemetry.addData("Saw red, going to spot 1", "");
+                moveXYPID(0, 18);
+            }else if(color == Qual11588OpenCV.ConeColor.GREEN) {
+                telemetry.addData("Saw green, going to spot 2", "");
+                moveXYPID(0, 42);
+            }else if(color == Qual11588OpenCV.ConeColor.BLUE){
+                telemetry.addData("Saw blue, going to spot 3", "");
+                moveXYPID(0, 68);
+            }
+            moveArm(Height.LOW);
+            moveArm(Height.GROUND);
+        } else {
+            moveXYPID(0, 42);
+            moveXYPID(22, 0);
+            moveArm(Height.HIGH);
+            moveXYPID(4, 0);
+            ElapsedTime timer = new ElapsedTime();
+            timer.reset();
+            while (timer.milliseconds() > 1000) {}
+            moveArm(Height.HIGH);
+            robot.claw.setPosition(robot.OPEN_POSITION);
+            moveXYPID(4, 0);
+            if(color == Qual11588OpenCV.ConeColor.RED){
+                moveXYPID(0, -68);
+                telemetry.addData("Saw red, going to spot 1", "");
+            }else if(color == Qual11588OpenCV.ConeColor.GREEN) {
+                telemetry.addData("Saw green, going to spot 2", "");
+                moveXYPID(0, -42);
+            }else if(color == Qual11588OpenCV.ConeColor.BLUE){
+                telemetry.addData("Saw blue, going to spot 3", "");
+                moveXYPID(0, -18);
+            }
+            moveArm(Height.LOW);
+            moveArm(Height.GROUND);
+        }
+    }
+
+    public void coneAndPark() {
+        coneAndPark(true);
     }
 
     public void telemetryStuff(){

@@ -86,6 +86,7 @@ public class DDROutreachBotOneTeleOp extends OpMode {
             isActive = !isActive;
         }
 
+        /*
         gmRightPower = gameMasterGP.left_stick_y.getValue();
         gmLeftPower = gameMasterGP.left_stick_y.getValue();
 
@@ -93,6 +94,11 @@ public class DDROutreachBotOneTeleOp extends OpMode {
 
         gmRightPower -= gameMasterGP.left_stick_x.getValue();
         gmLeftPower += gameMasterGP.left_stick_x.getValue();
+
+         */
+
+        gmLeftPower = gameMasterGP.left_stick_y.getValue();
+        gmRightPower = gameMasterGP.right_stick_y.getValue();
 
         double maxPower = Math.max(Math.abs(gmLeftPower), Math.abs(gmRightPower));
 
