@@ -52,9 +52,9 @@ public class NewControlClawbotTeleOp extends OpMode {
         }
 
         robot.leftDrive.setPower((-gamepadInControl.right_stick_y.getValue() + -gamepadInControl.left_stick_y.getValue()) / 4 +
-                (gamepadInControl.left_stick_x.getValue()));
+                (-gamepadInControl.right_stick_x.getValue()));
         robot.rightDrive.setPower((-gamepadInControl.right_stick_y.getValue() + -gamepadInControl.left_stick_y.getValue()) / 4 +
-                (gamepadInControl.right_stick_x.getValue()));
+                (gamepadInControl.left_stick_x.getValue()));
 
 
         switch(currentClawState){
