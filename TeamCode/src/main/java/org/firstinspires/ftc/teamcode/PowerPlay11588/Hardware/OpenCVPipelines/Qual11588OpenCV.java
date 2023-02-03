@@ -55,11 +55,11 @@ public class Qual11588OpenCV extends OpenCvPipeline {
     @Override
     public Mat processFrame(Mat input) {
         if (noStart) {
-            return null;
+
         }
         framesProceeded++;
         if (input == null) {
-            return null;
+            return lastImage;
 //Makes sure doesn't crash when the camera does nothing
         }
 
