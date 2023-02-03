@@ -40,7 +40,6 @@ public class Qual11588OpenCV extends OpenCvPipeline {
         this.telemetry = telemetry;
         this.hardware = hardware;
     }
-    //Constructor for RI3W11588OpenCV class
 
     public void init(Mat input) {
 
@@ -55,11 +54,11 @@ public class Qual11588OpenCV extends OpenCvPipeline {
     @Override
     public Mat processFrame(Mat input) {
         if (noStart) {
-            return null;
+
         }
         framesProceeded++;
         if (input == null) {
-            return null;
+            return lastImage;
 //Makes sure doesn't crash when the camera does nothing
         }
 

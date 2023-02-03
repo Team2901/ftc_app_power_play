@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.Qual11588Hardware;
 
 public class Qual11588BaseAuto extends LinearOpMode {
     public AllianceColor teamColor;
-    Qual11588Hardware robot = new Qual11588Hardware();
+    public Qual11588Hardware robot = new Qual11588Hardware();
     ElapsedTime PIDTimer = new ElapsedTime();
     //Defining the pidvariables outside the method so they can be used in a telemetry method
     int armTarget = 50;
@@ -52,7 +52,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
 
     public void moveXY(double y, double x){
         int ticksY = (int) (y * robot.TICKS_PER_INCH);
-        int ticksX = (int) (x * robot.TICKS_PER_INCH);
+        int ticksX = (int) (1.5 * x * robot.TICKS_PER_INCH);
 
         robot.frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -164,6 +164,87 @@ public class Qual11588BaseAuto extends LinearOpMode {
         robot.frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    public void moveXYAndArm(double y, double x, Height height){
+        if(height == Height.GROUND){
+            armTarget = 200;
+        } else if(height == Height.LOW){
+            armTarget = 550;
+        } else if(height == Height.MEDIUM){
+            armTarget = 800;
+        } else if(height == Height.HIGH){
+            armTarget = 1150;
+        }
+        error = armTarget - robot.arm.getCurrentPosition();
+        PIDTimer.reset();
+
+        int ticksY = (int) (y * robot.TICKS_PER_INCH);
+        int ticksX = (int) (1.5 * x * robot.TICKS_PER_INCH);
+
+        robot.frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        robot.frontLeft.setTargetPosition(ticksY + ticksX);
+        robot.frontRight.setTargetPosition(ticksY - ticksX);
+        robot.backLeft.setTargetPosition(ticksY - ticksX);
+        robot.backRight.setTargetPosition(ticksY + ticksX);
+
+        robot.frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        robot.frontLeft.setPower(0.5);
+        robot.frontRight.setPower(0.5);
+        robot.backLeft.setPower(0.5);
+        robot.backRight.setPower(0.5);
+
+        while (opModeIsActive() && ((robot.frontLeft.isBusy() || robot.frontRight.isBusy() ||
+                robot.backLeft.isBusy() || robot.backRight.isBusy()) || !(error < 10 && error > -10))){
+            error = armTarget - robot.arm.getCurrentPosition();
+            dArm = (error - pArm)/PIDTimer.seconds();
+            iArm = iArm + (error * PIDTimer.seconds());
+            pArm = error;
+            armAngle = (90.0/(1200.0 - 400.0)) * (robot.arm.getCurrentPosition() - 400.0);
+            //armAngle = 0.102856 * robot.arm.getCurrentPosition() - 43.6276;
+            cosArm = Math.cos(Math.toRadians(armAngle));
+            total = ((kp*pArm) + (ki*iArm) + (kd*dArm))/100 + (kCos *cosArm);
+            robot.arm.setPower(total);
+            PIDTimer.reset();
+            if(iArm > iArmMax){
+                iArm = iArmMax;
+            } else if(iArm < -iArmMax){
+                iArm = -iArmMax;
+            }
+            if(total > .5){
+                total = .5;
+            }
+            if(armAngle > 60 && total < -.5){
+                total = -.5;
+            }else if(total < .025 && armAngle < 60){
+                total = .025;
+            }
+            telemetryStuff();
+        }
+
+        robot.frontLeft.setPower(0);
+        robot.frontRight.setPower(0);
+        robot.backLeft.setPower(0);
+        robot.backRight.setPower(0);
+
+        robot.frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        armAngle = (90.0/(1200.0 - 400.0)) * (robot.arm.getCurrentPosition() - 400.0);
+        //armAngle = 0.102856 * robot.arm.getCurrentPosition() - 43.6276;
+        cosArm = Math.cos(Math.toRadians(armAngle));
+        double ffTotal = cosArm * kCos;
+        robot.arm.setPower(ffTotal);
     }
 
     public void park(){
