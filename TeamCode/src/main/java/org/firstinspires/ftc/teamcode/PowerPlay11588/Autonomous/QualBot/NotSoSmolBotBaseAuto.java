@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.PowerPlay11588.Autonomous.QualBot.NotSoSmolBot;
+package org.firstinspires.ftc.teamcode.PowerPlay11588.Autonomous.QualBot;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -104,14 +104,14 @@ public class NotSoSmolBotBaseAuto extends LinearOpMode {
             telemetry.addData("Turn Error", turnError);
         }
     }
-    public void moveArm(Qual11588BaseAuto.Height height) {
-        if (height == Qual11588BaseAuto.Height.GROUND) {
+    public void moveArm(Height height) {
+        if (height == Height.GROUND) {
             armTarget = 200;
-        } else if (height == Qual11588BaseAuto.Height.LOW) {
+        } else if (height == Height.LOW) {
             armTarget = 550;
-        } else if (height == Qual11588BaseAuto.Height.MEDIUM) {
+        } else if (height == Height.MEDIUM) {
             armTarget = 800;
-        } else if (height == Qual11588BaseAuto.Height.HIGH) {
+        } else if (height == Height.HIGH) {
             armTarget = 1150;
         }
         error = armTarget - robot.arm.getCurrentPosition();
@@ -258,14 +258,14 @@ public class NotSoSmolBotBaseAuto extends LinearOpMode {
         robot.backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-    public void moveXYAndArm(double y, double x, Qual11588BaseAuto.Height height){
-        if(height == Qual11588BaseAuto.Height.GROUND){
+    public void moveXYAndArm(double y, double x, Height height){
+        if(height == Height.GROUND){
             armTarget = 200;
-        } else if(height == Qual11588BaseAuto.Height.LOW){
+        } else if(height == Height.LOW){
             armTarget = 550;
-        } else if(height == Qual11588BaseAuto.Height.MEDIUM){
+        } else if(height == Height.MEDIUM){
             armTarget = 800;
-        } else if(height == Qual11588BaseAuto.Height.HIGH){
+        } else if(height == Height.HIGH){
             armTarget = 1150;
         }
         error = armTarget - robot.arm.getCurrentPosition();

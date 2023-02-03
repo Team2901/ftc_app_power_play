@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.PowerPlay11588.Autonomous.QualBot.NotSoSmolBot;
+package org.firstinspires.ftc.teamcode.PowerPlay11588.Autonomous.QualBot;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
@@ -16,7 +16,16 @@ public class NotSoSmolBotBlueLower extends Qual11588BaseAuto {
         moveXYPID(0, -36);
         moveXYAndArm(24, 0, Height.HIGH);
         robot.claw.setPosition(robot.OPEN_POSITION);
-        moveXYPID(0, 12);
+
+        //if spot 1
+        moveXYAndArm(0, 12, Height.MEDIUM);
+
+        //if spot 2
+        //moveXYAndArm(0, 36, Height.MEDIUM);
+
+        //if spot 3
+        //moveXYAndArm(0, 60, Height.MEDIUM);
+
         moveArm(Height.LOW);
         moveArm(Height.GROUND);
     }
