@@ -40,7 +40,6 @@ public class Qual11588OpenCV extends OpenCvPipeline {
         this.telemetry = telemetry;
         this.hardware = hardware;
     }
-    //Constructor for RI3W11588OpenCV class
 
     public void init(Mat input) {
 
