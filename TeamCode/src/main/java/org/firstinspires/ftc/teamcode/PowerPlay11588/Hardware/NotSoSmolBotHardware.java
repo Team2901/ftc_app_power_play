@@ -110,7 +110,6 @@ public class NotSoSmolBotHardware{
 
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        arm.setDirection(DcMotorSimple.Direction.REVERSE);
 
         frontLeft.setPower(0);
         frontRight.setPower(0);

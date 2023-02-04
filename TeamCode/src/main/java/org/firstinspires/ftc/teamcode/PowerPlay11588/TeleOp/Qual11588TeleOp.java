@@ -26,7 +26,7 @@ public class Qual11588TeleOp extends OpMode {
     //Making different variables for each target height
     Height lastArmHeight = currentArmHeight;
     int groundArmPosition = 200;
-    int stackArmPosition = 400;
+    int stackArmPosition = 350;
     int lowArmPosition = 550;
     int midArmPosition = 800;
     int highArmPosition = 1150;
@@ -93,7 +93,7 @@ public class Qual11588TeleOp extends OpMode {
         if (impGamepad1.x.isInitialPress()) {
             lowArmPosition = robot.arm.getCurrentPosition();
             groundArmPosition = lowArmPosition - 350;
-            stackArmPosition = lowArmPosition - 150;
+            stackArmPosition = lowArmPosition - 200;
             midArmPosition = lowArmPosition + 250;
             highArmPosition = lowArmPosition + 600;
             zeroAngleTicks = lowArmPosition - 75;
@@ -115,20 +115,32 @@ public class Qual11588TeleOp extends OpMode {
             //Sets the armTarget to the high pole
             armTarget = highArmPosition;
             currentArmHeight = Height.HIGH;
-        } else if ((impGamepad1.right_bumper.isInitialPress() || impGamepad1.left_bumper.isInitialPress()) && currentArmHeight != Height.STACK) {
-            /*
+        } else if(impGamepad1.right_bumper.isInitialPress()){
+            stackArmPosition += 35;
+            armTarget = stackArmPosition;
+            currentArmHeight = Height.STACK;
+        }else if(impGamepad1.left_bumper.isInitialPress()){
+            stackArmPosition -= 35;
+            armTarget = stackArmPosition;
+            currentArmHeight = Height.STACK;
+        }
+        /*
+        else if ((impGamepad1.right_bumper.isInitialPress() || impGamepad1.left_bumper.isInitialPress()) && currentArmHeight != Height.STACK) {
+
             If a stack button is pressed and we aren't already at a stack height
             sets armTarget to stack height
-            */
+
             armTarget = stackArmPosition;
             currentArmHeight = Height.STACK;
         } else if (impGamepad1.right_bumper.isInitialPress()) {
             //Increases stack position up one cone
-            stackArmPosition += 30;
+            stackArmPosition += 35;
         } else if (impGamepad1.left_bumper.isInitialPress()) {
             //Increases stack position down one cone
-            stackArmPosition -= 30;
+            stackArmPosition -= 35;
+
         }
+        */
 
         /*Allows for the armTarget to be changed for the duration of the TeleOp rather than resetting
         when you change height*/
@@ -225,8 +237,8 @@ public class Qual11588TeleOp extends OpMode {
         if(total > .5){
             total = .5;
         }
-        if(recalculateAngle() > 60 && total < -.5){
-            total = -.5;
+        if(recalculateAngle() > 60 && total < -.3){
+            total = -.3;
         }else if(total < .005 && recalculateAngle() < 60){
             total = .005;
         }
