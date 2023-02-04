@@ -8,6 +8,12 @@ public class NotSoSmolBotAutoTester extends NotSoSmolBotBaseAuto {
     public void runOpMode(){
         robot.init(hardwareMap, true);
         waitForStart();
+        moveArm(Height.MEDIUM);
+        turnToAngle(90);
+        turnToAngle(180);
+        turnToAngle( 270);
+        turnToAngle(360);
+        /*
         //scan for cone
         moveArm(Height.MEDIUM);
         moveXYPID(0, -36);
@@ -25,5 +31,7 @@ public class NotSoSmolBotAutoTester extends NotSoSmolBotBaseAuto {
 
         moveArm(Height.LOW);
         moveArm(Height.GROUND);
+
+         */
     }
 }

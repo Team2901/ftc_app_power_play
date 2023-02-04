@@ -126,7 +126,7 @@ public class NotSoSmolBotBaseAuto extends LinearOpMode {
             //armAngle = 0.102856 * robot.arm.getCurrentPosition() - 43.6276;
             cosArm = Math.cos(Math.toRadians(armAngle));
             total = ((kp * pArm) + (ki * iArm) + (kd * dArm)) / 100 + (kCos * cosArm);
-            robot.arm.setPower(total);
+
             PIDTimer.reset();
             if (iArm > iArmMax) {
                 iArm = iArmMax;
@@ -141,6 +141,7 @@ public class NotSoSmolBotBaseAuto extends LinearOpMode {
             } else if (total < .025 && armAngle < 60) {
                 total = .025;
             }
+            robot.arm.setPower(total);
         }
     }
 

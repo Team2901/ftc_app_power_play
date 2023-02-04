@@ -12,6 +12,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
     public AllianceColor teamColor;
     public Qual11588Hardware robot = new Qual11588Hardware();
     ElapsedTime PIDTimer = new ElapsedTime();
+    ElapsedTime safeWaitTimer = new ElapsedTime();
     //Defining the pidvariables outside the method so they can be used in a telemetry method
     int armTarget = 200;
     int lastArmTarget = armTarget;
@@ -31,8 +32,8 @@ public class Qual11588BaseAuto extends LinearOpMode {
     String colorSeen = "none";
 
     double startAngle = 0;
-    //Has targetAngle return -1 if it has not been defined, it is redefined before it is used
-    double targetAngle = -1;
+    double targetAngle = 0;
+    double currentAngle = 0;
     double turnError = 0;
     double turnPower = .5;
 
@@ -40,7 +41,12 @@ public class Qual11588BaseAuto extends LinearOpMode {
         GROUND,
         LOW,
         MEDIUM,
-        HIGH
+        HIGH,
+        STACK5,
+        STACK4,
+        STACK3,
+        STACK2,
+        STACK1
     }
     public enum AllianceColor{
         RED,
@@ -249,6 +255,235 @@ public class Qual11588BaseAuto extends LinearOpMode {
         robot.arm.setPower(ffTotal);
     }
 
+    public void moveArm(Height height){
+        /*
+        if(height == Height.GROUND){
+            armTarget = 200;
+        } else if(height == Height.LOW){
+            armTarget = 550;
+        } else if(height == Height.MEDIUM){
+            armTarget = 800;
+        } else if(height == Height.HIGH){
+            armTarget = 1200;
+        } else if(height == Height.STACK5){
+            armTarget = 350;
+        }
+
+         */
+
+        switch (height){
+            case GROUND:
+                armTarget = 200;
+                break;
+            case LOW:
+                armTarget = 550;
+                break;
+            case MEDIUM:
+                armTarget = 800;
+                break;
+            case HIGH:
+                armTarget = 1200;
+                break;
+            case STACK5:
+                armTarget = 350;
+                break;
+            case STACK4:
+                armTarget = 315;
+                break;
+            case STACK3:
+                armTarget = 280;
+                break;
+            case STACK2:
+                armTarget = 245;
+                break;
+            case STACK1:
+                armTarget = 210;
+                break;
+        }
+        error = armTarget - robot.arm.getCurrentPosition();
+        PIDTimer.reset();
+
+        while(opModeIsActive() && !(error < 10 && error > -10)){
+            error = armTarget - robot.arm.getCurrentPosition();
+            dArm = (error - pArm)/PIDTimer.seconds();
+            iArm = iArm + (error * PIDTimer.seconds());
+            pArm = error;
+            armAngle = (90.0/(1200.0 - 400.0)) * (robot.arm.getCurrentPosition() - 400.0);
+            //armAngle = 0.102856 * robot.arm.getCurrentPosition() - 43.6276;
+            cosArm = Math.cos(Math.toRadians(armAngle));
+            total = ((kp*pArm) + (ki*iArm) + (kd*dArm))/100 + (kCos *cosArm);
+
+            PIDTimer.reset();
+            if(iArm > iArmMax){
+                iArm = iArmMax;
+            } else if(iArm < -iArmMax){
+                iArm = -iArmMax;
+            }
+            if(total > .5){
+                total = .5;
+            }
+            if(armAngle > 60 && total < -.3){
+                total = -.3;
+            }else if(total < .005 && armAngle < 60){
+                total = .005;
+            }
+
+            robot.arm.setPower(total);
+            telemetryStuff();
+        }
+        armAngle = recalculateAngle();
+        //armAngle = 0.102856 * robot.arm.getCurrentPosition() - 43.6276;
+        cosArm = Math.cos(Math.toRadians(armAngle));
+        double ffTotal = cosArm * kCos;
+        robot.arm.setPower(ffTotal);
+
+    }
+
+    public double recalculateAngle(){
+        //Placeholder variables that will be deleted
+        double rightAngleDiff = 800;
+        double slope = 90/((400 + rightAngleDiff) - 400);
+        double newAngle = slope * (robot.arm.getCurrentPosition() - 400);
+        return newAngle;
+    }
+
+    /*
+    public void turnByAngle(double turnAngle){
+        startAngle = robot.getAngle();
+        targetAngle = AngleUnit.normalizeDegrees(startAngle + turnAngle);
+        turnError = targetAngle - robot.getAngle();
+        while (opModeIsActive() && (turnError > 5 || turnError < -5)){
+            turnError = targetAngle - robot.getAngle();
+            if(turnError < 0){
+                turnPower = -.5;
+            }else if(turnError > 0){
+                turnPower = .5;
+            }
+            robot.frontLeft.setPower(turnPower);
+            robot.frontRight.setPower(-turnPower);
+            robot.backLeft.setPower(turnPower);
+            robot.backRight.setPower(-turnPower);
+            telemetryStuff();
+            turnError = targetAngle - robot.getAngle();
+        }
+    }
+
+     */
+
+    public void turnByAngle(double turnAngle){
+        startAngle = robot.getAngle();
+        targetAngle = AngleUnit.normalizeDegrees(startAngle + turnAngle);
+        turnError = targetAngle - robot.getAngle();
+        while (opModeIsActive() && !(turnError < 2 && turnError > -2)){
+            turnError = targetAngle - robot.getAngle();
+            if(turnError < 0){
+                turnPower = -.5 * (turnError/50);
+                if(turnPower < -.5){
+                    turnPower = -.5;
+                }
+            }else if(turnError > 0){
+                turnPower = .5 * (turnError/50);
+                if(turnPower > .5){
+                    turnPower = .5;
+                }
+            }
+            robot.frontLeft.setPower(-turnPower);
+            robot.frontRight.setPower(turnPower);
+            robot.backLeft.setPower(-turnPower);
+            robot.backRight.setPower(turnPower);
+            turnError = targetAngle - robot.getAngle();
+        }
+        robot.frontLeft.setPower(0);
+        robot.frontRight.setPower(0);
+        robot.backRight.setPower(0);
+        robot.backLeft.setPower(0);
+    }
+    public void turnToAngle(double turnAngle){
+        //robot.getAngle is between -180 and 180, starting at 0
+        targetAngle = AngleUnit.normalizeDegrees(turnAngle) + 180;
+        startAngle = robot.getAngle() + 180;
+        turnError = AngleUnit.normalizeDegrees(targetAngle - startAngle);
+        while(opModeIsActive() && !(turnError < 2 && turnError > -2)){
+            if(turnError >= 0){
+                turnPower = turnError/50;
+                if(turnPower > .5){
+                    turnPower = .5;
+                }
+            }else if(turnError < 0){
+                turnPower = turnError/50;
+                if(turnPower < -.5){
+                    turnPower = -.5;
+                }
+            }
+            robot.frontLeft.setPower(-turnPower);
+            robot.frontRight.setPower(turnPower);
+            robot.backLeft.setPower(-turnPower);
+            robot.backRight.setPower(turnPower);
+
+            currentAngle = robot.getAngle() + 180;
+            turnError = AngleUnit.normalizeDegrees(targetAngle - currentAngle);
+        }
+        robot.frontLeft.setPower(0);
+        robot.frontRight.setPower(0);
+        robot.backRight.setPower(0);
+        robot.backLeft.setPower(0);
+    }
+
+    public void coneAndPark(boolean goLeft){
+        Qual11588OpenCV.ConeColor color = robot.pipeLine.getColor();
+        if(goLeft) {
+            moveXYPID(0, -42);
+            moveXYPID(22, 0);
+            moveArm(Height.HIGH);
+            moveXYPID(4, 0);
+            ElapsedTime timer = new ElapsedTime();
+            timer.reset();
+            while (timer.milliseconds() > 1000) {}
+            moveArm(Height.HIGH);
+            robot.claw.setPosition(robot.OPEN_POSITION);
+            moveXYPID(4, 0);
+            if(color == Qual11588OpenCV.ConeColor.RED){
+                telemetry.addData("Saw red, going to spot 1", "");
+                moveXYPID(0, 18);
+            }else if(color == Qual11588OpenCV.ConeColor.GREEN) {
+                telemetry.addData("Saw green, going to spot 2", "");
+                moveXYPID(0, 42);
+            }else if(color == Qual11588OpenCV.ConeColor.BLUE){
+                telemetry.addData("Saw blue, going to spot 3", "");
+                moveXYPID(0, 68);
+            }
+            moveArm(Height.LOW);
+            moveArm(Height.GROUND);
+        } else {
+            moveXYPID(0, 42);
+            moveXYPID(22, 0);
+            moveArm(Height.HIGH);
+            moveXYPID(4, 0);
+            ElapsedTime timer = new ElapsedTime();
+            timer.reset();
+            while (timer.milliseconds() > 1000) {}
+            moveArm(Height.HIGH);
+            robot.claw.setPosition(robot.OPEN_POSITION);
+            moveXYPID(4, 0);
+            if(color == Qual11588OpenCV.ConeColor.RED){
+                moveXYPID(0, -68);
+                telemetry.addData("Saw red, going to spot 1", "");
+            }else if(color == Qual11588OpenCV.ConeColor.GREEN) {
+                telemetry.addData("Saw green, going to spot 2", "");
+                moveXYPID(0, -42);
+            }else if(color == Qual11588OpenCV.ConeColor.BLUE){
+                telemetry.addData("Saw blue, going to spot 3", "");
+                moveXYPID(0, -18);
+            }
+            moveArm(Height.LOW);
+            moveArm(Height.GROUND);
+        }
+    }
+
+    public void coneAndPark() {
+        coneAndPark(true);
+    }
+
     public void park(){
         if(robot.pipeLine.coneColor == Qual11588OpenCV.ConeColor.RED){
             telemetry.addData("Saw red, going to spot 1", "");
@@ -307,137 +542,6 @@ public class Qual11588BaseAuto extends LinearOpMode {
         while(waitTimer.milliseconds() < 10000) {}
     }
 
-    public void moveArm(Height height){
-        if(height == Height.GROUND){
-            armTarget = 200;
-        } else if(height == Height.LOW){
-            armTarget = 550;
-        } else if(height == Height.MEDIUM){
-            armTarget = 800;
-        } else if(height == Height.HIGH){
-            armTarget = 1200;
-        }
-        error = armTarget - robot.arm.getCurrentPosition();
-        PIDTimer.reset();
-
-        while(opModeIsActive() && !(error < 10 && error > -10)){
-            error = armTarget - robot.arm.getCurrentPosition();
-            dArm = (error - pArm)/PIDTimer.seconds();
-            iArm = iArm + (error * PIDTimer.seconds());
-            pArm = error;
-            armAngle = (90.0/(1200.0 - 400.0)) * (robot.arm.getCurrentPosition() - 400.0);
-            //armAngle = 0.102856 * robot.arm.getCurrentPosition() - 43.6276;
-            cosArm = Math.cos(Math.toRadians(armAngle));
-            total = ((kp*pArm) + (ki*iArm) + (kd*dArm))/100 + (kCos *cosArm);
-
-            PIDTimer.reset();
-            if(iArm > iArmMax){
-                iArm = iArmMax;
-            } else if(iArm < -iArmMax){
-                iArm = -iArmMax;
-            }
-            if(total > .5){
-                total = .5;
-            }
-            if(armAngle > 60 && total < -.3){
-                total = -.3;
-            }else if(total < .005 && armAngle < 60){
-                total = .005;
-            }
-
-            robot.arm.setPower(total);
-            telemetryStuff();
-        }
-        armAngle = recalculateAngle();
-        //armAngle = 0.102856 * robot.arm.getCurrentPosition() - 43.6276;
-        cosArm = Math.cos(Math.toRadians(armAngle));
-        double ffTotal = cosArm * kCos;
-        robot.arm.setPower(ffTotal);
-    }
-
-    public double recalculateAngle(){
-        //Placeholder variables that will be deleted
-        double rightAngleDiff = 800;
-        double slope = 90/((400 + rightAngleDiff) - 400);
-        double newAngle = slope * (robot.arm.getCurrentPosition() - 400);
-        return newAngle;
-    }
-
-    public void turnByAngle(double turnAngle){
-        startAngle = robot.getAngle();
-        targetAngle = AngleUnit.normalizeDegrees(startAngle + turnAngle);
-        turnError = targetAngle - robot.getAngle();
-        while (opModeIsActive() && (turnError > 5 || turnError < -5)){
-            turnError = targetAngle - robot.getAngle();
-            if(turnError < 0){
-                turnPower = -.5;
-            }else if(turnError > 0){
-                turnPower = .5;
-            }
-            robot.frontLeft.setPower(turnPower);
-            robot.frontRight.setPower(-turnPower);
-            robot.backLeft.setPower(turnPower);
-            robot.backRight.setPower(-turnPower);
-            telemetryStuff();
-            turnError = targetAngle - robot.getAngle();
-        }
-    }
-
-    public void coneAndPark(boolean goLeft){
-        Qual11588OpenCV.ConeColor color = robot.pipeLine.getColor();
-        if(goLeft) {
-            moveXYPID(0, -42);
-            moveXYPID(22, 0);
-            moveArm(Height.HIGH);
-            moveXYPID(4, 0);
-            ElapsedTime timer = new ElapsedTime();
-            timer.reset();
-            while (timer.milliseconds() > 1000) {}
-            moveArm(Height.HIGH);
-            robot.claw.setPosition(robot.OPEN_POSITION);
-            moveXYPID(4, 0);
-            if(color == Qual11588OpenCV.ConeColor.RED){
-                telemetry.addData("Saw red, going to spot 1", "");
-                moveXYPID(0, 18);
-            }else if(color == Qual11588OpenCV.ConeColor.GREEN) {
-                telemetry.addData("Saw green, going to spot 2", "");
-                moveXYPID(0, 42);
-            }else if(color == Qual11588OpenCV.ConeColor.BLUE){
-                telemetry.addData("Saw blue, going to spot 3", "");
-                moveXYPID(0, 68);
-            }
-            moveArm(Height.LOW);
-            moveArm(Height.GROUND);
-        } else {
-            moveXYPID(0, 42);
-            moveXYPID(22, 0);
-            moveArm(Height.HIGH);
-            moveXYPID(4, 0);
-            ElapsedTime timer = new ElapsedTime();
-            timer.reset();
-            while (timer.milliseconds() > 1000) {}
-            moveArm(Height.HIGH);
-            robot.claw.setPosition(robot.OPEN_POSITION);
-            moveXYPID(4, 0);
-            if(color == Qual11588OpenCV.ConeColor.RED){
-                moveXYPID(0, -68);
-                telemetry.addData("Saw red, going to spot 1", "");
-            }else if(color == Qual11588OpenCV.ConeColor.GREEN) {
-                telemetry.addData("Saw green, going to spot 2", "");
-                moveXYPID(0, -42);
-            }else if(color == Qual11588OpenCV.ConeColor.BLUE){
-                telemetry.addData("Saw blue, going to spot 3", "");
-                moveXYPID(0, -18);
-            }
-            moveArm(Height.LOW);
-            moveArm(Height.GROUND);
-        }
-    }
-
-    public void coneAndPark() {
-        coneAndPark(true);
-    }
-
     public void telemetryStuff(){
         /*
         telemetry.addData("Frames Processed", robot.pipeLine.framesProceeded);
@@ -462,8 +566,9 @@ public class Qual11588BaseAuto extends LinearOpMode {
         telemetry.addData("PID Total", total);
         telemetry.addData("Feed Forward", ffTotal);
         telemetry.addData("Alliance", teamColor);
-        telemetry.addData("Current Angle", robot.getAngle());
+        telemetry.addData("Robot Angle", robot.getAngle());
         telemetry.addData("Target Angle", targetAngle);
+        telemetry.addData("Turn Error", turnError);
         telemetry.update();
     }
 }
