@@ -127,9 +127,9 @@ public class PIDTunerTeleOp extends OpMode {
         plug it into desmos how it is modeled using a linear regression
         0 degrees = 425 90 degrees = 1300
          */
-        armAngle = 0.102856 * tuneMotor.getCurrentPosition() - 43.6276;
+        armAngle = (90.0/(1200.0 - 400.0)) * (tuneMotor.getCurrentPosition() - 400.0);
         cosArm = Math.cos(Math.toRadians(armAngle));
-        double ffTotal = (kCos * cosArm)/100;
+        double ffTotal = (kCos * cosArm);
         return ffTotal;
     }
 

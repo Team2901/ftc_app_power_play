@@ -13,7 +13,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
     public Qual11588Hardware robot = new Qual11588Hardware();
     ElapsedTime PIDTimer = new ElapsedTime();
     //Defining the pidvariables outside the method so they can be used in a telemetry method
-    int armTarget = 50;
+    int armTarget = 200;
     int lastArmTarget = armTarget;
     int error = 0;
     double total = 0.0;
@@ -27,6 +27,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
     double cosArm = 0.0;
     double iArmMax = .25;
     double armAngle = 0;
+    double ffTotal = 0;
     String colorSeen = "none";
 
     double startAngle = 0;
@@ -52,7 +53,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
 
     public void moveXY(double y, double x){
         int ticksY = (int) (y * robot.TICKS_PER_INCH);
-        int ticksX = (int) (1.5 * x * robot.TICKS_PER_INCH);
+        int ticksX = (int) (x * robot.TICKS_PER_INCH);
 
         robot.frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -180,7 +181,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
         PIDTimer.reset();
 
         int ticksY = (int) (y * robot.TICKS_PER_INCH);
-        int ticksX = (int) (1.5 * x * robot.TICKS_PER_INCH);
+        int ticksX = (int) (x * robot.TICKS_PER_INCH);
 
         robot.frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -212,7 +213,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
             //armAngle = 0.102856 * robot.arm.getCurrentPosition() - 43.6276;
             cosArm = Math.cos(Math.toRadians(armAngle));
             total = ((kp*pArm) + (ki*iArm) + (kd*dArm))/100 + (kCos *cosArm);
-            robot.arm.setPower(total);
+
             PIDTimer.reset();
             if(iArm > iArmMax){
                 iArm = iArmMax;
@@ -224,9 +225,10 @@ public class Qual11588BaseAuto extends LinearOpMode {
             }
             if(armAngle > 60 && total < -.5){
                 total = -.5;
-            }else if(total < .025 && armAngle < 60){
-                total = .025;
+            }else if(total < .005 && armAngle < 60){
+                total = .005;
             }
+            robot.arm.setPower(total);
             telemetryStuff();
         }
 
@@ -243,7 +245,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
         armAngle = (90.0/(1200.0 - 400.0)) * (robot.arm.getCurrentPosition() - 400.0);
         //armAngle = 0.102856 * robot.arm.getCurrentPosition() - 43.6276;
         cosArm = Math.cos(Math.toRadians(armAngle));
-        double ffTotal = cosArm * kCos;
+        ffTotal = cosArm * kCos;
         robot.arm.setPower(ffTotal);
     }
 
@@ -313,7 +315,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
         } else if(height == Height.MEDIUM){
             armTarget = 800;
         } else if(height == Height.HIGH){
-            armTarget = 1150;
+            armTarget = 1200;
         }
         error = armTarget - robot.arm.getCurrentPosition();
         PIDTimer.reset();
@@ -327,7 +329,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
             //armAngle = 0.102856 * robot.arm.getCurrentPosition() - 43.6276;
             cosArm = Math.cos(Math.toRadians(armAngle));
             total = ((kp*pArm) + (ki*iArm) + (kd*dArm))/100 + (kCos *cosArm);
-            robot.arm.setPower(total);
+
             PIDTimer.reset();
             if(iArm > iArmMax){
                 iArm = iArmMax;
@@ -337,18 +339,28 @@ public class Qual11588BaseAuto extends LinearOpMode {
             if(total > .5){
                 total = .5;
             }
-            if(armAngle > 60 && total < -.5){
-                total = -.5;
-            }else if(total < .025 && armAngle < 60){
-                total = .025;
+            if(armAngle > 60 && total < -.3){
+                total = -.3;
+            }else if(total < .005 && armAngle < 60){
+                total = .005;
             }
+
+            robot.arm.setPower(total);
             telemetryStuff();
         }
-        armAngle = (90.0/(1200.0 - 400.0)) * (robot.arm.getCurrentPosition() - 400.0);
+        armAngle = recalculateAngle();
         //armAngle = 0.102856 * robot.arm.getCurrentPosition() - 43.6276;
         cosArm = Math.cos(Math.toRadians(armAngle));
         double ffTotal = cosArm * kCos;
         robot.arm.setPower(ffTotal);
+    }
+
+    public double recalculateAngle(){
+        //Placeholder variables that will be deleted
+        double rightAngleDiff = 800;
+        double slope = 90/((400 + rightAngleDiff) - 400);
+        double newAngle = slope * (robot.arm.getCurrentPosition() - 400);
+        return newAngle;
     }
 
     public void turnByAngle(double turnAngle){
@@ -369,14 +381,6 @@ public class Qual11588BaseAuto extends LinearOpMode {
             telemetryStuff();
             turnError = targetAngle - robot.getAngle();
         }
-    }
-
-    public void placeCone() {
-        moveArm(Height.MEDIUM);
-        moveXY(0, 12);
-        moveXY(6, 0);
-        moveArm(Height.LOW);
-        robot.claw.setPosition(robot.OPEN_POSITION);
     }
 
     public void coneAndPark(boolean goLeft){
@@ -435,11 +439,13 @@ public class Qual11588BaseAuto extends LinearOpMode {
     }
 
     public void telemetryStuff(){
+        /*
         telemetry.addData("Frames Processed", robot.pipeLine.framesProceeded);
         telemetry.addData("Red seen", robot.pipeLine.redAmount);
         telemetry.addData("Green seen", robot.pipeLine.greenAmount);
         telemetry.addData("Blue seen", robot.pipeLine.blueAmount);
         telemetry.addData("Color decided", colorSeen);
+         */
         telemetry.addData("Front Left Target", robot.frontLeft.getTargetPosition());
         telemetry.addData("Front Left Position", robot.frontLeft.getCurrentPosition());
         telemetry.addData("Front Right Target", robot.frontRight.getTargetPosition());
@@ -450,8 +456,11 @@ public class Qual11588BaseAuto extends LinearOpMode {
         telemetry.addData("Back Right Position", robot.backRight.getCurrentPosition());
         telemetry.addData("Arm Target", armTarget);
         telemetry.addData("Arm Position", robot.arm.getCurrentPosition());
+        telemetry.addData("Arm Angle", armAngle);
         telemetry.addData("Arm Error", error);
-        telemetry.addData("Arm Power", total);
+        telemetry.addData("Arm Power", robot.arm.getPower());
+        telemetry.addData("PID Total", total);
+        telemetry.addData("Feed Forward", ffTotal);
         telemetry.addData("Alliance", teamColor);
         telemetry.addData("Current Angle", robot.getAngle());
         telemetry.addData("Target Angle", targetAngle);
