@@ -125,6 +125,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
 
         while (opModeIsActive() && (robot.frontLeft.isBusy() || robot.frontRight.isBusy() ||
                 robot.backLeft.isBusy() || robot.backRight.isBusy())){
+            /*
             armAngle = (90.0/(1200 - 400)) * (robot.arm.getCurrentPosition() - 400);
             //armAngle = 0.102856 * robot.arm.getCurrentPosition() - 43.6276;
 
@@ -155,9 +156,11 @@ public class Qual11588BaseAuto extends LinearOpMode {
                 total = .005;
             }
             lastArmTarget = armTarget;
+            */
 
+            armAngle = recalculateAngle();
             cosArm = Math.cos(Math.toRadians(armAngle));
-            double ffTotal = cosArm * kCos;
+            ffTotal = cosArm * kCos;
             robot.arm.setPower(ffTotal);
             telemetryStuff();
         }
@@ -282,7 +285,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
                 armTarget = 800;
                 break;
             case HIGH:
-                armTarget = 1200;
+                armTarget = 1150;
                 break;
             case STACK5:
                 armTarget = 350;
@@ -334,7 +337,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
         armAngle = recalculateAngle();
         //armAngle = 0.102856 * robot.arm.getCurrentPosition() - 43.6276;
         cosArm = Math.cos(Math.toRadians(armAngle));
-        double ffTotal = cosArm * kCos;
+        ffTotal = cosArm * kCos;
         robot.arm.setPower(ffTotal);
 
     }
@@ -346,29 +349,6 @@ public class Qual11588BaseAuto extends LinearOpMode {
         double newAngle = slope * (robot.arm.getCurrentPosition() - 400);
         return newAngle;
     }
-
-    /*
-    public void turnByAngle(double turnAngle){
-        startAngle = robot.getAngle();
-        targetAngle = AngleUnit.normalizeDegrees(startAngle + turnAngle);
-        turnError = targetAngle - robot.getAngle();
-        while (opModeIsActive() && (turnError > 5 || turnError < -5)){
-            turnError = targetAngle - robot.getAngle();
-            if(turnError < 0){
-                turnPower = -.5;
-            }else if(turnError > 0){
-                turnPower = .5;
-            }
-            robot.frontLeft.setPower(turnPower);
-            robot.frontRight.setPower(-turnPower);
-            robot.backLeft.setPower(turnPower);
-            robot.backRight.setPower(-turnPower);
-            telemetryStuff();
-            turnError = targetAngle - robot.getAngle();
-        }
-    }
-
-     */
 
     public void turnByAngle(double turnAngle){
         startAngle = robot.getAngle();
@@ -392,6 +372,12 @@ public class Qual11588BaseAuto extends LinearOpMode {
             robot.backLeft.setPower(-turnPower);
             robot.backRight.setPower(turnPower);
             turnError = targetAngle - robot.getAngle();
+
+            armAngle = recalculateAngle();
+            cosArm = Math.cos(Math.toRadians(armAngle));
+            ffTotal = cosArm * kCos;
+            robot.arm.setPower(ffTotal);
+            telemetryStuff();
         }
         robot.frontLeft.setPower(0);
         robot.frontRight.setPower(0);
@@ -403,7 +389,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
         targetAngle = AngleUnit.normalizeDegrees(turnAngle) + 180;
         startAngle = robot.getAngle() + 180;
         turnError = AngleUnit.normalizeDegrees(targetAngle - startAngle);
-        while(opModeIsActive() && !(turnError < 2 && turnError > -2)){
+        while(opModeIsActive() && !(turnError < .5 && turnError > -.5)){
             if(turnError >= 0){
                 turnPower = turnError/50;
                 if(turnPower > .5){
@@ -422,11 +408,28 @@ public class Qual11588BaseAuto extends LinearOpMode {
 
             currentAngle = robot.getAngle() + 180;
             turnError = AngleUnit.normalizeDegrees(targetAngle - currentAngle);
+
+            armAngle = recalculateAngle();
+            cosArm = Math.cos(Math.toRadians(armAngle));
+            ffTotal = cosArm * kCos;
+            robot.arm.setPower(ffTotal);
+            telemetryStuff();
         }
         robot.frontLeft.setPower(0);
         robot.frontRight.setPower(0);
         robot.backRight.setPower(0);
         robot.backLeft.setPower(0);
+    }
+
+    public void safeWaitPID(int milliseconds){
+        safeWaitTimer.reset();
+        while(opModeIsActive() && safeWaitTimer.milliseconds() < milliseconds){
+            armAngle = recalculateAngle();
+            cosArm = Math.cos(Math.toRadians(armAngle));
+            ffTotal = cosArm * kCos;
+            robot.arm.setPower(ffTotal);
+            telemetryStuff();
+        }
     }
 
     public void coneAndPark(boolean goLeft){

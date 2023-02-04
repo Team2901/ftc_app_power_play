@@ -6,9 +6,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.Qual11588Hardware;
 
 
-@Autonomous (name = "NotSoSmolBot Blue Upper", group = "11588")
+@Autonomous (name = "NotSoSmolBot Blue Upper", group = "Not So Smol Bot")
 public class NotSoSmolBotBlueUpper extends Qual11588BaseAuto {
-    ElapsedTime timer = new ElapsedTime();
     @Override
     public void runOpMode() throws InterruptedException {
         robot.init(hardwareMap, telemetry, false, Qual11588Hardware.allianceColor.BLUE, true);
@@ -16,44 +15,25 @@ public class NotSoSmolBotBlueUpper extends Qual11588BaseAuto {
         waitForStart();
         //scan for cone
         moveArm(Height.MEDIUM);
-        moveXY(6, 0);
-        moveXY(0, 24);
-
-        robot.claw.setPosition(robot.OPEN_POSITION);
-        timer.reset();
-        while(opModeIsActive() && timer.milliseconds() < 1000){
-
-        }
-        robot.claw.setPosition(robot.CLOSED_POSITION);
-        timer.reset();
-        while(opModeIsActive() && timer.milliseconds() < 1000){
-
-        }
-        moveXY(24,0);
+        moveXYPID(6, 0);
+        moveXYPID(0, 24);
+        moveXYPID(24,0);
         moveArm(Height.HIGH);
-        timer.reset();
-        while(opModeIsActive() && timer.milliseconds() < 1000){
-
-        }
-        moveXY(0,18);
-        moveXY(4,0);
+        safeWaitPID(500);
+        moveXYPID(0,16);
+        moveXYPID(3,0);
         robot.claw.setPosition(robot.OPEN_POSITION);
-        timer.reset();
-        while(opModeIsActive() && timer.milliseconds() < 1000){
-
-        }
-        moveXY(-6,0);
+        safeWaitPID(500);
+        moveXYPID(-6,0);
 
         //if spot 1
-        //moveXYAndArm(0, -12, Height.MEDIUM);
-        moveXY(0,15);
-        moveArm(Height.MEDIUM);
+        //moveXYPID(0,-15);
 
         //if spot 2
-        //moveXYAndArm(0, -36, Height.MEDIUM);
+        //moveXYPID(0, -40);
 
         //if spot 3
-        //moveXYAndArm(0, -60, Height.MEDIUM);
+        moveXYPID(0, -66);
 
         moveArm(Height.GROUND);
     }

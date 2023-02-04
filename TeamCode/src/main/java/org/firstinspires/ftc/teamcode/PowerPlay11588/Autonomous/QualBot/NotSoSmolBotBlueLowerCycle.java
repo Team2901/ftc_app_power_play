@@ -17,12 +17,19 @@ public class NotSoSmolBotBlueLowerCycle extends Qual11588BaseAuto{
         turnToAngle(270);
         robot.claw.setPosition(robot.OPEN_POSITION);
         moveArm(Height.STACK5);
-
+        moveXYPID(18, 0);
+        safeWaitPID(500);
         robot.claw.setPosition(robot.CLOSED_POSITION);
+        safeWaitPID(500);
         moveArm(Height.HIGH);
+        moveXYPID(-18, 0);
         turnToAngle(45);
+        moveXYPID(16, 0);
+        moveArm(Height.HIGH);
+        safeWaitPID(500);
         robot.claw.setPosition(robot.OPEN_POSITION);
+        safeWaitPID(500);
         turnToAngle(0);
-        moveArm(Height.LOW);
+        moveArm(Height.GROUND);
     }
 }
