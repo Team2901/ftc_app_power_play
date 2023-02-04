@@ -56,6 +56,5 @@ public class NotSoSmolBotBlueLower extends Qual11588BaseAuto {
         //moveXYAndArm(0, 60, Height.MEDIUM);
 
         moveArm(Height.GROUND);
-
     }
 }
