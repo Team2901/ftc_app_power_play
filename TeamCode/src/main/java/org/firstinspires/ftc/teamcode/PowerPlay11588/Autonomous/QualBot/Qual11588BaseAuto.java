@@ -13,6 +13,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
     public Qual11588Hardware robot = new Qual11588Hardware();
     ElapsedTime PIDTimer = new ElapsedTime();
     ElapsedTime safeWaitTimer = new ElapsedTime();
+    ElapsedTime PIDTimeout = new ElapsedTime();
     //Defining the pidvariables outside the method so they can be used in a telemetry method
     int armTarget = 200;
     int lastArmTarget = armTarget;
@@ -97,7 +98,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
         robot.backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-    public void moveXYPID(double y, double x){
+    public void moveXYPID(double y, double x, double power){
         int ticksY = (int) (y * robot.TICKS_PER_INCH);
         int ticksX = (int) (x * robot.TICKS_PER_INCH);
 
@@ -118,45 +119,13 @@ public class Qual11588BaseAuto extends LinearOpMode {
         robot.backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        robot.frontLeft.setPower(0.5);
-        robot.frontRight.setPower(0.5);
-        robot.backLeft.setPower(0.5);
-        robot.backRight.setPower(0.5);
+        robot.frontLeft.setPower(power);
+        robot.frontRight.setPower(power);
+        robot.backLeft.setPower(power);
+        robot.backRight.setPower(power);
 
         while (opModeIsActive() && (robot.frontLeft.isBusy() || robot.frontRight.isBusy() ||
                 robot.backLeft.isBusy() || robot.backRight.isBusy())){
-            /*
-            armAngle = (90.0/(1200 - 400)) * (robot.arm.getCurrentPosition() - 400);
-            //armAngle = 0.102856 * robot.arm.getCurrentPosition() - 43.6276;
-
-            error = armTarget - robot.arm.getCurrentPosition();
-            dArm = (error - pArm) / PIDTimer.seconds();
-            iArm = iArm + (error * PIDTimer.seconds());
-            pArm = error;
-            cosArm = Math.cos(Math.toRadians(armAngle));
-            total = ((pArm * kp) + (iArm * ki) + (dArm * kd))/100 + (cosArm * kCos);
-            PIDTimer.reset();
-
-            if(armTarget != lastArmTarget){
-                iArm = 0;
-            }
-
-            if(iArm > iArmMax){
-                iArm = iArmMax;
-            }else if(iArm < -iArmMax){
-                iArm = -iArmMax;
-            }
-
-            if(total > .65){
-                total = .65;
-            }
-            if(armAngle > 60 && total < -.5){
-                total = -.5;
-            }else if(total < .005 && armAngle < 60){
-                total = .005;
-            }
-            lastArmTarget = armTarget;
-            */
 
             armAngle = recalculateAngle();
             cosArm = Math.cos(Math.toRadians(armAngle));
@@ -174,6 +143,10 @@ public class Qual11588BaseAuto extends LinearOpMode {
         robot.frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    public void moveXYPID(double y, double x){
+        moveXYPID(y, x, .5);
     }
 
     public void moveXYAndArm(double y, double x, Height height){
@@ -285,28 +258,29 @@ public class Qual11588BaseAuto extends LinearOpMode {
                 armTarget = 800;
                 break;
             case HIGH:
-                armTarget = 1150;
+                armTarget = 1200;
                 break;
             case STACK5:
-                armTarget = 350;
+                armTarget = 310;
                 break;
             case STACK4:
-                armTarget = 315;
+                armTarget = 275;
                 break;
             case STACK3:
-                armTarget = 280;
+                armTarget = 240;
                 break;
             case STACK2:
-                armTarget = 245;
+                armTarget = 205;
                 break;
             case STACK1:
-                armTarget = 210;
+                armTarget = 170;
                 break;
         }
         error = armTarget - robot.arm.getCurrentPosition();
         PIDTimer.reset();
+        PIDTimeout.reset();
 
-        while(opModeIsActive() && !(error < 10 && error > -10)){
+        while(opModeIsActive() && !(error < 10 && error > -10) && PIDTimeout.milliseconds() < 3000){
             error = armTarget - robot.arm.getCurrentPosition();
             dArm = (error - pArm)/PIDTimer.seconds();
             iArm = iArm + (error * PIDTimer.seconds());
@@ -322,16 +296,17 @@ public class Qual11588BaseAuto extends LinearOpMode {
             } else if(iArm < -iArmMax){
                 iArm = -iArmMax;
             }
-            if(total > .5){
-                total = .5;
+            if(total > .6){
+                total = .6;
             }
             if(armAngle > 60 && total < -.3){
                 total = -.3;
-            }else if(total < .005 && armAngle < 60){
-                total = .005;
+            }else if(total < .001 && armAngle < 60){
+                total = .001;
             }
 
             robot.arm.setPower(total);
+
             telemetryStuff();
         }
         armAngle = recalculateAngle();
@@ -392,13 +367,13 @@ public class Qual11588BaseAuto extends LinearOpMode {
         while(opModeIsActive() && !(turnError < .5 && turnError > -.5)){
             if(turnError >= 0){
                 turnPower = turnError/50;
-                if(turnPower > .5){
-                    turnPower = .5;
+                if(turnPower > .75){
+                    turnPower = .75;
                 }
             }else if(turnError < 0){
                 turnPower = turnError/50;
-                if(turnPower < -.5){
-                    turnPower = -.5;
+                if(turnPower < -.75){
+                    turnPower = -.75;
                 }
             }
             robot.frontLeft.setPower(-turnPower);

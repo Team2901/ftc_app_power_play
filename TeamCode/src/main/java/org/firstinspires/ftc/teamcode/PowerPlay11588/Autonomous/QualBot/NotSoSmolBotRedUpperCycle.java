@@ -4,8 +4,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.Qual11588Hardware;
 
-@Autonomous (name = "NotSoSmolBot Blue Lower Cycle", group = "Not So Smol Bot")
-public class NotSoSmolBotBlueLowerCycle extends Qual11588BaseAuto{
+@Autonomous (name = "NotSoSmolBot Red Upper Cycle", group = "Not So Smol Bot")
+public class NotSoSmolBotRedUpperCycle extends Qual11588BaseAuto{
     @Override
     public void runOpMode() throws InterruptedException{
         robot.autoInit(hardwareMap, telemetry, Qual11588Hardware.allianceColor.BLUE);

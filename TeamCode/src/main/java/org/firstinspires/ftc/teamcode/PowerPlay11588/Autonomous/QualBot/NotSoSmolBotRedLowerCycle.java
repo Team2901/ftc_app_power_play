@@ -4,8 +4,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.Qual11588Hardware;
 
-@Autonomous (name = "NotSoSmolBot Blue Lower Cycle", group = "Not So Smol Bot")
-public class NotSoSmolBotBlueLowerCycle extends Qual11588BaseAuto{
+@Autonomous (name = "NotSoSmolBot Red Lower Cycle", group = "Not So Smol Bot")
+public class NotSoSmolBotRedLowerCycle extends Qual11588BaseAuto{
     @Override
     public void runOpMode() throws InterruptedException{
         robot.autoInit(hardwareMap, telemetry, Qual11588Hardware.allianceColor.BLUE);
@@ -17,7 +17,7 @@ public class NotSoSmolBotBlueLowerCycle extends Qual11588BaseAuto{
         moveXYPID(-4, 0, 0.7);
         moveArm(Height.HIGH);
         turnToAngle(0);
-        moveXYPID(0, -14, 0.8);
+        moveXYPID(0, 14, 0.8);
         turnToAngle(0);
         moveXYPID(5, 0, 0.7);
         turnToAngle(0);
@@ -25,7 +25,7 @@ public class NotSoSmolBotBlueLowerCycle extends Qual11588BaseAuto{
         robot.claw.setPosition(robot.OPEN_POSITION);
         safeWaitPID(100);
         moveXYPID(-6, 0, 0.7);
-        moveXYPID(0, 12, 0.7);
+        moveXYPID(0, -12, 0.7);
         turnToAngle(270);
         turnToAngle(270);
         moveXYPID(10, 0, 0.8);
@@ -48,19 +48,19 @@ public class NotSoSmolBotBlueLowerCycle extends Qual11588BaseAuto{
         moveXYPID(-6, 0);
 
         //if spot 1
-        moveXYPID(0, -12);
+        moveXYPID(0, 12);
         moveXYPID(-24, 0, .8);
 
         //if spot 2
         /*
-        moveXYPID(0, 12);
+        moveXYPID(0, -12);
         moveXYPID(-24, 0, .8);
 
          */
 
         //if spot 3
         /*
-        moveXYPID(0, -36, .8);
+        moveXYPID(0, 36, .8);
         moveXYPID(-24, 0, .8);
 
          */
