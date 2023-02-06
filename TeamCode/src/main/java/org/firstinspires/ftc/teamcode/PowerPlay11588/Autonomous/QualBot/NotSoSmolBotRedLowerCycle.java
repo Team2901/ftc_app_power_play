@@ -1,17 +1,21 @@
 package org.firstinspires.ftc.teamcode.PowerPlay11588.Autonomous.QualBot;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.OpenCVPipelines.Qual11588OpenCV;
 import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.Qual11588Hardware;
 
 @Autonomous (name = "NotSoSmolBot Red Lower Cycle", group = "Not So Smol Bot")
 public class NotSoSmolBotRedLowerCycle extends Qual11588BaseAuto{
     @Override
     public void runOpMode() throws InterruptedException{
-        robot.autoInit(hardwareMap, telemetry, Qual11588Hardware.allianceColor.BLUE);
+        robot.autoInit(hardwareMap, telemetry, Qual11588Hardware.allianceColor.RED);
         telemetryStuff();
         waitForStart();
-        //identify cone
+        robot.pipeLine.stopCam();
+
+        Qual11588OpenCV.ConeColor color = robot.pipeLine.getColor();
         moveArm(Height.MEDIUM);
         moveXYPID(54, 0, 0.8);
         moveXYPID(-4, 0, 0.7);
@@ -47,9 +51,19 @@ public class NotSoSmolBotRedLowerCycle extends Qual11588BaseAuto{
         safeWaitPID(100);
         moveXYPID(-6, 0);
 
+        if (color == Qual11588OpenCV.ConeColor.RED) {
+            moveXYPID(0, 12);
+            moveXYPID(-24, 0, .8);
+        } else if (color == Qual11588OpenCV.ConeColor.GREEN) {
+            moveXYPID(0, -12);
+            moveXYPID(-24, 0, .8);
+        } else if (color == Qual11588OpenCV.ConeColor.BLUE) {
+            moveXYPID(0, 36, .8);
+            moveXYPID(-24, 0, .8);
+        }
         //if spot 1
-        moveXYPID(0, 12);
-        moveXYPID(-24, 0, .8);
+//        moveXYPID(0, 12);
+//        moveXYPID(-24, 0, .8);
 
         //if spot 2
         /*

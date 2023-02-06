@@ -12,6 +12,7 @@ import org.openftc.easyopencv.OpenCvPipeline;
 public class Qual11588OpenCV extends OpenCvPipeline {
 
     private Mat lastImage = null;
+    private final double ALPHA = 0.1;
     private Mat subMat = null;
     public enum ConeColor { RED, GREEN, BLUE};
     public ConeColor coneColor = null;
@@ -26,8 +27,8 @@ public class Qual11588OpenCV extends OpenCvPipeline {
     public double greenAmountAverage;
     public double blueAmountAverage;
     public int framesProceeded;
-    public boolean noStart = true;
-    Rect r = new Rect(100, 100, 100, 100);
+    public boolean useCam = true;
+    Rect r = new Rect(100, 125, 75, 75);
     Mat redMask = new Mat();
     Mat blueMask = new Mat();
     Mat greenMask = new Mat();
@@ -47,22 +48,18 @@ public class Qual11588OpenCV extends OpenCvPipeline {
 
     }
 
-    public void startCam() {
-        this.noStart = false;
+    public void stopCam() {
+        this.useCam = false;
     }
 
     @Override
     public Mat processFrame(Mat input) {
-        if (noStart) {
-
-        }
         framesProceeded++;
         if (input == null) {
             return lastImage;
 //Makes sure doesn't crash when the camera does nothing
         }
 
-        if(framesProceeded < 30) {
             input.copyTo(lastImage);
             //copies the last input to lastImage, actually assigning it
 
@@ -88,11 +85,22 @@ public class Qual11588OpenCV extends OpenCvPipeline {
             double nonZeroPixelsGreen = Core.countNonZero(greenMask);
             //This counts the number of non zero pixels in each mask
 
-            redAmount = nonZeroPixelsRed / subMat.total() * 100;
+            if (useCam) {
+                redAmount = nonZeroPixelsRed / subMat.total() * 100;
 
-            blueAmount = nonZeroPixelsBlue / subMat.total() * 100;
+                blueAmount = nonZeroPixelsBlue / subMat.total() * 100;
 
-            greenAmount = nonZeroPixelsGreen / subMat.total() * 100;
+                greenAmount = nonZeroPixelsGreen / subMat.total() * 100;
+
+                redAmountAllTime = redAmountAllTime + redAmount;
+                blueAmountAllTime = blueAmountAllTime + blueAmount;
+                greenAmountAllTime = greenAmountAllTime + greenAmount;
+
+                redAmountAverage = ALPHA * redAmount + (1 - ALPHA) * redAmountAverage;
+                greenAmountAverage = ALPHA * greenAmount + (1 - ALPHA) * greenAmountAverage;
+                blueAmountAverage = ALPHA * blueAmount + (1 - ALPHA) * blueAmountAverage;
+            }
+
 
             //This creates a percentage of pixels on the screen, this are not scaled to each other
             //TO a degree each value/mask is arbitrary
@@ -105,13 +113,7 @@ public class Qual11588OpenCV extends OpenCvPipeline {
             //Core.bitwise_and(subMat, subMat, subMat, redMask);
             //This commented out code is only for visualizing the pipeline
 
-            redAmountAllTime = redAmountAllTime + redAmount;
-            blueAmountAllTime = blueAmountAllTime + blueAmount;
-            greenAmountAllTime = greenAmountAllTime + greenAmount;
 
-            redAmountAverage = redAmountAllTime / framesProceeded;
-            greenAmountAverage = greenAmountAllTime / framesProceeded;
-            blueAmountAverage = blueAmountAllTime / framesProceeded;
 
 //            This code is literally only for testing and getting an average
 
@@ -119,7 +121,6 @@ public class Qual11588OpenCV extends OpenCvPipeline {
 
             //All Pipeline code must be written above here
             //Simple if statement to determine what is the largest amount/percentage of a color
-        }
 
         /*The entire thing is in an if statement because we only want process frame to run one until
         we get a value for coneColor because we don't want it to change in the middle of our run because that

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.PowerPlay11588.TeleOp;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -7,6 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.NotSoSmolBotHardware;
 import org.firstinspires.ftc.teamcode.Shared.Gamepad.ImprovedGamepad;
 
+@Disabled
 @TeleOp (name = "NotSoSmolBot TeleOp", group = "11588")
 public class NotSoSmolBotTeleOp extends OpMode {
     NotSoSmolBotHardware robot = new NotSoSmolBotHardware();
