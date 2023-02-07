@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.PowerPlay11588.TeleOp;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.exception.RobotCoreException;
@@ -8,6 +9,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.SmolBot11588Hardware;
 
+@Disabled
 @TeleOp(name = "SmolBot 11588 TeleOp", group = "11588")
 public class SmolBot11588TeleOp extends OpMode {
     SmolBot11588Hardware robot = new SmolBot11588Hardware();

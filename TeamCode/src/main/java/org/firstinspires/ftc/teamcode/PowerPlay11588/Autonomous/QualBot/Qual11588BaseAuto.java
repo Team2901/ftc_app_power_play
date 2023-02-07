@@ -258,7 +258,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
                 armTarget = 800;
                 break;
             case HIGH:
-                armTarget = 1200;
+                armTarget = 1150;
                 break;
             case STACK5:
                 armTarget = 310;
