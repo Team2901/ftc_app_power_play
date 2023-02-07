@@ -7,6 +7,9 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+/**
+ * Created by Allenn23825 on 1/24/2023.
+ */
 public class NewClawbotHardware {
     public static final double CLAW_OPEN_POSITION = 0.0;
     public static final double CLAW_CLOSED_POSITION = 0.45;

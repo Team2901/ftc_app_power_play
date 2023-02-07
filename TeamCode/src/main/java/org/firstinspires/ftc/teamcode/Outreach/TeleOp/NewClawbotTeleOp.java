@@ -7,6 +7,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.Outreach.Hardware.NewClawbotHardware;
 import org.firstinspires.ftc.teamcode.Shared.Gamepad.ImprovedGamepad;
 
+/**
+ * Created by Allenn23825 on 1/24/2023.
+ */
 @TeleOp(name="New Clawbot Teleop", group="Outreach")
 public class NewClawbotTeleOp extends OpMode {
     public enum ClawState {OPEN, CLOSED}
