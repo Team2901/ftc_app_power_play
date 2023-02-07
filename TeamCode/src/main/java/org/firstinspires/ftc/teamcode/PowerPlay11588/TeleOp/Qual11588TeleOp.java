@@ -99,6 +99,14 @@ public class Qual11588TeleOp extends OpMode {
             zeroAngleTicks = lowArmPosition - 75;
         }
 
+        /*
+        I'm really gonna miss you guys. I'm really sorry that it had to end like this
+        I'm always here to help if you need me. Please don't forget me. I have spent
+        4 years on this team doing everything for this team. I really wish I could stay
+        until the end of the year but I just can't do it anymore. You guys know how to
+        reach me if you need it. I'm sorry
+         */
+
         if (impGamepad1.dpad_left.isInitialPress()) {
             //Sets the armTarget to ground/intake
             armTarget = groundArmPosition;
