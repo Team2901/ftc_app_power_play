@@ -2,31 +2,24 @@ package org.firstinspires.ftc.teamcode.Outreach.TeleOp;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Outreach.Hardware.NewClawbotHardware;
 import org.firstinspires.ftc.teamcode.Shared.Gamepad.ImprovedGamepad;
 
-/**
- * Created by Allenn23825 on 1/24/2023.
- */
-@TeleOp(name="New Clawbot Teleop", group="Outreach")
-public class NewClawbotTeleOp extends OpMode {
+@TeleOp(name="New Clawbot Teleop No PID", group="Outreach")
+public class NewClawBotTeleOpNoPID extends OpMode {
     public enum ClawState {OPEN, CLOSED}
     public enum Controller{PARTICIPANT, MASTER}
-    public ClawState currentClawState = ClawState.CLOSED;
+    public NewClawbotTeleOp.ClawState currentClawState = NewClawbotTeleOp.ClawState.CLOSED;
     public ImprovedGamepad gamepad;
+    public double voltage;
     public ImprovedGamepad masterGamepad;
     public ImprovedGamepad gamepadInControl;
     public ElapsedTime gamepadTimer = new ElapsedTime();
 
     public boolean gamepadOverride = false;
-    public double armAngle = 0.0;
-    public final double ZERO_DEGREE_VOLTAGE = 1.347;
-    public final double NINTY_DEGREE_VOLTAGE = 2.737;
-    public double cosArm = 0.0;
-    public double kCos = 0.3;
-    public double pidArm = 0.0;
 
     NewClawbotHardware robot = new NewClawbotHardware();
     @Override
@@ -35,12 +28,15 @@ public class NewClawbotTeleOp extends OpMode {
         masterGamepad = new ImprovedGamepad(gamepad2, gamepadTimer, "masterGamepad");
         gamepadInControl = null;
         robot.init(hardwareMap);
+
     }
 
     @Override
     public void loop() {
         gamepad.update();
         masterGamepad.update();
+
+
 
         if(masterGamepad.x.isInitialPress() && gamepadOverride){
             gamepadOverride = false;
@@ -61,36 +57,44 @@ public class NewClawbotTeleOp extends OpMode {
             case OPEN:
                 robot.claw.setPosition(NewClawbotHardware.CLAW_OPEN_POSITION);
                 if(gamepadInControl.b.isInitialPress()){
-                    currentClawState = ClawState.CLOSED;
+                    currentClawState = NewClawbotTeleOp.ClawState.CLOSED;
                 }
                 break;
             case CLOSED:
                 robot.claw.setPosition(NewClawbotHardware.CLAW_CLOSED_POSITION);
                 if(gamepadInControl.b.isInitialPress()){
-                    currentClawState = ClawState.OPEN;
+                    currentClawState = NewClawbotTeleOp.ClawState.OPEN;
                 }
                 break;
         }
 
-        armAngle = (90/(NINTY_DEGREE_VOLTAGE - ZERO_DEGREE_VOLTAGE) * robot.potentiometer.getVoltage() - ZERO_DEGREE_VOLTAGE);
-        cosArm = Math.cos(Math.toRadians(armAngle));
-        pidArm = cosArm * kCos;
-        if(gamepadInControl.dpad_up.isPressed() || gamepadInControl.y.isPressed()){
-            robot.arm.setPower(pidArm + .5);
-        }else if(gamepadInControl.dpad_down.isPressed() || gamepadInControl.a.isPressed()){
-            robot.arm.setPower(pidArm - .5);
-        }else{
-            robot.arm.setPower(pidArm);
+        double result = Double.POSITIVE_INFINITY;
+        for (VoltageSensor sensor : hardwareMap.voltageSensor) {
+            double voltage = sensor.getVoltage();
+            if (voltage > 0) {
+                result = Math.min(result, voltage);
+            }
+        }
+        double scaleFactor = 12/result;
+        voltage = scaleFactor * robot.potentiometer.getVoltage();
+
+
+        if (gamepadInControl.dpad_up.getValue() && voltage > 2) {
+            robot.arm.setPower(0.5);
+        } else if (gamepadInControl.dpad_down.getValue() && voltage < 3.2) {
+            robot.arm.setPower(-0.2);
+        } else {
+            robot.arm.setPower(0);
         }
 
-        if (gamepadInControl.left_stick_y.getValue() > 0 || gamepadInControl.left_stick_y.getValue() < 0 || gamepadInControl.right_stick_y.getValue() > 0 || gamepadInControl.right_stick_y.getValue() < 0) {
-            robot.arm.setPower(pidArm + .5);
+        if ((gamepadInControl.left_stick_y.getValue() != 0 || gamepadInControl.right_stick_y.getValue() != 0) && voltage > 2.7) {
+            robot.arm.setPower(0.3);
         }
-
 
         telemetry.addData("Override", gamepadOverride);
         telemetry.addData("Gamepad In Control", gamepadInControl);
         telemetry.addData("Claw State", currentClawState);
+        telemetry.addData("Voltage", voltage);
         telemetry.update();
 
     }

@@ -11,8 +11,8 @@ import com.qualcomm.robotcore.hardware.Servo;
  * Created by Allenn23825 on 1/24/2023.
  */
 public class NewClawbotHardware {
-    public static final double CLAW_OPEN_POSITION = 0.0;
-    public static final double CLAW_CLOSED_POSITION = 0.45;
+    public static final double CLAW_OPEN_POSITION = 0.2;
+    public static final double CLAW_CLOSED_POSITION = 0.5;
     public DcMotorEx leftDrive;
     public DcMotorEx rightDrive;
     public DcMotorEx arm;
