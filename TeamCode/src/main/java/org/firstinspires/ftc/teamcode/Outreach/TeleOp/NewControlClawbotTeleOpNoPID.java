@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.Outreach.TeleOp;
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
+
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
@@ -8,8 +10,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.Outreach.Hardware.NewClawbotHardware;
 import org.firstinspires.ftc.teamcode.Shared.Gamepad.ImprovedGamepad;
 
-@TeleOp(name="OUTREACH New Clawbot Teleop", group="Outreach")
-public class NewClawBotTeleOpNoPID extends OpMode {
+@TeleOp(name="OUTREACH New Control Clawbot Teleop", group="Outreach")
+public class NewControlClawbotTeleOpNoPID extends OpMode {
     public static final int MINIMUM_LOW_ARM_VOLTAGE = 2;
     public static final double MAXIMUM_MEDIUM_ARM_VOLTAGE = 3.2;
     public static final double MINIMUM_HIGH_ARM_VOLTAGE = 1.3;
@@ -23,6 +25,9 @@ public class NewClawBotTeleOpNoPID extends OpMode {
     public ImprovedGamepad gamepadInControl;
     public ElapsedTime gamepadTimer = new ElapsedTime();
     public boolean override = false;
+    public double rightPower = 0;
+    public double leftPower = 0;
+
 
     public boolean gamepadOverride = false;
 
@@ -59,8 +64,11 @@ public class NewClawBotTeleOpNoPID extends OpMode {
             gamepadInControl = gamepad;
         }
 
-        robot.leftDrive.setPower(-gamepadInControl.left_stick_y.getValue());
-        robot.rightDrive.setPower(-gamepadInControl.right_stick_y.getValue());
+        rightPower = (gamepadInControl.left_stick_y.getValue() / 2) + (gamepadInControl.right_stick_y.getValue() / 2) - (gamepadInControl.right_stick_x.getValue() / 2) - (gamepadInControl.left_stick_x.getValue() / 2);
+        leftPower = (gamepadInControl.left_stick_y.getValue() / 2) + (gamepadInControl.right_stick_y.getValue() / 2) + (gamepadInControl.left_stick_x.getValue() / 2) + (gamepadInControl.right_stick_x.getValue() / 2);
+
+        robot.leftDrive.setPower(-leftPower);
+        robot.rightDrive.setPower(-rightPower);
 
         switch(currentClawState){
             case OPEN:
@@ -107,7 +115,7 @@ public class NewClawBotTeleOpNoPID extends OpMode {
         double scaleFactor = 12/result;
         voltage = scaleFactor * robot.potentiometer.getVoltage();
 
-        if ((gamepadInControl.right_stick_y.getValue() != 0 || gamepadInControl.left_stick_y.getValue() != 0) && (armState == NewClawbotHardware.ArmState.GROUND || armState == NewClawbotHardware.ArmState.LOW) ) {
+        if ((rightPower != 0 || leftPower != 0) && (armState == NewClawbotHardware.ArmState.GROUND || armState == NewClawbotHardware.ArmState.LOW) ) {
             armState = NewClawbotHardware.ArmState.LOW;
         }
 
@@ -121,7 +129,7 @@ public class NewClawBotTeleOpNoPID extends OpMode {
             robot.arm.setPower(0);
         }
 
-        if ((gamepadInControl.left_stick_y.getValue() != 0 || gamepadInControl.right_stick_y.getValue() != 0) && voltage > 2.7) {
+        if ((rightPower != 0 || leftPower != 0) && voltage > 2.7) {
             robot.arm.setPower(0.3);
         }
 

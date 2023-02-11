@@ -18,6 +18,8 @@ public class NewClawbotHardware {
     public DcMotorEx arm;
     public Servo claw;
     public AnalogInput potentiometer;
+    public enum ArmState {GROUND, LOW, MEDIUM, HIGH}
+
 
 
     public void init(HardwareMap hardwareMap) {
