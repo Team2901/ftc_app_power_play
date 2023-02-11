@@ -115,7 +115,7 @@ public class NewControlClawbotTeleOpNoPID extends OpMode {
         double scaleFactor = 12/result;
         voltage = scaleFactor * robot.potentiometer.getVoltage();
 
-        if ((rightPower != 0 || leftPower != 0) && (armState == NewClawbotHardware.ArmState.GROUND || armState == NewClawbotHardware.ArmState.LOW) ) {
+        if ((gamepadInControl.right_stick_y.getValue() != 0 || gamepadInControl.left_stick_y.getValue() != 0 || gamepadInControl.left_stick_x.getValue() != 0 || gamepadInControl.right_stick_x.getValue() != 0) && (armState == NewClawbotHardware.ArmState.GROUND || armState == NewClawbotHardware.ArmState.LOW) ) {
             armState = NewClawbotHardware.ArmState.LOW;
         }
 
