@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+@Disabled
 @TeleOp(name="TeleOp1", group="Linear Opmode")
 public class TeleOp1 extends LinearOpMode {
 

@@ -10,6 +10,10 @@ import org.firstinspires.ftc.teamcode.Shared.Gamepad.ImprovedGamepad;
 
 @TeleOp(name="New Clawbot Teleop No PID", group="Outreach")
 public class NewClawBotTeleOpNoPID extends OpMode {
+    public static final int MINIMUM_LOW_ARM_VOLTAGE = 2;
+    public static final double MAXIMUM_MEDIUM_ARM_VOLTAGE = 3.2;
+    public static final double MINIMUM_HIGH_ARM_VOLTAGE = 1.3;
+    private static ArmState armState = ArmState.GROUND;
     public enum ClawState {OPEN, CLOSED}
     public enum Controller{PARTICIPANT, MASTER}
     public NewClawbotTeleOp.ClawState currentClawState = NewClawbotTeleOp.ClawState.CLOSED;
@@ -18,6 +22,7 @@ public class NewClawBotTeleOpNoPID extends OpMode {
     public ImprovedGamepad masterGamepad;
     public ImprovedGamepad gamepadInControl;
     public ElapsedTime gamepadTimer = new ElapsedTime();
+    public boolean override = false;
 
     public boolean gamepadOverride = false;
 
@@ -28,7 +33,7 @@ public class NewClawBotTeleOpNoPID extends OpMode {
         masterGamepad = new ImprovedGamepad(gamepad2, gamepadTimer, "masterGamepad");
         gamepadInControl = null;
         robot.init(hardwareMap);
-
+        telemetry();
     }
 
     @Override
@@ -36,7 +41,11 @@ public class NewClawBotTeleOpNoPID extends OpMode {
         gamepad.update();
         masterGamepad.update();
 
-
+        if (masterGamepad.areButtonsActive()) {
+            override = true;
+        } else {
+            override = false;
+        }
 
         if(masterGamepad.x.isInitialPress() && gamepadOverride){
             gamepadOverride = false;
@@ -68,6 +77,26 @@ public class NewClawBotTeleOpNoPID extends OpMode {
                 break;
         }
 
+        switch (armState) {
+            case GROUND:
+            case LOW:
+                if (gamepadInControl.dpad_up.isInitialPress()) {
+                    armState = ArmState.MEDIUM;
+                }
+                break;
+            case MEDIUM:
+                if (gamepadInControl.dpad_up.isInitialPress()) {
+                    armState = ArmState.HIGH;
+                } else if (gamepadInControl.dpad_down.isInitialPress()) {
+                    armState = ArmState.LOW;
+                }
+                break;
+            case HIGH:
+                if (gamepadInControl.dpad_down.isInitialPress()) {
+                    armState = ArmState.MEDIUM;
+                }
+        }
+
         double result = Double.POSITIVE_INFINITY;
         for (VoltageSensor sensor : hardwareMap.voltageSensor) {
             double voltage = sensor.getVoltage();
@@ -78,11 +107,16 @@ public class NewClawBotTeleOpNoPID extends OpMode {
         double scaleFactor = 12/result;
         voltage = scaleFactor * robot.potentiometer.getVoltage();
 
+        if ((gamepadInControl.right_stick_y.getValue() != 0 || gamepadInControl.left_stick_y.getValue() != 0) && (armState == ArmState.GROUND || armState == ArmState.LOW) ) {
+            armState = ArmState.LOW;
+        }
 
-        if (gamepadInControl.dpad_up.getValue() && voltage > 2) {
+        if (armState == ArmState.MEDIUM && voltage > MINIMUM_LOW_ARM_VOLTAGE) {
             robot.arm.setPower(0.5);
-        } else if (gamepadInControl.dpad_down.getValue() && voltage < 3.2) {
+        } else if (armState == ArmState.LOW && voltage < MAXIMUM_MEDIUM_ARM_VOLTAGE) {
             robot.arm.setPower(-0.2);
+        } else if (armState == ArmState.HIGH && voltage > MINIMUM_HIGH_ARM_VOLTAGE) {
+            robot.arm.setPower(0.3);
         } else {
             robot.arm.setPower(0);
         }
@@ -91,11 +125,20 @@ public class NewClawBotTeleOpNoPID extends OpMode {
             robot.arm.setPower(0.3);
         }
 
-        telemetry.addData("Override", gamepadOverride);
-        telemetry.addData("Gamepad In Control", gamepadInControl);
-        telemetry.addData("Claw State", currentClawState);
-        telemetry.addData("Voltage", voltage);
-        telemetry.update();
+        telemetry();
 
     }
+
+    public void telemetry() {
+        telemetry.addData("Master Control Start", "Start + B");
+        telemetry.addData("Player Control Start", "Start + A");
+        telemetry.addData("Forward/Backward", "Left and Right game stick");
+        telemetry.addData("Open/Close claw", "B");
+        telemetry.addData("Move Arm Up", "D-pad up");
+        telemetry.addData("Move Arm Down", "D-pad down");
+        telemetry.addData("Master Gamepad Override", "X");
+        telemetry.addData("Override", override);
+        telemetry.update();
+    }
+    public enum ArmState {GROUND, LOW, MEDIUM, HIGH}
 }

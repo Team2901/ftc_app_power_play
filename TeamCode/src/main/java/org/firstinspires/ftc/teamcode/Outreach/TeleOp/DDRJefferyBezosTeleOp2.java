@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Outreach.TeleOp;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -16,6 +17,7 @@ import org.firstinspires.ftc.teamcode.Shared.Gamepad.DDRGamepad;
 import org.firstinspires.ftc.teamcode.Shared.Gamepad.ImprovedGamepad;
 import org.firstinspires.ftc.teamcode.Utility.CountDownTimer;
 
+@Disabled
 @TeleOp(name = "DDR Jeffrey Bezos 2", group = "Outreach")
 public class DDRJefferyBezosTeleOp2 extends OpMode {
 

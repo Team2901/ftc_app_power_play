@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Outreach.TeleOp;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -10,6 +11,7 @@ import org.firstinspires.ftc.teamcode.Shared.Gamepad.ImprovedGamepad;
 /**
  * Created by Allenn23825 on 1/24/2023.
  */
+@Disabled
 @TeleOp(name="New Clawbot Teleop", group="Outreach")
 public class NewClawbotTeleOp extends OpMode {
     public enum ClawState {OPEN, CLOSED}

@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.teamcode.Outreach.TeleOp;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Outreach.Hardware.NewClawbotHardware;
 
+@Disabled
 @TeleOp(name="Clawbot Voltage tester", group="Outreach")
 public class ClawbotVoltageTester extends OpMode {
 

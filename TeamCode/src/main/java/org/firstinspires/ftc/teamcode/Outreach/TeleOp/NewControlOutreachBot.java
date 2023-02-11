@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Outreach.TeleOp;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -8,6 +9,7 @@ import org.firstinspires.ftc.teamcode.Outreach.Hardware.OutreachBotOneHardware;
 import org.firstinspires.ftc.teamcode.Shared.Gamepad.DDRGamepad;
 import org.firstinspires.ftc.teamcode.Shared.Gamepad.ImprovedGamepad;
 
+@Disabled
 @TeleOp(name = "Outreach Bot New Control TeleOp", group = "Outreach")
 public class NewControlOutreachBot extends OpMode {
     OutreachBotOneHardware robot = new OutreachBotOneHardware();
