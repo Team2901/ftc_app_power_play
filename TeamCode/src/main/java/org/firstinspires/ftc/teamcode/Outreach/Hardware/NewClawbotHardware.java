@@ -19,6 +19,7 @@ public class NewClawbotHardware {
     public Servo claw;
     public AnalogInput potentiometer;
     public enum ArmState {GROUND, LOW, MEDIUM, HIGH}
+    public enum ClawState {OPEN, CLOSED}
 
 
 
