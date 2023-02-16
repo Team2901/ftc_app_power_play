@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * Created by Kearneyg20428 on 2/7/2017.
  */
-
+//NEVER USE THIS HARDWARE CLASS EVER AGAIN: PLEASE USE NewClawBotHardware
 public class ClawbotHardware {
 
     public static final double MID_SERVO = 0.5;
