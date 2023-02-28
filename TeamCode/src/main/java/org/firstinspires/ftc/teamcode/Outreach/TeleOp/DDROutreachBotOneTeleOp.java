@@ -5,11 +5,15 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.Outreach.Hardware.DDRDance;
+import org.firstinspires.ftc.teamcode.Outreach.Hardware.DanceObserver;
 import org.firstinspires.ftc.teamcode.Outreach.Hardware.OutreachBotOneHardware;
 import org.firstinspires.ftc.teamcode.Shared.Gamepad.BooleanButton;
 import org.firstinspires.ftc.teamcode.Shared.Gamepad.DDRGamepad;
 import org.firstinspires.ftc.teamcode.Shared.Gamepad.ImprovedGamepad;
 import org.firstinspires.ftc.teamcode.Utility.CountDownTimer;
+
+import java.util.ArrayList;
 
 @Disabled
 @TeleOp(name = "DDR Outreach Bot One Teleop", group = "Outreach")
@@ -316,4 +320,42 @@ public class DDROutreachBotOneTeleOp extends OpMode {
         telemetry.addLine(lineTwo);
         telemetry.addLine(lineThree);
     }
+
+//    private ArrayList<DDRDance> dances;
+//    private void initDances()
+//    {
+//        DDRDance fooDance = new DDRDance(fooDanceMoves, ddrPad);
+//        fooDance.addObserver(new FooDanceObserver());
+//        dances.add(fooDance);
+//        DDRDance barDance = new DDRDance(barDanceMoves, ddrPad);
+//        barDance.addObserver(new BarDanceObserver());
+//        dances.add(barDance);
+//    }
+//
+//    private void loop()
+//    {
+//        fooDance.update();
+//        barDance.update();
+//
+//        for (dance : dances) {
+//            dance.update();
+//        }
+//    }
+//
+//    private class FooDanceObserver implements DanceObserver
+//    {
+//
+//        @Override
+//        public void onCompleted() {
+//            // foo dance completed
+//        }
+//    }
+//
+//    private class BarDanceObserver implements DanceObserver
+//    {
+//        @Override
+//        public void onCompleted() {
+//            // bar dance completed
+//        }
+//    }
 }
