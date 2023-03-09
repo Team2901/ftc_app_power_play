@@ -5,14 +5,15 @@ import org.firstinspires.ftc.teamcode.Shared.Gamepad.DDRGamepad;
 import java.util.ArrayList;
 
 public class DDRDance {
-    enum DanceMoves { LEFT, RIGHT, UP, DOWN, X, O }
+
+    public enum DanceMoves { LEFT, RIGHT, UP, DOWN, X, O }
     private enum ProgressState { COMPLETED, AWAITING, FAILED}
     private ArrayList<DanceMoves> danceMoves;
     private DDRGamepad gamepad;
     private DanceObserver observer;
     private int progress = 0;
 
-     DDRDance(ArrayList<DanceMoves> moves, DDRGamepad ddrGamepad, DanceObserver danceObserver) {
+     public DDRDance(ArrayList<DanceMoves> moves, DDRGamepad ddrGamepad, DanceObserver danceObserver) {
         danceMoves = moves;
         gamepad = ddrGamepad;
         observer = danceObserver;
