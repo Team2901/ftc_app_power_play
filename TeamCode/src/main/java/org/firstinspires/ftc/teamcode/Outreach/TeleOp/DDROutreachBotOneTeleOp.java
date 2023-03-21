@@ -15,7 +15,7 @@ import org.firstinspires.ftc.teamcode.Utility.CountDownTimer;
 
 import java.util.ArrayList;
 
-//@Disabled
+@Disabled
 @TeleOp(name = "DDR Outreach Bot One Teleop", group = "Outreach")
 public class DDROutreachBotOneTeleOp extends OpMode {
     final static int WAITING = 0;

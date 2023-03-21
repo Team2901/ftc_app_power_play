@@ -11,7 +11,7 @@ public class DDRDance {
     private ArrayList<DanceMoves> danceMoves;
     private DDRGamepad gamepad;
     private DanceObserver observer;
-    private int progress = 0;
+    public int progress = 0;
 
      public DDRDance(ArrayList<DanceMoves> moves, DDRGamepad ddrGamepad, DanceObserver danceObserver) {
         danceMoves = moves;
@@ -20,10 +20,10 @@ public class DDRDance {
     }
 
     public void update() {
-
          ProgressState currentState = checkDance(danceMoves.get(progress));
         if (currentState == ProgressState.COMPLETED) {
             progress++;
+            observer.onSuccess();
         } else if (currentState == ProgressState.FAILED) {
             progress = 0;
         }
@@ -66,14 +66,14 @@ public class DDRDance {
                 }
                 break;
             case X:
-                if (gamepad.startButton.isInitialPress()) {
+                if (gamepad.topLeftArrow.isInitialPress()) {
                     return ProgressState.COMPLETED;
                 } else if (gamepad.areButtonsInitialPress()) {
                     return ProgressState.FAILED;
                 }
                 break;
             case O:
-                if (gamepad.a.isInitialPress()) {
+                if (gamepad.topRightArrow.isInitialPress()) {
                     return ProgressState.COMPLETED;
                 } else if (gamepad.areButtonsInitialPress()) {
                     return ProgressState.FAILED;

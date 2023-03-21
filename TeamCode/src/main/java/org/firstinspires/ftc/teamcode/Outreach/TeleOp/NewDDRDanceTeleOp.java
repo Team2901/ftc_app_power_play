@@ -18,20 +18,27 @@ public class NewDDRDanceTeleOp extends OpMode {
     ElapsedTime timer = new ElapsedTime();
     static DDRGamepad participantGamepad;
     ImprovedGamepad masterGamepad;
-//    static ArrayList<DDRDance> dances = new ArrayList<DDRDance>();
-//    static DDRDance testDance;
+    double speedBoostFactor = 1;
+    boolean spining = false;
+    static ArrayList<DDRDance> dances = new ArrayList<DDRDance>();
+    static DDRDance testDance;
     boolean overide = false;
-    private final double MOTOR_POWER = 0.5;
+    private double leftSpeed = 0;
+    private double rightSpeed = 0;
     @Override
     public void init() {
         robot.init(hardwareMap);
+        telemetry.addData("Master override", "X");
+        telemetry.update();
         participantGamepad = new DDRGamepad(this.gamepad1, this.timer, "GP1");
         masterGamepad = new ImprovedGamepad(this.gamepad2, this.timer, "GP2");
+        initDances();
     }
 
     @Override
     public void loop() {
-
+        participantGamepad.update();
+        masterGamepad.update();
         if (masterGamepad.areButtonsActive()) {
             robot.rightDrive.setPower(masterGamepad.left_stick_y.getValue());
             robot.leftDrive.setPower(masterGamepad.right_stick_y.getValue());
@@ -45,61 +52,107 @@ public class NewDDRDanceTeleOp extends OpMode {
             return;
         }
 
-//        updateDances();
+        updateDances();
+        leftSpeed = 0;
+        rightSpeed = 0;
 
         if (participantGamepad.upArrow.getValue()) {
-            robot.leftDrive.setPower(MOTOR_POWER);
-            robot.rightDrive.setPower(MOTOR_POWER);
-        }
-        if (participantGamepad.downArrow.getValue()) {
-            robot.leftDrive.setPower(-MOTOR_POWER);
-            robot.rightDrive.setPower(-MOTOR_POWER);
+            leftSpeed += .5 * speedBoostFactor;
+            rightSpeed += .5 * speedBoostFactor;
+        } else if (participantGamepad.downArrow.getValue()) {
+            leftSpeed += -.5 * speedBoostFactor;
+            rightSpeed += -.5 * speedBoostFactor;
         }
 
         if (participantGamepad.leftArrow.getValue()) {
-            robot.leftDrive.setPower(MOTOR_POWER);
+            if (rightSpeed == 0 && rightSpeed == 0) {
+                leftSpeed = -.4;
+                rightSpeed = .4;
+            } else if (leftSpeed > 0){
+                rightSpeed = .65;
+            } else {
+                rightSpeed = -.65;
+            }
+        } else if (participantGamepad.rightArrow.getValue()) {
+            if (rightSpeed == 0 && rightSpeed == 0) {
+                rightSpeed = -.4;
+                leftSpeed = .4;
+            } else if (rightSpeed > 0) {
+                leftSpeed = .65;
+            } else {
+                leftSpeed = -.65;
+            }
         }
-
-        if (participantGamepad.rightArrow.getValue()) {
-            robot.rightDrive.setPower(MOTOR_POWER);
-        }
-
         switch (robot.currentClawState) {
             case OPEN:
-                if (participantGamepad.a.isInitialPress() || masterGamepad.b.isInitialPress()) {
+                if (participantGamepad.topRightArrow.isInitialPress() || participantGamepad.topLeftArrow.isInitialPress() || masterGamepad.b.isInitialPress()) {
                     robot.currentClawState = OutreachBotOneHardware.ClawState.CLOSED;
                 }
                 robot.claw.setPosition(robot.OPEN_POSITON);
                 break;
             case CLOSED:
-                if (participantGamepad.a.isInitialPress() || masterGamepad.b.isInitialPress()) {
+                if (participantGamepad.topRightArrow.isInitialPress() || participantGamepad.topLeftArrow.isInitialPress() || masterGamepad.b.isInitialPress()) {
                     robot.currentClawState = OutreachBotOneHardware.ClawState.OPEN;
                 }
                 robot.claw.setPosition(robot.CLOSED_POSITON);
                 break;
         }
+        robot.rightDrive.setPower(rightSpeed);
+        robot.leftDrive.setPower(leftSpeed);
+
+
     }
 
-//    public void initDances() {
-//        ArrayList testDanceMoves = new ArrayList<DDRDance.DanceMoves>();
-//        testDanceMoves.add(DDRDance.DanceMoves.X);
-//        testDanceMoves.add(DDRDance.DanceMoves.LEFT);
-//        testDanceMoves.add(DDRDance.DanceMoves.RIGHT);
-//        testDanceMoves.add(DDRDance.DanceMoves.O);
-//        testDance = new DDRDance(testDanceMoves, participantGamepad,new BarDanceObserver());
-//        dances.add(testDance);
-//    }
-//
-//    public void updateDances() {
-//        testDance.update();
-//    }
-//
-//    private class BarDanceObserver implements DanceObserver
-//    {
-//        @Override
-//        public void onCompleted() {
-//            telemetry.addData("Test dance complete", true);
-//            telemetry.update();
-//        }
-//    }
+    public void initDances() {
+        ArrayList testDanceMoves = new ArrayList<DDRDance.DanceMoves>();
+        testDanceMoves.add(DDRDance.DanceMoves.LEFT);
+        testDanceMoves.add(DDRDance.DanceMoves.RIGHT);
+        testDanceMoves.add(DDRDance.DanceMoves.UP);
+        testDance = new DDRDance(testDanceMoves, participantGamepad, new SpeedDanceObserver());
+        dances.add(testDance);
+    }
+
+    public void updateDances() {
+        testDance.update();
+    }
+
+    private class SpeedDanceObserver implements DanceObserver
+    {
+        @Override
+        public void onCompleted() {
+            speedBoostFactor = 1.5;
+        }
+
+        @Override
+        public void onSuccess() {
+            //none
+        }
+    }
+
+    private class SuperSpeedDanceObserver implements DanceObserver
+    {
+        @Override
+        public void onCompleted() {
+            speedBoostFactor = 2;
+        }
+
+        @Override
+        public void onSuccess() {
+            //none
+        }
+    }
+
+    private class SpinDanceObserver implements DanceObserver
+    {
+        @Override
+        public void onCompleted() {
+            spining = true;
+
+        }
+
+        @Override
+        public void onSuccess() {
+            //none
+        }
+    }
 }
