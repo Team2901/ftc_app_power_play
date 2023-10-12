@@ -58,15 +58,15 @@ public class Qual11588BaseAuto extends LinearOpMode {
 
     }
 
-    public void moveXY(double y, double x){
-        int ticksY = (int) (y * robot.TICKS_PER_INCH);
-        int ticksX = (int) (x * robot.TICKS_PER_INCH);
+    public void moveXY(double yInches, double xInches){
+        int ticksY = (int) (yInches * robot.TICKS_PER_INCH);
+        int ticksX = (int) (xInches * robot.TICKS_PER_INCH);
 
         robot.frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
+// TODO: Figure out what this is doing
         robot.frontLeft.setTargetPosition(ticksY + ticksX);
         robot.frontRight.setTargetPosition(ticksY - ticksX);
         robot.backLeft.setTargetPosition(ticksY - ticksX);
@@ -82,16 +82,17 @@ public class Qual11588BaseAuto extends LinearOpMode {
         robot.backLeft.setPower(0.5);
         robot.backRight.setPower(0.5);
 
-        while (opModeIsActive() && (robot.frontLeft.isBusy() || robot.frontRight.isBusy() ||
-                robot.backLeft.isBusy() || robot.backRight.isBusy())){
-            telemetryStuff();
+        // TODO: change to and instead of or
+        while (opModeIsActive() && (robot.frontLeft.isBusy() && robot.frontRight.isBusy() &&
+                robot.backLeft.isBusy() && robot.backRight.isBusy())){
+            telemetryLog();
         }
 
         robot.frontLeft.setPower(0);
         robot.frontRight.setPower(0);
         robot.backLeft.setPower(0);
         robot.backRight.setPower(0);
-
+// TODO: Save the original mode, put it back before you leave
         robot.frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -131,7 +132,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
             cosArm = Math.cos(Math.toRadians(armAngle));
             ffTotal = cosArm * kCos;
             robot.arm.setPower(ffTotal);
-            telemetryStuff();
+            telemetryLog();
         }
 
         robot.frontLeft.setPower(0);
@@ -211,7 +212,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
                 total = .005;
             }
             robot.arm.setPower(total);
-            telemetryStuff();
+            telemetryLog();
         }
 
         robot.frontLeft.setPower(0);
@@ -307,7 +308,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
 
             robot.arm.setPower(total);
 
-            telemetryStuff();
+            telemetryLog();
         }
         armAngle = recalculateAngle();
         //armAngle = 0.102856 * robot.arm.getCurrentPosition() - 43.6276;
@@ -352,7 +353,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
             cosArm = Math.cos(Math.toRadians(armAngle));
             ffTotal = cosArm * kCos;
             robot.arm.setPower(ffTotal);
-            telemetryStuff();
+            telemetryLog();
         }
         robot.frontLeft.setPower(0);
         robot.frontRight.setPower(0);
@@ -388,7 +389,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
             cosArm = Math.cos(Math.toRadians(armAngle));
             ffTotal = cosArm * kCos;
             robot.arm.setPower(ffTotal);
-            telemetryStuff();
+            telemetryLog();
         }
         robot.frontLeft.setPower(0);
         robot.frontRight.setPower(0);
@@ -403,7 +404,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
             cosArm = Math.cos(Math.toRadians(armAngle));
             ffTotal = cosArm * kCos;
             robot.arm.setPower(ffTotal);
-            telemetryStuff();
+            telemetryLog();
         }
     }
 
@@ -520,7 +521,7 @@ public class Qual11588BaseAuto extends LinearOpMode {
         while(waitTimer.milliseconds() < 10000) {}
     }
 
-    public void telemetryStuff(){
+    public void telemetryLog(){
         /*
         telemetry.addData("Frames Processed", robot.pipeLine.framesProceeded);
         telemetry.addData("Red seen", robot.pipeLine.redAmount);

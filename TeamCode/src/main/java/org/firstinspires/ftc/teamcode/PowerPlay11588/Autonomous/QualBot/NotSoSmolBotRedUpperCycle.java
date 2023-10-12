@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.PowerPlay11588.Autonomous.QualBot;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.OpenCVPipelines.Qual11588OpenCV;
 import org.firstinspires.ftc.teamcode.PowerPlay11588.Hardware.Qual11588Hardware;
@@ -11,7 +10,7 @@ public class NotSoSmolBotRedUpperCycle extends Qual11588BaseAuto{
     @Override
     public void runOpMode() throws InterruptedException{
         robot.autoInit(hardwareMap, telemetry, Qual11588Hardware.allianceColor.RED);
-        telemetryStuff();
+        telemetryLog();
         waitForStart();
         robot.pipeLine.stopCam();
 
